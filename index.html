@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>유니버셜 경포해변 지도</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; }
+        body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #f8f9fa; }
+        
+        /* 1. 첫 화면 (인트로) */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #007aff, #00c6ff); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
+        .intro-icon { font-size: 5rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+        .intro-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
+        .intro-subtitle { font-size: 1.1rem; font-weight: 400; margin-bottom: 40px; opacity: 0.9; }
+        .btn-start { background: #fff; color: #007aff; border: none; padding: 18px 45px; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .btn-start:active { transform: scale(0.95); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+
+        /* 2. 메인 앱 영역 */
+        #main-app { display: none; flex-direction: column; height: 100%; width: 100%; position: relative; }
+
+        header { background: #fff; padding: 15px 20px 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); z-index: 1000; position: relative; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .header-title { font-weight: 800; font-size: 1.2rem; color: #111; }
+        .gps-btn { background: #007aff; color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,122,255,0.3); }
+        
+        /* 검색창 */
+        .search-wrapper { display: flex; background: #f1f3f5; border-radius: 12px; padding: 10px 15px; align-items: center; margin-bottom: 12px; }
+        .search-input { border: none; background: transparent; outline: none; font-size: 1rem; width: 100%; color: #333; }
+        
+        /* 검색 결과 */
+        #search-results { display: none; position: absolute; top: 110px; left: 20px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1001; max-height: 35vh; overflow-y: auto; }
+        .result-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .result-item:last-child { border-bottom: none; }
+        .result-info h4 { font-size: 1rem; color: #111; margin-bottom: 4px; }
+        .result-info p { font-size: 0.85rem; color: #666; }
+        .result-dist { font-weight: bold; color: #007aff; font-size: 0.9rem; }
+
+        /* 필터 바 */
+        .filter-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-container::-webkit-scrollbar { display: none; }
+        .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #ddd; background: #fff; font-size: 0.9rem; font-weight: 600; color: #555; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .filter-btn.active { background: #111; color: #fff; border-color: #111; }
+
+        #map { flex: 1; width: 100%; z-index: 1; }
+        #toast { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); background: rgba(30, 30, 30, 0.9); color: white; padding: 12px 20px; border-radius: 20px; font-size: 0.95rem; z-index: 2000; display: none; white-space: nowrap; font-weight: bold; }
+
+        .my-location-marker { background: #007aff; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 122, 255, 0.5); position: relative; }
+        .my-location-marker::after { content: ''; position: absolute; top: -12px; left: -12px; right: -12px; bottom: -12px; border-radius: 50%; border: 2px solid #007aff; animation: pulse 1.5s infinite; opacity: 0; }
+
+        .facility-marker { background: #16a34a; color: white; border: 2px solid #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .facility-marker.active { background: #ff3b30; transform: scale(1.25); z-index: 999 !important; border-color: #ffe4e1; }
+        
+        /* 바텀 시트 */
+        #bottom-sheet { position: absolute; bottom: 0; left: 0; width: 100%; background: #fff; border-radius: 24px 24px 0 0; padding: 25px 20px 35px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(100%); }
+        #bottom-sheet.show { transform: translateY(0); }
+        
+        .sheet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .sheet-title { font-size: 1.3rem; font-weight: 800; color: #111; display: flex; align-items: center; gap: 8px; }
+        .sheet-distance { font-size: 1rem; font-weight: 700; color: #007aff; } 
+        .sheet-desc { color: #555; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; background: #f8f9fa; padding: 15px; border-radius: 12px; white-space: pre-line; }
+        
+        .btn-primary { width: 100%; background: #111; color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-primary.navigating { background: #ff3b30; }
+    </style>
+</head>
+<body>
+
+    <div id="intro-screen">
+        <div class="intro-icon">♿</div>
+        <div class="intro-title">유니버셜 경포해변 지도</div>
+        <div class="intro-subtitle">안전하고 편리한 강릉 길찾기</div>
+        <button class="btn-start" onclick="enterMap()">지도 보기</button>
+    </div>
+
+    <div id="main-app">
+        <header>
+            <div class="header-top">
+                <div class="header-title">♿ 편의시설 맵핑</div>
+                <button class="gps-btn" onclick="centerToMyLocation()">내 위치 찾기 📍</button>
+            </div>
+            
+            <div class="search-wrapper">
+                <span style="margin-right: 8px;">🔍</span>
+                <input type="text" id="search-input" class="search-input" placeholder="화장실, 주차장, 대여 검색..." onkeyup="handleSearch()">
+            </div>
+
+            <div class="filter-container">
+                <button class="filter-btn active" onclick="filterMarkers('all', this)">전체보기</button>
+                <button class="filter-btn" onclick="filterMarkers('restroom', this)">🚻 화장실</button>
+                <button class="filter-btn" onclick="filterMarkers('parking', this)">🅿️ 주차장</button>
+                <button class="filter-btn" onclick="filterMarkers('service', this)">🔋 대여/충전</button>
+                <button class="filter-btn" onclick="filterMarkers('access', this)">♿ 접근로</button>
+            </div>
+        </header>
+        
+        <div id="search-results"></div>
+        <div id="toast">현재 위치가 경포해변이 아닙니다.<br>지도 모드로만 제공됩니다.</div>
+        <div id="map"></div>
+
+        <div id="bottom-sheet">
+            <div class="sheet-header">
+                <div class="sheet-title" id="bs-title"><span id="bs-icon"></span> <span id="bs-name">장소 이름</span></div>
+                <div class="sheet-distance" id="bs-distance">거리 계산중...</div>
+            </div>
+            <div class="sheet-desc" id="bs-desc">시설 상세 정보</div>
+            <button class="btn-primary" id="action-btn" onclick="toggleNavigation()">이곳으로 길안내 시작</button>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let myLocation = null; 
+        let targetFacility = null;
+        let isNavigating = false;
+        let polylinePath = null;
+        let allMarkers = [];
+        let myMarker;
+
+        const facilities = [
+            // --- 북부 구역 ---
+            { id: 1, type: "parking", icon: "🅿️", name: "북부 제1공영주차장", lat: 37.80880, lng: 128.90380, desc: "✔️ 장애인 전용 주차구역 5면 확보" },
+            { id: 2, type: "restroom", icon: "🚻", name: "북부 해변 화장실", lat: 37.80800, lng: 128.90440, desc: "✔️ 출입구 경사로 설치\n✔️ 남녀 구분 장애인 화장실" },
+            { id: 3, type: "parking", icon: "🅿️", name: "경포수호텔 인근 주차구역", lat: 37.80750, lng: 128.90450, desc: "✔️ 장애인 주차 1면\n✔️ 인근 전동휠체어 충전설비 이용 가능" },
+            
+            // --- 중앙 구역 (해변 중앙광장 주변) ---
+            { id: 4, type: "service", icon: "ℹ️", name: "무장애 관광안내센터", lat: 37.80660, lng: 128.90590, desc: "✔️ 휠체어/유모차 무상 대여\n✔️ 점자 리플렛 비치" },
+            { id: 5, type: "parking", icon: "🅿️", name: "중앙 제1공영주차장", lat: 37.80620, lng: 128.90640, desc: "✔️ 해수욕장 입구 최단거리\n✔️ 장애인 전용 주차구역 9면" },
+            { id: 6, type: "restroom", icon: "🚻", name: "중앙광장 장애인화장실", lat: 37.80582, lng: 128.90743, desc: "✔️ 휠체어 전용 가족화장실 (자동문)\n✔️ 비상벨 및 영유아 거치대" },
+            { id: 7, type: "service", icon: "🔋", name: "전동휠체어 급속충전기", lat: 37.80595, lng: 128.90730, desc: "✔️ 중앙 공중화장실 인근 설치\n✔️ 다기능 휠체어 급속 충전 지원" },
+            { id: 8, type: "parking", icon: "🅿️", name: "스카이베이 측면 주차장", lat: 37.80520, lng: 128.90680, desc: "✔️ 중앙 광장 인접\n✔️ 강원장콜(장애인콜택시) 승하차 용이 구역" },
+            
+            // --- 경포호수 방면 ---
+            { id: 9, type: "parking", icon: "🅿️", name: "경포호수 공영주차장", lat: 37.80550, lng: 128.90300, desc: "✔️ 경포호수 산책로 입구\n✔️ 넓은 장애인 주차구역 확보" },
+            { id: 10, type: "restroom", icon: "🚻", name: "경포호 생태습지 화장실", lat: 37.80480, lng: 128.90250, desc: "✔️ 휠체어 접근 가능 화장실\n✔️ 남녀 장애인 구분" },
+            
+            // --- 남부 구역 (강문 방면) ---
+            { id: 11, type: "access", icon: "🌲", name: "송림 데크길 & 포토존", lat: 37.80410, lng: 128.90880, desc: "✔️ 무장애 데크 (단차 2cm 이하)\n✔️ 휠체어 추락 방지 바 설치" },
+            { id: 12, type: "parking", icon: "🅿️", name: "남부 제2공영주차장", lat: 37.80390, lng: 128.90850, desc: "✔️ 남부 해변 접근 용이\n✔️ 장애인 전용 주차구역 4면" },
+            { id: 13, type: "restroom", icon: "🚿", name: "남부 무장애 샤워장", lat: 37.80385, lng: 128.90915, desc: "✔️ 단차 없는 진입\n✔️ 시각장애인용 점자블록 완비" },
+            { id: 14, type: "parking", icon: "🅿️", name: "강문해변 제1공영주차장", lat: 37.80250, lng: 128.91000, desc: "✔️ 강문해변 진입로 방면\n✔️ 장애인 전용 주차구역 및 경사로 연결" },
+            { id: 15, type: "restroom", icon: "🚻", name: "강문 방면 화장실", lat: 37.80200, lng: 128.91050, desc: "✔️ 장애인 화장실 별도 설치\n✔️ 회전 반경 확보" }
+        ];
+
+        function enterMap() {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            
+            if (!map) {
+                map = L.map('map', { zoomControl: false }).setView([37.8055, 128.9055], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+                const myIcon = L.divIcon({ className: 'my-location-marker', iconSize: [22, 22] });
+                myMarker = L.marker([0, 0], { icon: myIcon, zIndexOffset: 1000 });
+
+                facilities.forEach(fac => {
+                    let iconHtml = L.divIcon({ html: fac.icon, className: 'facility-marker', iconSize: [30, 30] });
+                    let marker = L.marker([fac.lat, fac.lng], { icon: iconHtml });
+                    marker.facilityData = fac;
+                    marker.on('click', function() {
+                        allMarkers.forEach(m => m.getElement()?.classList.remove('active'));
+                        this.getElement().classList.add('active');
+                        openBottomSheet(fac, marker);
+                    });
+                    marker.addTo(map);
+                    allMarkers.push(marker);
+                });
+
+                startGPS();
+            }
+            map.invalidateSize();
+        }
+
+        function startGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(
+                    (pos) => updateMyLocation(pos.coords.latitude, pos.coords.longitude),
+                    (err) => updateMyLocation(37.5665, 126.9780, true), 
+                    { enableHighAccuracy: true }
+                );
+            }
+        }
+
+        function updateMyLocation(lat, lng, isFallback = false) {
+            myLocation = { lat: lat, lng: lng };
+            if (!map.hasLayer(myMarker)) myMarker.addTo(map);
+            myMarker.setLatLng([lat, lng]);
+
+            const isAtGyeongpo = (lat > 37.79 && lat < 37.82 && lng > 128.89 && lng < 128.92);
+            if (!isAtGyeongpo && !isFallback) {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 4000);
+            } else if (isNavigating) {
+                map.panTo([lat, lng], { animate: true });
+                updateDistanceUI();
+            }
+        }
+
+        function centerToMyLocation() {
+            if (myLocation) map.flyTo([myLocation.lat, myLocation.lng], 16);
+        }
+
+        function handleSearch() {
+            const keyword = document.getElementById('search-input').value.trim();
+            const resultContainer = document.getElementById('search-results');
+            
+            if (keyword === "") {
+                resultContainer.style.display = 'none';
+                return;
+            }
+
+            let filtered = facilities.filter(f => f.name.includes(keyword) || f.type.includes(keyword) || f.desc.includes(keyword));
+
+            if (myLocation) {
+                filtered.forEach(f => {
+                    f.distance = map.distance([myLocation.lat, myLocation.lng], [f.lat, f.lng]);
+                });
+                filtered.sort((a, b) => a.distance - b.distance);
+            }
+
+            resultContainer.innerHTML = '';
+            if (filtered.length === 0) {
+                resultContainer.innerHTML = '<div style="padding: 15px; text-align:center; color:#666;">검색 결과가 없습니다.</div>';
+            } else {
+                filtered.forEach(f => {
+                    let distText = f.distance ? (f.distance > 5000 ? `${(f.distance/1000).toFixed(1)}km` : `${Math.round(f.distance)}m`) : '';
+                    
+                    let typeKr = "";
+                    if(f.type === 'parking') typeKr = '주차장';
+                    else if(f.type === 'restroom') typeKr = '화장실';
+                    else if(f.type === 'service') typeKr = '대여/충전';
+                    else typeKr = '접근로';
+
+                    let item = document.createElement('div');
+                    item.className = 'result-item';
+                    item.innerHTML = `
+                        <div class="result-info">
+                            <h4>${f.icon} ${f.name}</h4>
+                            <p>${typeKr}</p>
+                        </div>
+                        <div class="result-dist">${distText}</div>
+                    `;
+                    item.onclick = () => {
+                        resultContainer.style.display = 'none';
+                        document.getElementById('search-input').value = '';
+                        document.querySelector('.filter-btn').click(); 
+                        let targetMarker = allMarkers.find(m => m.facilityData.id === f.id);
+                        if (targetMarker) {
+                            allMarkers.forEach(m => m.getElement()?.classList.remove('active'));
+                            targetMarker.getElement().classList.add('active');
+                            openBottomSheet(f, targetMarker);
+                        }
+                    };
+                    resultContainer.appendChild(item);
+                });
+            }
+            resultContainer.style.display = 'block';
+        }
+
+        function filterMarkers(category, buttonElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            allMarkers.forEach(marker => {
+                map.removeLayer(marker);
+                if (category === 'all' || marker.facilityData.type === category) {
+                    marker.addTo(map);
+                }
+            });
+        }
+
+        function openBottomSheet(fac, markerElement) {
+            if (isNavigating) return; 
+            targetFacility = fac;
+            document.getElementById('bs-icon').innerText = fac.icon;
+            document.getElementById('bs-name').innerText = fac.name;
+            document.getElementById('bs-desc').innerText = fac.desc;
+            
+            updateDistanceUI(); 
+
+            document.getElementById('bottom-sheet').classList.add('show');
+            document.getElementById('action-btn').innerText = "이곳으로 길안내 시작";
+            map.setView([fac.lat, fac.lng], 17, { animate: true });
+        }
+
+        function updateDistanceUI() {
+            const distanceText = document.getElementById('bs-distance');
+            if (myLocation && targetFacility) {
+                const dist = map.distance([myLocation.lat, myLocation.lng], [targetFacility.lat, targetFacility.lng]);
+                if (dist > 5000) {
+                    distanceText.innerText = `약 ${(dist/1000).toFixed(1)}km 떨어짐`;
+                    distanceText.style.color = "#ff3b30";
+                } else {
+                    distanceText.innerText = `약 ${Math.round(dist)}m 앞`;
+                    distanceText.style.color = "#007aff";
+                }
+            } else {
+                distanceText.innerText = "거리 계산 불가";
+            }
+        }
+
+        function toggleNavigation() {
+            const btn = document.getElementById('action-btn');
+            if (!isNavigating) {
+                isNavigating = true;
+                if (myLocation) {
+                    const latlngs = [ [myLocation.lat, myLocation.lng], [targetFacility.lat, targetFacility.lng] ];
+                    if (polylinePath) map.removeLayer(polylinePath);
+                    polylinePath = L.polyline(latlngs, { color: '#007aff', weight: 6, dashArray: '10, 10' }).addTo(map);
+                }
+                btn.innerText = "안내 종료";
+                btn.classList.add('navigating');
+                map.setView([myLocation.lat, myLocation.lng], 18, { animate: true });
+            } else {
+                isNavigating = false;
+                if (polylinePath) map.removeLayer(polylinePath);
+                document.getElementById('bottom-sheet').classList.remove('show');
+                btn.classList.remove('navigating');
+                allMarkers.forEach(m => m.getElement()?.classList.remove('active'));
+            }
+        }
+    </script>
+</body>
+</html>
