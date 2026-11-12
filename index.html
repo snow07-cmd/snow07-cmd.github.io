@@ -5,26 +5,912 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
-
-  <!-- 글꼴: Noto Sans KR -->
+  <!--
+    ★ 요트핏 웹사이트 — 이 파일 하나만 있으면 사이트가 작동합니다.
+    ★ 내용(요금, 업체, 장소 등)을 고칠 때는 아래 "정보 영역" (window.SITE_DATA) 부분만 고치세요.
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+/* =====================================================================
+   요트핏 디자인 파일 (style.css)
+   색을 바꾸고 싶으면 맨 위 :root 의 색 코드만 바꾸면 전체가 바뀝니다.
+   ===================================================================== */
+:root {
+  --navy: #0B2A3F;        /* 진한 남색: 히어로, 강조 박스 */
+  --bg: #F4F8FA;          /* 연한 하늘색 배경 */
+  --card: #FFFFFF;        /* 카드 */
+  --line: #DDE8EC;        /* 카드 테두리 */
+  --chip-bg: #E3F1F4;     /* 칩 배경 */
+  --chip-text: #0B4A5A;   /* 칩 글자 */
+  --sub: #3C6270;         /* 보조 글자 */
+  --orange: #F5A25D;      /* 주황 버튼·강조 */
+  --text: #0B2A3F;
+  --radius: 18px;
+}
 
-  <link rel="stylesheet" href="style.css">
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  word-break: keep-all;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main { flex: 1; }
+a { color: inherit; text-decoration: none; }
+button, textarea { font-family: inherit; }
+.icon { flex-shrink: 0; vertical-align: middle; }
+
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.container.narrow { max-width: 760px; }
+
+/* ---------- 상단 ---------- */
+#site-header {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 50;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: var(--navy); color: var(--orange);
+  display: grid; place-items: center;
+}
+.logo-text { font-weight: 900; font-size: 20px; line-height: 1.1; display: flex; flex-direction: column; }
+.logo-text small { font-size: 11px; font-weight: 500; color: var(--sub); letter-spacing: .02em; }
+
+.nav { display: flex; gap: 4px; align-items: center; }
+.nav a {
+  padding: 8px 12px; border-radius: 10px;
+  font-size: 15px; font-weight: 500; color: var(--sub);
+  transition: background .15s, color .15s;
+}
+.nav a:hover { background: var(--bg); color: var(--navy); }
+.nav a.current { color: var(--navy); font-weight: 700; }
+.nav a.nav-ai { background: var(--navy); color: #fff; margin-left: 6px; }
+.nav a.nav-ai:hover, .nav a.nav-ai.current { background: #143D58; color: #fff; }
+
+.menu-btn { display: none; background: none; border: 0; width: 40px; height: 40px; cursor: pointer; }
+.menu-btn span { display: block; width: 22px; height: 2px; background: var(--navy); margin: 5px auto; border-radius: 2px; }
+
+/* ---------- 하단 ---------- */
+#site-footer { background: #fff; border-top: 1px solid var(--line); margin-top: 64px; }
+.footer-inner { padding: 28px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.footer-inner p { color: var(--sub); font-size: 14px; }
+
+/* ---------- 히어로 ---------- */
+.hero { background: var(--navy); color: #fff; padding: 72px 0; }
+.hero-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+.eyebrow { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .16em; color: var(--sub); margin-bottom: 12px; }
+.eyebrow.light { color: var(--orange); }
+.hero h1 { font-size: 44px; font-weight: 900; line-height: 1.3; margin-bottom: 20px; }
+.hero p { font-size: 17px; color: #C7D6DE; }
+
+/* AI 입력 카드 */
+.ai-card {
+  background: #fff; color: var(--text);
+  border-radius: 20px; padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.18);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ai-card-wide { box-shadow: none; border: 1px solid var(--line); }
+.ai-card-title { font-size: 18px; font-weight: 700; }
+.ai-card textarea {
+  width: 100%; resize: vertical; min-height: 110px;
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 16px; font-size: 16px; line-height: 1.6;
+  background: var(--bg); color: var(--text);
+}
+.ai-card textarea:focus { outline: 2px solid var(--orange); outline-offset: 1px; background: #fff; }
+
+/* ---------- 버튼 ---------- */
+.btn-orange {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--orange); color: var(--navy);
+  border: 0; border-radius: 14px; padding: 15px 22px;
+  font-size: 17px; font-weight: 700; cursor: pointer;
+  transition: filter .15s, transform .15s;
+}
+.btn-orange:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn-orange.sm { padding: 9px 14px; font-size: 14px; border-radius: 10px; }
+.btn-line {
+  display: inline-flex; align-items: center; padding: 9px 14px;
+  border: 1px solid var(--line); border-radius: 10px;
+  font-size: 14px; font-weight: 500; color: var(--chip-text); background: #fff;
+}
+.btn-line:hover { border-color: var(--chip-text); }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 12px; }
+
+/* ---------- 섹션 ---------- */
+.section { padding: 56px 0; }
+.pt-0 { padding-top: 0; }
+.section-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.section-title.sm { font-size: 20px; }
+.section-desc { color: var(--sub); margin-bottom: 20px; }
+.section-title + .chip-row, .section-title + .grid-3, .section-title + .preparing { margin-top: 16px; }
+
+/* 하위 페이지 제목 영역 */
+.page-head { background: #fff; border-bottom: 1px solid var(--line); padding: 44px 0 36px; }
+.page-head .eyebrow { color: var(--orange); }
+.page-head h1 { font-size: 32px; font-weight: 900; margin-bottom: 6px; }
+.page-head p { color: var(--sub); }
+
+/* ---------- 칩 ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip-row.small { gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center;
+  background: var(--chip-bg); color: var(--chip-text);
+  border: 1px solid transparent; border-radius: 999px;
+  padding: 7px 14px; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+.chip-row.small .chip { padding: 5px 11px; font-size: 13px; cursor: default; }
+.chip-lg { padding: 12px 22px; font-size: 16px; }
+a.chip:hover, button.chip:hover { border-color: var(--chip-text); }
+.chip.active { background: var(--navy); color: #fff; }
+.chip-empty { background: #fff; border: 1px dashed #A9C4CC; color: var(--sub); }
+
+/* ---------- 카드 ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 24px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+a.card { transition: transform .15s, box-shadow .15s, border-color .15s; }
+a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,63,.08); border-color: #BCD3DA; }
+.card h3 { font-size: 19px; font-weight: 700; }
+.card p { color: var(--sub); }
+.card-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: var(--chip-bg); color: var(--chip-text);
+  display: grid; place-items: center; margin-bottom: 6px;
+}
+.card-label { font-size: 14px !important; font-weight: 700; color: var(--sub); margin-bottom: 4px; }
+.more { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--chip-text); }
+.muted { color: var(--sub); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+/* 주변 관광 카드의 이동 정보 */
+.move-info {
+  margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: 13px; color: var(--sub);
+}
+.move-info b { color: var(--chip-text); margin-left: auto; }
+.tour-card p { font-size: 15px; }
+
+/* 체험 카드 */
+.info-list { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--sub); }
+.info-list li { display: flex; align-items: center; gap: 6px; }
+
+/* 준비 중 카드 */
+.soon-card h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag-soon {
+  font-size: 12px; font-weight: 700; color: var(--navy);
+  background: #FDE7D3; border-radius: 999px; padding: 3px 10px;
+}
+
+/* ---------- 준비 중 상자 ---------- */
+.preparing {
+  background: #fff; border: 1px dashed #B8CFD6; border-radius: var(--radius);
+  padding: 44px 24px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.preparing-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #FDE7D3; color: #C26A1F;
+  display: grid; place-items: center; margin-bottom: 6px;
+}
+.preparing strong { font-size: 18px; }
+.preparing p { color: var(--sub); font-size: 15px; }
+.placeholder-text { color: #7E9AA4 !important; font-size: 14px; }
+
+/* ---------- AI 결과 페이지 ---------- */
+.result-grid { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+.result-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 92px; }
+.quote { font-size: 16px; color: var(--text) !important; background: var(--bg); border-radius: 12px; padding: 14px 16px; }
+.text-link { font-size: 14px; font-weight: 700; color: var(--chip-text); }
+.note { font-size: 13px; margin-top: 6px; }
+.result-main { display: flex; flex-direction: column; gap: 14px; }
+.course-title { font-size: 28px; font-weight: 900; }
+.mb-16 { margin-bottom: 4px; }
+
+.step-card { flex-direction: row; gap: 18px; align-items: flex-start; }
+.step-card.best { border: 2px solid var(--orange); box-shadow: 0 10px 24px rgba(245,162,93,.15); }
+.step-num {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--chip-bg); color: var(--chip-text);
+  display: grid; place-items: center; font-weight: 900; font-size: 18px;
+}
+.step-card.best .step-num { background: var(--orange); color: var(--navy); }
+.step-body { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.step-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.badge { background: var(--orange); color: var(--navy); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+
+.navy-box {
+  background: var(--navy); color: #fff; border-radius: var(--radius);
+  padding: 22px 24px; display: flex; flex-direction: column; gap: 8px;
+}
+.navy-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: #9FB6C2; }
+.navy-links a { color: var(--orange); font-weight: 700; }
+.navy-links a:hover { text-decoration: underline; }
+.disclaimer { font-size: 13px; color: var(--sub); }
+
+/* AI 입력 페이지 예시 문장 */
+.examples { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.example {
+  text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 18px; font-size: 15px; color: var(--sub); cursor: pointer;
+}
+.example:hover { border-color: var(--orange); color: var(--navy); }
+
+/* 안전 가이드 */
+.safety-card.focus { border: 2px solid var(--orange); }
+.check-list { padding-left: 20px; color: var(--text); }
+
+/* 여백 도우미 */
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mt-48 { margin-top: 48px; }
+.center { text-align: center; }
+
+/* =====================================================================
+   반응형: 화면이 좁아지면 카드가 아래로 쌓임
+   ===================================================================== */
+@media (max-width: 1080px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .nav a { padding: 8px 9px; font-size: 14px; }
+}
+
+@media (max-width: 900px) {
+  .menu-btn { display: block; }
+  .nav {
+    display: none; position: absolute; top: 68px; left: 0; right: 0;
+    background: #fff; border-bottom: 1px solid var(--line);
+    flex-direction: column; align-items: stretch; padding: 12px 24px 20px; gap: 2px;
+  }
+  .nav.open { display: flex; }
+  .nav a { padding: 12px 10px; font-size: 16px; }
+  .nav a.nav-ai { margin: 8px 0 0; text-align: center; }
+
+  .hero { padding: 48px 0; }
+  .hero-inner { grid-template-columns: 1fr; gap: 32px; }
+  .hero h1 { font-size: 34px; }
+  .br-pc { display: none; }
+
+  .grid-3 { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr; }
+  .result-side { position: static; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 0 16px; }
+  .grid-2, .grid-4 { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 28px; }
+  .hero p { font-size: 15px; }
+  .ai-card { padding: 20px; }
+  .section { padding: 40px 0; }
+  .section-title { font-size: 22px; }
+  .page-head h1 { font-size: 26px; }
+  .chip-lg { padding: 10px 16px; font-size: 15px; }
+  .step-card { padding: 18px; gap: 14px; }
+  .course-title { font-size: 23px; }
+}
+
+  </style>
 </head>
 <body>
-  <!-- 상단 메뉴 (app.js가 채워 넣습니다) -->
   <header id="site-header"></header>
-
-  <!-- 페이지 본문 (메뉴를 누르면 app.js가 내용을 바꿉니다) -->
-  <main id="app"></main>
-
-  <!-- 하단 (app.js가 채워 넣습니다) -->
+  <main id="app">
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요.</p></noscript>
+  </main>
   <footer id="site-footer"></footer>
 
-  <!-- 순서 중요: 정보 파일(data.js) 먼저, 그다음 동작 파일(app.js) -->
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script>
+/* =====================================================================
+   요트핏 정보 영역 (원래 data.js)
+   ---------------------------------------------------------------------
+   ● 사이트에 보이는 "내용"은 전부 이 파일 하나에서 고칩니다.
+   ● 목록( [ ] )이 비어 있으면 사이트에 자동으로 "준비 중" 화면이 뜹니다.
+   ● 확인되지 않은 정보(요금, 운영 시간, 업체명 등)는 지어내지 말고
+     비워 두거나 "[ ]"로 적어 주세요.
+   ● 고칠 때 주의: 따옴표(" "), 쉼표(,), 괄호({ } [ ])를 지우지 마세요.
+   ===================================================================== */
+
+window.SITE_DATA = {
+
+  /* ---------- 1. 사이트 기본 정보 ---------- */
+  site: {
+    name: "요트핏",
+    subtitle: "강릉 마리나 가이드",
+    contact: "[연락처 입력]",
+    notice: "요금과 운영 시간은 업체 사정에 따라 달라질 수 있습니다."
+  },
+
+  /* ---------- 2. 기능 켜기/끄기 ----------
+     true  = 사용 / false = "준비 중" 화면 표시
+     나중에 기능을 완성하면 true 로 바꾸면 됩니다. */
+  features: {
+    ai: false,        // AI 코스 추천 (AI API 연결 후 true)
+    booking: false,   // 앱 내 예약 (서버/DB 연결 후 true)
+    reviews: false    // 탑승자 리뷰 (서버/DB 연결 후 true)
+  },
+
+  /* ---------- 3. 카테고리 (메인 화면 칩 7개) ----------
+     options = 카테고리를 눌렀을 때 고를 수 있는 항목 */
+  categories: [
+    { id: "companion",  name: "동행자",          options: ["가족", "연인·부부", "친구", "혼자", "단체"] },
+    { id: "purpose",    name: "이용 목적",       options: ["노을 감상", "기념일", "가족 나들이", "휴식", "사진 촬영"] },
+    { id: "time",       name: "요일·시간",       options: ["평일", "주말", "오전", "오후", "노을 시간대"] },
+    { id: "type",       name: "퍼블릭/프라이빗", options: ["퍼블릭(합승)", "프라이빗(단독)"] },
+    { id: "seasick",    name: "뱃멀미 정도",     options: ["괜찮아요", "조금 걱정돼요", "많이 걱정돼요"] },
+    { id: "pet",        name: "반려동물·유모차", options: ["반려동물 동반", "유모차 동반"] },
+    { id: "wheelchair", name: "휠체어",          options: ["휠체어 이용"] }
+  ],
+
+  /* ---------- 4. 마리나 소개 ----------
+     예시) { title: "[마리나 이름]", text: "[소개 문장]" } */
+  marina: [],
+
+  /* ---------- 5. 요트·체험 상품 ----------
+     예시 (tags에는 위 카테고리 options 글자를 그대로 적으면 필터에 걸립니다)
+     {
+       name: "[상품 이름]",
+       company: "[업체명]",
+       price: "[요금]",
+       hours: "[운영 시간]",
+       duration: "[소요 시간]",
+       place: "[출발 장소]",
+       phone: "[전화번호]",
+       link: "[업체 홈페이지 주소]",
+       tags: ["프라이빗(단독)", "노을 시간대", "연인·부부"]
+     } */
+  experiences: [],
+
+  /* ---------- 6. 마리나 시설 ----------
+     예시) { name: "[시설 이름]", text: "[설명]" } */
+  facilities: [],
+
+  /* ---------- 7. 가는 방법 ----------
+     예시) { from: "[강릉역]", how: "[버스 ○번]", time: "[약 ○분]", text: "[설명]" } */
+  transport: [],
+
+  /* ---------- 8. 마리나 주변 관광 (메인 화면 카드 4개) ----------
+     items 예시) { name: "[장소 이름]", move: "[도보]", time: "[약 ○분]", text: "[설명]" } */
+  tours: [
+    { id: "beach", name: "안목해변 산책", desc: "바다를 따라 걷는 산책 코스", items: [] },
+    { id: "cafe",  name: "카페",          desc: "투어 전후 쉬어 가기 좋은 곳", items: [] },
+    { id: "food",  name: "먹거리",        desc: "마리나 근처 식사 장소",       items: [] },
+    { id: "etc",   name: "그 외 볼거리",   desc: "함께 둘러보면 좋은 곳",       items: [] }
+  ],
+
+  /* ---------- 9. 안전 가이드 (승선 안내 5종) ----------
+     items 예시) ["[유의사항 1]", "[유의사항 2]"] */
+  safety: [
+    { id: "before",   name: "승선 전 필수 숙지 사항", desc: "탑승 전 꼭 알아야 할 기본 유의사항",     items: [] },
+    { id: "clothes",  name: "복장 가이드",            desc: "계절·시간대·해상 환경에 맞는 복장",       items: [] },
+    { id: "seasick",  name: "뱃멀미 예방법",          desc: "멀미를 줄이는 사전 준비와 대처 방법",     items: [] },
+    { id: "etiquette",name: "마리나 에티켓",          desc: "마리나 시설과 선상에서 지킬 매너",        items: [] },
+    { id: "rules",    name: "해상 안전 수칙",         desc: "구명조끼 착용 등 해상 안전 행동 요령",     items: [] }
+  ],
+
+  /* ---------- 10. AI 입력창 예시 문장 ---------- */
+  aiExamples: [
+    "대중교통으로 온 부부예요. 오후에 2시간쯤 있고 노을을 보고 싶어요. 뱃멀미가 걱정돼요.",
+    "4인 가족이에요. 유모차가 있고 주말 오전에 가고 싶어요.",
+    "반려견과 함께 탈 수 있는 요트가 있을까요?"
+  ]
+};
+
+  </script>
+
+  <script>
+/* =====================================================================
+   요트핏 동작 파일 (app.js)
+   ---------------------------------------------------------------------
+   메뉴 이동, 화면 그리기, "준비 중" 표시를 담당합니다.
+   내용(글, 요금 등)은 여기서 고치지 말고 data.js에서 고치세요.
+   ===================================================================== */
+
+const D = window.SITE_DATA;
+
+/* ---------- 메뉴 목록 ---------- */
+const MENU = [
+  { path: "#/marina",    label: "마리나 소개" },
+  { path: "#/yacht",     label: "요트·체험" },
+  { path: "#/transport", label: "가는 방법" },
+  { path: "#/tour",      label: "주변 관광" },
+  { path: "#/safety",    label: "안전 가이드" },
+  { path: "#/ai",        label: "AI 코스 추천", highlight: true }
+];
+
+/* ---------- 작은 도우미 함수 ---------- */
+// 사용자가 입력한 글을 화면에 안전하게 표시 (코드로 실행되지 않게)
+function esc(text) {
+  return String(text ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+const isEmpty = list => !list || list.length === 0;
+
+// 간단한 아이콘 (선 그림)
+const ICON = {
+  boat:   '<path d="M3 17l2 3h14l2-3H3z"/><path d="M12 3v11"/><path d="M12 4l6 9h-6"/><path d="M12 6l-5 7h5"/>',
+  route:  '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
+  wave:   '<path d="M2 12c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M2 17c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/>',
+  cup:    '<path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v2M12 3v2"/>',
+  bowl:   '<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M12 7c0-1.5 1-2 1-3M16 7c0-1.5 1-2 1-3"/>',
+  pin:    '<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  clock:  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  spark:  '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/>',
+  tool:   '<path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-6h4v6"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  star:   '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>'
+};
+function icon(name, size = 24) {
+  return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
+}
+
+/* ---------- "준비 중" 상자 ---------- */
+function preparing(title = "준비 중입니다", text = "정보를 확인하고 있어요. 조금만 기다려 주세요.") {
+  return `
+    <div class="preparing">
+      <div class="preparing-icon">${icon("tool", 28)}</div>
+      <strong>${esc(title)}</strong>
+      <p>${esc(text)}</p>
+    </div>`;
+}
+
+/* ---------- 페이지 맨 위 제목 영역 (하위 페이지 공통) ---------- */
+function pageHead(eyebrow, title, desc) {
+  return `
+    <section class="page-head">
+      <div class="container">
+        <span class="eyebrow">${esc(eyebrow)}</span>
+        <h1>${esc(title)}</h1>
+        <p>${esc(desc)}</p>
+      </div>
+    </section>`;
+}
+
+/* ---------- AI 입력 카드 (메인, AI 페이지에서 같이 사용) ---------- */
+function aiInputCard(extraClass = "") {
+  return `
+    <form class="ai-card ${extraClass}" data-ai-form>
+      <label for="ai-input" class="ai-card-title">내 상황을 문장으로 적어보세요</label>
+      <textarea id="ai-input" name="q" rows="4" placeholder="${esc(D.aiExamples[0])}"></textarea>
+      <button type="submit" class="btn-orange">${icon("spark", 20)} AI 코스 추천받기</button>
+    </form>`;
+}
+
+/* =====================================================================
+   페이지들
+   ===================================================================== */
+
+/* ---------- ① 메인 ---------- */
+function pageHome() {
+  const chips = D.categories.map(c =>
+    `<a class="chip chip-lg" href="#/category/${c.id}">${esc(c.name)}</a>`).join("");
+
+  const tourIcons = { beach: "wave", cafe: "cup", food: "bowl", etc: "pin" };
+  const tourCards = D.tours.map(t => `
+    <a class="card tour-card" href="#/tour">
+      <div class="card-icon">${icon(tourIcons[t.id] || "pin")}</div>
+      <h3>${esc(t.name)}</h3>
+      <p>${esc(t.desc)}</p>
+      <div class="move-info">
+        ${icon("route", 16)} <span>마리나에서 이동 방법·시간</span>
+        <b>${isEmpty(t.items) ? "[ ]" : esc(t.items[0].move + " · " + t.items[0].time)}</b>
+      </div>
+    </a>`).join("");
+
+  return `
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <span class="eyebrow light">GANGNEUNG MARINA</span>
+          <h1>강릉 마리나,<br>처음이어도 쉽게 즐기세요</h1>
+          <p>체험, 요금, 가는 방법, 안전 수칙을 한곳에서 확인하고<br class="br-pc"> 내 상황을 적으면 AI가 방문 코스를 짜드립니다.</p>
+        </div>
+        ${aiInputCard()}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">카테고리로 직접 찾기</h2>
+        <div class="chip-row">${chips}</div>
+      </div>
+    </section>
+
+    <section class="section pt-0">
+      <div class="container grid-3">
+        <a class="card feature-card" href="#/yacht">
+          <div class="card-icon">${icon("boat")}</div>
+          <h3>마리나 체험</h3>
+          <p>요트 투어 · 시설 안내</p>
+          <span class="more">자세히 보기 →</span>
+        </a>
+        <a class="card feature-card" href="#/transport">
+          <div class="card-icon">${icon("route")}</div>
+          <h3>가는 방법</h3>
+          <p>대중교통 이동 안내</p>
+          <span class="more">자세히 보기 →</span>
+        </a>
+        <a class="card feature-card" href="#/safety">
+          <div class="card-icon">${icon("shield")}</div>
+          <h3>승선 안내</h3>
+          <p>복장 · 멀미 · 안전 수칙</p>
+          <span class="more">자세히 보기 →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section pt-0">
+      <div class="container">
+        <h2 class="section-title">마리나 주변 관광</h2>
+        <p class="section-desc">투어 전후로 함께 둘러보기 좋은 곳</p>
+        <div class="grid-4">${tourCards}</div>
+      </div>
+    </section>`;
+}
+
+/* ---------- ② AI 코스 추천 결과 ---------- */
+function pageResult(params) {
+  const q = (params.get("q") || "").trim();
+  const conditionLabels = ["인원", "동행자", "이동 수단", "이용 시간", "시간대·분위기", "특수 조건"];
+
+  // AI가 연결되기 전에는 빈 칩([ ])과 준비 중 안내를 보여줍니다.
+  const chips = conditionLabels.map(l => `<span class="chip chip-empty">${l} [ ]</span>`).join("");
+
+  const step = (num, title, sub, best = false) => `
+    <div class="card step-card ${best ? "best" : ""}">
+      <div class="step-num">${num}</div>
+      <div class="step-body">
+        <div class="step-title-row">
+          <h3>${title}</h3>
+          ${best ? '<span class="badge">가장 잘 맞음</span>' : ""}
+        </div>
+        <p class="muted">${sub}</p>
+        <p class="placeholder-text">[ ] AI 연결 후 추천 내용이 표시됩니다.</p>
+      </div>
+    </div>`;
+
+  return `
+    ${pageHead("AI COURSE", "AI 코스 추천 결과", "입력한 문장을 바탕으로 마리나 방문 코스를 짜드려요.")}
+    <section class="section">
+      <div class="container result-grid">
+        <aside class="result-side">
+          <div class="card">
+            <h3 class="card-label">입력한 문장</h3>
+            <p class="quote">${q ? esc(q) : "입력한 문장이 없어요."}</p>
+            <a class="text-link" href="#/ai">다시 입력하기 →</a>
+          </div>
+          <div class="card">
+            <h3 class="card-label">AI가 읽은 조건</h3>
+            <div class="chip-row small">${chips}</div>
+            ${!D.features.ai ? '<p class="note">AI 연결 준비 중이에요. 연결되면 문장에서 조건을 뽑아 칩으로 보여드려요.</p>' : ""}
+          </div>
+        </aside>
+
+        <div class="result-main">
+          <h2 class="course-title">[코스 제목]</h2>
+          <p class="muted mb-16">이동 → 요트 투어 → 투어 후 주변 관광 순서로 추천해요.</p>
+          ${step(1, "이동", "마리나까지 가는 방법")}
+          ${step(2, "요트 투어", "조건에 맞는 체험", true)}
+          ${step(3, "투어 후", "주변 관광")}
+          <div class="navy-box">
+            <strong>이 코스 전에 알아두세요</strong>
+            <div class="navy-links">
+              <a href="#/safety/clothes">복장 가이드</a><span>·</span>
+              <a href="#/safety/seasick">뱃멀미 예방법</a><span>·</span>
+              <a href="#/safety/rules">해상 안전 수칙</a>
+            </div>
+          </div>
+          <p class="disclaimer">AI 추천은 등록된 정보만 근거로 해요. 요금·운항 여부 등 등록되지 않은 정보는 업체에 문의해 주세요.</p>
+        </div>
+      </div>
+    </section>`;
+}
+
+/* ---------- AI 코스 추천 (입력 페이지) ---------- */
+function pageAI() {
+  const examples = D.aiExamples.map(e =>
+    `<button type="button" class="example" data-example="${esc(e)}">${esc(e)}</button>`).join("");
+  return `
+    ${pageHead("AI COURSE", "AI 코스 추천", "인원, 동행자, 이동 수단, 시간, 원하는 분위기, 걱정되는 점을 편하게 적어주세요.")}
+    <section class="section">
+      <div class="container narrow">
+        ${aiInputCard("ai-card-wide")}
+        <h2 class="section-title sm mt-32">이렇게 적어보세요</h2>
+        <div class="examples">${examples}</div>
+      </div>
+    </section>`;
+}
+
+/* ---------- 카테고리로 찾기 ---------- */
+function pageCategory(id) {
+  const current = D.categories.find(c => c.id === id) || D.categories[0];
+  const tabs = D.categories.map(c =>
+    `<a class="chip ${c.id === current.id ? "active" : ""}" href="#/category/${c.id}">${esc(c.name)}</a>`).join("");
+  const options = current.options.map(o =>
+    `<button type="button" class="chip option" data-option="${esc(o)}" aria-pressed="false">${esc(o)}</button>`).join("");
+
+  return `
+    ${pageHead("CATEGORY", "카테고리로 직접 찾기", "원하는 조건을 골라 나에게 맞는 체험을 찾아보세요. 여러 개를 함께 고를 수 있어요.")}
+    <section class="section">
+      <div class="container">
+        <div class="chip-row">${tabs}</div>
+        <div class="card mt-24">
+          <h3 class="card-label">${esc(current.name)}</h3>
+          <div class="chip-row">${options}</div>
+        </div>
+        <h2 class="section-title sm mt-32">조건에 맞는 체험</h2>
+        <div id="category-result">${renderExperiences([])}</div>
+      </div>
+    </section>`;
+}
+
+// 체험 목록 그리기 (선택한 조건으로 거르기)
+function renderExperiences(selected) {
+  if (isEmpty(D.experiences)) return preparing("체험 정보 준비 중입니다", "강릉 마리나 체험 정보를 모으고 있어요.");
+  const list = selected.length
+    ? D.experiences.filter(e => selected.every(s => (e.tags || []).includes(s)))
+    : D.experiences;
+  if (list.length === 0) return preparing("조건에 맞는 체험이 없어요", "다른 조건을 골라 보세요.");
+  return `<div class="grid-3">${list.map(experienceCard).join("")}</div>`;
+}
+
+function experienceCard(e) {
+  return `
+    <div class="card exp-card">
+      <h3>${esc(e.name)}</h3>
+      <p class="muted">${esc(e.company || "[업체명]")}</p>
+      <ul class="info-list">
+        <li>${icon("clock", 16)} 운영 ${esc(e.hours || "[ ]")} · 소요 ${esc(e.duration || "[ ]")}</li>
+        <li>${icon("pin", 16)} 출발 ${esc(e.place || "[ ]")}</li>
+        <li><b>요금</b> ${esc(e.price || "[ ]")}</li>
+      </ul>
+      <div class="chip-row small">${(e.tags || []).map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+      <div class="btn-row">
+        ${e.phone ? `<a class="btn-line" href="tel:${esc(e.phone)}">전화 문의</a>` : ""}
+        ${e.link ? `<a class="btn-line" href="${esc(e.link)}" target="_blank" rel="noopener">업체 홈페이지</a>` : ""}
+        <a class="btn-orange sm" href="#/booking">예약하기</a>
+      </div>
+    </div>`;
+}
+
+/* ---------- 마리나 소개 ---------- */
+function pageMarina() {
+  const body = isEmpty(D.marina)
+    ? preparing("마리나 소개 준비 중입니다")
+    : `<div class="grid-2">${D.marina.map(m => `<div class="card"><h3>${esc(m.title)}</h3><p>${esc(m.text)}</p></div>`).join("")}</div>`;
+  return `
+    ${pageHead("ABOUT", "마리나 소개", "강릉 마리나는 어떤 곳인지 알려드려요.")}
+    <section class="section"><div class="container">${body}</div></section>`;
+}
+
+/* ---------- 요트·체험 (+ 예약·리뷰 자리) ---------- */
+function pageYacht() {
+  const facilities = isEmpty(D.facilities)
+    ? preparing("시설 안내 준비 중입니다")
+    : `<div class="grid-3">${D.facilities.map(f => `<div class="card"><h3>${esc(f.name)}</h3><p>${esc(f.text)}</p></div>`).join("")}</div>`;
+  return `
+    ${pageHead("EXPERIENCE", "요트·체험", "요트 투어를 비롯한 마리나 체험과 시설을 확인하세요.")}
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">요트 투어·체험</h2>
+        ${renderExperiences([])}
+
+        <h2 class="section-title mt-48">마리나 시설</h2>
+        ${facilities}
+
+        <div class="grid-2 mt-48">
+          <div class="card soon-card">
+            <div class="card-icon">${icon("calendar")}</div>
+            <h3>앱에서 바로 예약 <span class="tag-soon">준비 중</span></h3>
+            <p class="muted">원하는 시간 타임을 골라 바로 예약하는 기능을 준비하고 있어요. 지금은 업체에 직접 문의해 주세요.</p>
+          </div>
+          <div class="card soon-card">
+            <div class="card-icon">${icon("star")}</div>
+            <h3>탑승 후기 <span class="tag-soon">준비 중</span></h3>
+            <p class="muted">실제로 예약하고 탑승한 분만 남길 수 있는 후기 기능을 준비하고 있어요.</p>
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
+/* ---------- 예약 (준비 중) ---------- */
+function pageBooking() {
+  return `
+    ${pageHead("BOOKING", "예약하기", "앱에서 바로 예약하는 기능을 준비하고 있어요.")}
+    <section class="section"><div class="container narrow">
+      ${preparing("예약 기능 준비 중입니다", "지금은 요트·체험 페이지의 업체 전화번호나 홈페이지로 문의해 주세요.")}
+      <p class="center mt-24"><a class="btn-line" href="#/yacht">요트·체험 보러 가기</a></p>
+    </div></section>`;
+}
+
+/* ---------- 가는 방법 ---------- */
+function pageTransport() {
+  const body = isEmpty(D.transport)
+    ? preparing("이동 안내 준비 중입니다", "강릉역·버스터미널에서 마리나까지 가는 방법을 정리하고 있어요.")
+    : `<div class="grid-2">${D.transport.map(t => `
+        <div class="card">
+          <h3>${esc(t.from)}에서</h3>
+          <ul class="info-list">
+            <li>${icon("route", 16)} ${esc(t.how)}</li>
+            <li>${icon("clock", 16)} ${esc(t.time)}</li>
+          </ul>
+          <p>${esc(t.text || "")}</p>
+        </div>`).join("")}</div>`;
+  return `
+    ${pageHead("HOW TO GET THERE", "가는 방법", "자가용이 없어도 마리나까지 쉽게 갈 수 있도록 안내해요.")}
+    <section class="section"><div class="container">${body}</div></section>`;
+}
+
+/* ---------- 주변 관광 ---------- */
+function pageTour() {
+  const groups = D.tours.map(g => `
+    <h2 class="section-title ${g === D.tours[0] ? "" : "mt-48"}">${esc(g.name)}</h2>
+    <p class="section-desc">${esc(g.desc)}</p>
+    ${isEmpty(g.items)
+      ? preparing(`${g.name} 정보 준비 중입니다`)
+      : `<div class="grid-3">${g.items.map(i => `
+          <div class="card tour-card">
+            <h3>${esc(i.name)}</h3>
+            <p>${esc(i.text || "")}</p>
+            <div class="move-info">${icon("route", 16)} <span>마리나에서</span> <b>${esc(i.move)} · ${esc(i.time)}</b></div>
+          </div>`).join("")}</div>`}`).join("");
+  return `
+    ${pageHead("NEARBY", "마리나 주변 관광", "투어 전후로 함께 둘러보기 좋은 곳을 소개해요.")}
+    <section class="section"><div class="container">${groups}</div></section>`;
+}
+
+/* ---------- 안전 가이드 ---------- */
+function pageSafety(focusId) {
+  const cards = D.safety.map(s => `
+    <div class="card safety-card ${s.id === focusId ? "focus" : ""}" id="safety-${s.id}">
+      <h3>${esc(s.name)}</h3>
+      <p class="muted">${esc(s.desc)}</p>
+      ${isEmpty(s.items)
+        ? '<p class="placeholder-text">준비 중입니다.</p>'
+        : `<ul class="check-list">${s.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`}
+    </div>`).join("");
+  return `
+    ${pageHead("SAFETY GUIDE", "안전 가이드", "요트가 처음이어도 안전하고 즐겁게 탈 수 있도록 미리 알려드려요.")}
+    <section class="section"><div class="container grid-2 safety-grid">${cards}</div></section>`;
+}
+
+/* ---------- 없는 주소 ---------- */
+function pageNotFound() {
+  return `<section class="section"><div class="container narrow">
+    ${preparing("준비 중인 페이지입니다", "메뉴에서 다른 페이지를 선택해 주세요.")}
+  </div></section>`;
+}
+
+/* =====================================================================
+   공통 상단/하단
+   ===================================================================== */
+function renderHeader() {
+  const links = MENU.map(m =>
+    `<a href="${m.path}" class="${m.highlight ? "nav-ai" : ""}" data-nav="${m.path}">${m.label}</a>`).join("");
+  document.getElementById("site-header").innerHTML = `
+    <div class="container header-inner">
+      <a href="#/" class="logo">
+        <span class="logo-mark">${icon("boat", 22)}</span>
+        <span class="logo-text">${esc(D.site.name)}<small>${esc(D.site.subtitle)}</small></span>
+      </a>
+      <button class="menu-btn" aria-label="메뉴 열기" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav">${links}</nav>
+    </div>`;
+
+  const btn = document.querySelector(".menu-btn");
+  const nav = document.querySelector(".nav");
+  btn.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open);
+  });
+}
+
+function renderFooter() {
+  document.getElementById("site-footer").innerHTML = `
+    <div class="container footer-inner">
+      <strong>${esc(D.site.name)}</strong>
+      <p>문의 ${esc(D.site.contact)} · ${esc(D.site.notice)}</p>
+    </div>`;
+}
+
+/* =====================================================================
+   주소(#/...)에 따라 페이지 바꾸기
+   ===================================================================== */
+function router() {
+  try { routerInner(); } catch (err) {
+    console.error(err);
+    document.getElementById("app").innerHTML = pageNotFound();
+  }
+}
+function routerInner() {
+  const hash = location.hash || "#/";
+  const [pathPart, queryPart] = hash.slice(1).split("?");
+  const parts = pathPart.split("/").filter(Boolean);   // 예: ["category", "pet"]
+  const params = new URLSearchParams(queryPart || "");
+
+  let html;
+  switch (parts[0]) {
+    case undefined:   html = pageHome(); break;
+    case "result":    html = pageResult(params); break;
+    case "ai":        html = pageAI(); break;
+    case "category":  html = pageCategory(parts[1]); break;
+    case "marina":    html = pageMarina(); break;
+    case "yacht":     html = pageYacht(); break;
+    case "booking":   html = pageBooking(); break;
+    case "transport": html = pageTransport(); break;
+    case "tour":      html = pageTour(); break;
+    case "safety":    html = pageSafety(parts[1]); break;
+    default:          html = pageNotFound();
+  }
+  document.getElementById("app").innerHTML = html;
+
+  // 현재 메뉴 표시
+  document.querySelectorAll("[data-nav]").forEach(a =>
+    a.classList.toggle("current", hash.startsWith(a.dataset.nav)));
+  document.querySelector(".nav")?.classList.remove("open");
+
+  // 안전 가이드 특정 항목으로 왔으면 그 위치로, 아니면 맨 위로
+  const focus = parts[0] === "safety" && parts[1] && document.getElementById("safety-" + parts[1]);
+  if (focus) focus.scrollIntoView({ behavior: "smooth", block: "center" });
+  else window.scrollTo(0, 0);
+}
+
+/* ---------- 클릭·입력 처리 ---------- */
+document.addEventListener("submit", e => {
+  const form = e.target.closest("[data-ai-form]");
+  if (!form) return;
+  e.preventDefault();
+  const text = form.q.value.trim() || form.q.placeholder;
+  location.hash = "#/result?q=" + encodeURIComponent(text);
+});
+
+document.addEventListener("click", e => {
+  // 예시 문장 누르면 입력창에 채우기
+  const ex = e.target.closest("[data-example]");
+  if (ex) {
+    const box = document.getElementById("ai-input");
+    box.value = ex.dataset.example;
+    box.focus();
+    return;
+  }
+  // 카테고리 항목 고르기 (여러 개 선택 가능)
+  const opt = e.target.closest(".option");
+  if (opt) {
+    const on = opt.getAttribute("aria-pressed") !== "true";
+    opt.setAttribute("aria-pressed", on);
+    opt.classList.toggle("active", on);
+    const selected = [...document.querySelectorAll(".option.active")].map(b => b.dataset.option);
+    document.getElementById("category-result").innerHTML = renderExperiences(selected);
+  }
+});
+
+window.addEventListener("hashchange", router);
+renderHeader();
+renderFooter();
+router();
+
+  </script>
 </body>
 </html>
