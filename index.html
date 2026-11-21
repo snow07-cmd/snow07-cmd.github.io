@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v6">
-  <!-- 사이트 버전 v6 (2026-11-21) -->
+  <meta name="site-version" content="v7">
+  <!-- 사이트 버전 v7 (2026-11-21) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
   <!--
@@ -222,6 +222,12 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 
 /* ---------- 요트·체험 ---------- */
 .exp-card .chip-row { margin-top: 4px; }
+.exp-price { font-size: 20px; font-weight: 900; color: var(--ink) !important; letter-spacing: -.02em; }
+.exp-note { font-size: 14px; color: var(--primary) !important; }
+.exp-info { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); gap: 6px; }
+.exp-info li { align-items: flex-start; }
+.exp-info .icon { margin-top: 3px; }
+.exp-info b { color: var(--ink); font-weight: 700; margin-right: 4px; }
 .facility-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .fee-tag { flex-shrink: 0; font-size: 12px; font-weight: 700; background: var(--soft); color: var(--primary); border-radius: 4px; padding: 2px 8px; margin-top: 3px; }
 .facility-card .info-list { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
@@ -425,7 +431,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v6)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v7)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -448,7 +454,7 @@ window.SITE_DATA = {
     subtitle: "강릉 마리나 안내",
     contact: "[연락처 입력]",
     notice: "요금과 운영 시간은 업체 사정에 따라 달라질 수 있어요.",
-    address: "강원 강릉시 창해로14번길 51-20",
+    address: "강원특별자치도 강릉시 창해로14번길 51-20",
     title: "강릉항 요트마리나\n이용 안내"
   },
 
@@ -536,7 +542,14 @@ window.SITE_DATA = {
 
   /* ---------- 4. 마리나 소개 ----------
      예시) { title: "[마리나 이름]", text: "[소개 문장]" } */
-  marina: [],
+  marina: [
+    { title: "강릉항요트마리나",
+      text: "강릉항 여객터미널 입구에 있는 요트 마리나예요. 주소는 강원특별자치도 강릉시 창해로14번길 51-20이에요." },
+    { title: "운영 시간",
+      text: "매일 10:00부터 해 질 때까지 운영해요. 계절마다 해 뜨고 지는 시간이 달라서 운항 시각도 달라져요." },
+    { title: "운영",
+      text: "클럽요트마스터에서 요트 투어를 운영해요." }
+  ],
 
   /* ---------- 5. 요트·체험 상품 ----------
      예시 (tags에는 위 카테고리 options 글자를 그대로 적으면 필터에 걸립니다)
@@ -551,7 +564,55 @@ window.SITE_DATA = {
        link: "[업체 홈페이지 주소]",
        tags: ["프라이빗(단독)", "노을 시간대", "연인·부부"]
      } */
-  experiences: [],
+  experiences: [
+    { name: "오전 10시 코스",
+      price: "1인 30,000원",
+      note: "가장 저렴한 코스예요.",
+      hours: "10:00 출항",
+      duration: "약 1시간",
+      company: "클럽요트마스터",
+      place: "강릉항요트마리나 선착장 (출발 20분 전까지 도착)",
+      capacity: "최소 2명, 최대 12명",
+      reserve: "전화, 네이버 예약, 마이리얼트립, 현장",
+      refund: "풍랑주의보 등 날씨가 나쁘면 운항이 취소돼요. 전날 오전 9시까지 취소하면 전액 환불돼요.",
+      phone: "",
+      links: [
+        { label: "네이버 예약", url: "https://m.booking.naver.com/booking/6/bizes/198748/items/2930878" },
+        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3886593" }
+      ],
+      tags: ["오전", "평일", "주말", "퍼블릭(합승)", "프라이빗(단독)"] },
+    { name: "연중 1시간 코스",
+      price: "40,000원",
+      hours: "매일 운항 (출항 시각은 업체 문의)",
+      duration: "약 1시간",
+      company: "클럽요트마스터",
+      place: "강릉항요트마리나 선착장 (출발 20분 전까지 도착)",
+      capacity: "최소 2명, 최대 12명",
+      reserve: "전화, 네이버 예약, 마이리얼트립, 현장",
+      refund: "풍랑주의보 등 날씨가 나쁘면 운항이 취소돼요. 전날 오전 9시까지 취소하면 전액 환불돼요.",
+      phone: "",
+      links: [
+        { label: "네이버 예약", url: "https://m.booking.naver.com/booking/6/bizes/198748/items/2930878" },
+        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3886593" }
+      ],
+      tags: ["오후", "평일", "주말", "퍼블릭(합승)", "프라이빗(단독)"] },
+    { name: "일몰 1시간 30분 코스",
+      price: "50,000원",
+      note: "해 지는 시간에 맞춰 출항해요. 계절마다 출항 시각이 달라요.",
+      hours: "노을 시간 출항",
+      duration: "약 1시간 30분",
+      company: "클럽요트마스터",
+      place: "강릉항요트마리나 선착장 (출발 20분 전까지 도착)",
+      capacity: "최소 2명, 최대 12명",
+      reserve: "전화, 네이버 예약, 마이리얼트립, 현장",
+      refund: "풍랑주의보 등 날씨가 나쁘면 운항이 취소돼요. 전날 오전 9시까지 취소하면 전액 환불돼요.",
+      phone: "",
+      links: [
+        { label: "네이버 예약", url: "https://m.booking.naver.com/booking/6/bizes/198748/items/2930878" },
+        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3886593" }
+      ],
+      tags: ["노을 시간대", "노을 감상", "평일", "주말", "퍼블릭(합승)", "프라이빗(단독)"] }
+  ],
 
   /* ---------- 6. 마리나 시설 ----------
      place(위치), hours(이용 시간), fee(요금)는 모르면 빼도 됩니다.
@@ -990,21 +1051,25 @@ function renderExperiences(selected) {
 }
 
 function experienceCard(e) {
+  const row = (ic, label, v) => v ? `<li>${icon(ic, 16)}<span><b>${label}</b> ${esc(v)}</span></li>` : "";
+  const links = (e.links || []).filter(l => /^https:\/\//.test(l.url || ""))
+    .map(l => `<a class="btn-line" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
   return `
     <div class="card exp-card">
       <h3>${esc(e.name)}</h3>
-      <p class="muted">${esc(e.company || "[업체명]")}</p>
-      <ul class="info-list">
-        <li>${icon("clock", 16)} 운영 ${esc(e.hours || "업체 문의")}</li>
-        <li>${icon("clock", 16)} 소요 ${esc(e.duration || "업체 문의")}</li>
-        <li>${icon("pin", 16)} 출발 ${esc(e.place || "업체 문의")}</li>
-        <li><b>요금</b> ${esc(e.price || "업체 문의")}</li>
+      <p class="muted">${esc(e.company || "")}</p>
+      <p class="exp-price">${esc(e.price || "요금은 업체에 문의해 주세요")}</p>
+      ${e.note ? `<p class="exp-note">${esc(e.note)}</p>` : ""}
+      <ul class="info-list exp-info">
+        ${row("clock", "출항", e.hours)}${row("clock", "소요", e.duration)}
+        ${row("pin", "출발", e.place)}${row("toilet", "인원", e.capacity)}
+        ${row("calendar", "예약", e.reserve)}${row("alert", "취소", e.refund)}
       </ul>
       <div class="chip-row small">${(e.tags || []).map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
       <div class="btn-row">
-        ${e.phone ? `<a class="btn-line" href="tel:${esc(e.phone)}">전화 문의</a>` : ""}
-        ${e.link ? `<a class="btn-line" href="${esc(e.link)}" target="_blank" rel="noopener">업체 홈페이지</a>` : ""}
-        <a class="btn-orange sm" href="#/booking">예약하기</a>
+        ${e.phone ? `<a class="btn-orange sm" href="tel:${esc(e.phone.replace(/[^0-9+]/g, ""))}">전화 ${esc(e.phone)}</a>` : ""}
+        ${links}
+        ${D.features.booking ? `<a class="btn-orange sm" href="#/booking">예약하기</a>` : ""}
       </div>
     </div>`;
 }
