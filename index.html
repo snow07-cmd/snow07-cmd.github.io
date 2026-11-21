@@ -259,6 +259,41 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
 .safety-card.focus { border: 2px solid var(--orange); }
 .check-list { padding-left: 20px; color: var(--text); }
 
+/* 시설 카드 */
+.facility-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.fee-tag {
+  flex-shrink: 0; font-size: 12px; font-weight: 700;
+  background: var(--chip-bg); color: var(--chip-text);
+  border-radius: 999px; padding: 3px 10px; margin-top: 2px;
+}
+.facility-card .info-list { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line); }
+
+/* 가는 방법 카드 */
+.notice-line {
+  background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--orange);
+  border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
+  font-size: 14px; color: var(--sub);
+}
+.transport-card { gap: 10px; }
+.mode-title { display: flex; align-items: center; gap: 6px; font-weight: 700; margin-top: 6px; }
+.mode-title .muted { font-weight: 500; font-size: 14px; }
+.bus-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.bus-table th {
+  text-align: left; font-size: 12px; font-weight: 500; color: var(--sub);
+  padding: 4px 6px; border-bottom: 1px solid var(--line);
+}
+.bus-table td { padding: 7px 6px; border-bottom: 1px solid #EEF4F6; }
+.bus-no {
+  display: inline-block; min-width: 52px; text-align: center;
+  background: var(--navy); color: #fff; font-weight: 700;
+  border-radius: 8px; padding: 2px 8px; font-size: 13px;
+}
+.mode-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px; background: var(--bg); border-radius: 12px; font-size: 14px;
+}
+.mode-row .muted { margin-left: auto; }
+
 /* 여백 도우미 */
 .mt-24 { margin-top: 24px; }
 .mt-32 { margin-top: 32px; }
@@ -379,12 +414,66 @@ window.SITE_DATA = {
   experiences: [],
 
   /* ---------- 6. 마리나 시설 ----------
-     예시) { name: "[시설 이름]", text: "[설명]" } */
-  facilities: [],
+     place(위치), hours(이용 시간), fee(요금)는 모르면 빼도 됩니다.
+     예시) { name: "[시설 이름]", text: "[설명]", place: "[주소]", hours: "[09:00~18:00]", fee: "무료" } */
+  facilities: [
+    { name: "화장실",
+      text: "마리나 안에는 화장실이 없어요. 가까운 강릉 안목 여행자센터 화장실을 이용해 주세요.",
+      place: "강원 강릉시 창해로14번길 51-4", hours: "09:00~18:00", fee: "무료" },
+    { name: "주차장",
+      text: "강릉항 공영주차장을 이용할 수 있어요.",
+      place: "강원 강릉시 창해로14번길 51-4", hours: "24시간", fee: "무료" },
+    { name: "대기실",
+      text: "선착장 앞 강릉항여객터미널에서 출항을 기다릴 수 있어요.",
+      place: "강원 강릉시 창해로14번길 51-26", fee: "무료" },
+    { name: "카페 · 퀸 마리나 커피",
+      text: "강릉항요트마리나 건물 4층에 있는 카페예요.",
+      place: "강원 강릉시 창해로14번길 51-20, 4층", hours: "09:00~22:00" },
+    { name: "식당 · 씨푸드바다",
+      text: "강릉항요트마리나 건물 5층에 있는 식당이에요.",
+      place: "강원 강릉시 창해로14번길 51-20, 5층", hours: "11:00~21:00" },
+    { name: "구명조끼",
+      text: "요트에 탈 때 선장님이 나눠 드려요. 따로 빌리지 않아도 돼요.",
+      fee: "무료" },
+    { name: "휠체어 경사로",
+      text: "경사로가 없어요. 휠체어를 이용하시면 업체에 미리 문의해 주세요." }
+  ],
 
   /* ---------- 7. 가는 방법 ----------
-     예시) { from: "[강릉역]", how: "[버스 ○번]", time: "[약 ○분]", text: "[설명]" } */
-  transport: [],
+     options의 type: "bus"(버스), "taxi"(택시), "walk"(도보)
+     예시) { from: "[출발지]", board: "[탈 정류장]", stop: "[내릴 정류장]", busFare: "[버스 요금]",
+            options: [ { type: "bus", no: "[버스 번호]", time: "[약 ○분]", freq: "[평일 하루 ○회]" },
+                       { type: "taxi", time: "[약 ○분]", fare: "[약 ○원]" },
+                       { type: "walk", time: "[약 ○분]" } ] } */
+  transportNote: "평일 기준이에요. 버스 운행 횟수와 요금은 바뀔 수 있으니 출발 전에 지도 앱에서 한 번 더 확인해 주세요.",
+  transport: [
+    { from: "강릉역", stop: "안목커피거리", busFare: "1,530원",
+      options: [
+        { type: "bus", no: "223-1", time: "약 33분", freq: "평일 하루 30회" },
+        { type: "bus", no: "314-1", time: "약 27분", freq: "평일 하루 8회" },
+        { type: "bus", no: "225-1", time: "약 27분", freq: "평일 하루 4회" },
+        { type: "taxi", time: "약 12분", fare: "약 7,400원" },
+        { type: "walk", time: "약 1시간 22분" }
+      ] },
+    { from: "강릉 시외·고속버스터미널", stop: "안목커피거리", busFare: "1,530원",
+      options: [
+        { type: "bus", no: "314-1", time: "약 41분", freq: "평일 하루 8회" },
+        { type: "bus", no: "302-1", time: "약 36분", freq: "평일 하루 7회" },
+        { type: "bus", no: "225-1", time: "약 41분", freq: "평일 하루 4회" },
+        { type: "bus", no: "212-1", time: "약 36분", freq: "평일 하루 3회" },
+        { type: "taxi", time: "약 16분", fare: "약 10,700원" },
+        { type: "walk", time: "약 1시간 54분" }
+      ] },
+    { from: "강릉 월화거리", board: "신영극장 정류장", stop: "안목커피거리", busFare: "1,530원",
+      options: [
+        { type: "bus", no: "300-1", time: "약 33분", freq: "평일 하루 43회" },
+        { type: "bus", no: "504-1", time: "약 33분", freq: "평일 하루 33회" },
+        { type: "bus", no: "200",   time: "약 40분", freq: "평일 하루 13회" },
+        { type: "bus", no: "104-1", time: "약 40분", freq: "평일 하루 3회" },
+        { type: "taxi", time: "약 17분", fare: "약 10,400원" },
+        { type: "walk", time: "약 1시간 30분" }
+      ] }
+  ],
 
   /* ---------- 8. 마리나 주변 관광 (메인 화면 카드 4개) ----------
      items 예시) { name: "[장소 이름]", move: "[도보]", time: "[약 ○분]", text: "[설명]" } */
@@ -398,10 +487,42 @@ window.SITE_DATA = {
   /* ---------- 9. 안전 가이드 (승선 안내 5종) ----------
      items 예시) ["[유의사항 1]", "[유의사항 2]"] */
   safety: [
-    { id: "before",   name: "승선 전 필수 숙지 사항", desc: "탑승 전 꼭 알아야 할 기본 유의사항",     items: [] },
-    { id: "clothes",  name: "복장 가이드",            desc: "계절·시간대·해상 환경에 맞는 복장",       items: [] },
-    { id: "seasick",  name: "뱃멀미 예방법",          desc: "멀미를 줄이는 사전 준비와 대처 방법",     items: [] },
-    { id: "etiquette",name: "마리나 에티켓",          desc: "마리나 시설과 선상에서 지킬 매너",        items: [] },
+    { id: "before",   name: "승선 전 필수 숙지 사항", desc: "탑승 전 꼭 알아야 할 기본 유의사항", items: [
+      "구명조끼는 꼭 입어요. 수상레저안전법에 따른 의무이고, 입지 않으면 과태료가 부과될 수 있어요.",
+      "구명조끼와 슬리퍼를 나눠 드리니 가볍게 오셔도 돼요.",
+      "출항 최소 1시간 전까지 도착해 주세요. 주말에는 조금 더 여유 있게 오세요.",
+      "출항 전에 날씨와 기상특보를 확인해요.",
+      "풍랑주의보가 예보되면 운항이 취소돼요. 업체가 2일 전부터 확인해 문자나 전화로 알려 드리고 환불해 드려요.",
+      "풍랑주의보는 바다 위 바람이 초속 14m(시속 약 50km) 이상으로 3시간 넘게 불거나, 파도 높이(유의파고)가 3m 이상으로 예상될 때 내려지는 특보예요.",
+      "나이나 신체 조건에 따른 제한이 없어요. 장애인, 임산부, 영유아, 어르신도 탈 수 있어요.",
+      "정해진 정원을 지켜 탑승해요.",
+      "마리나 안에는 화장실이 없어요. 탑승 전에 강릉 안목 여행자센터 화장실을 미리 다녀오세요."
+    ] },
+    { id: "clothes",  name: "복장 가이드", desc: "바닷바람과 갑판에 맞는 옷차림", items: [
+      "요트화를 신고 오세요. 없으면 양말만 신거나 나눠 드리는 슬리퍼를 신으면 돼요.",
+      "움직이기 편한 옷을 입어요.",
+      "바닷바람이 차가울 수 있어요. 얇은 옷을 겹쳐 입고 바람막이를 챙기세요.",
+      "주머니 속 작은 물건은 바다에 빠지지 않게 가방에 넣어 두세요."
+    ] },
+    { id: "seasick",  name: "뱃멀미 예방법", desc: "멀미를 줄이는 사전 준비와 대처 방법", items: [
+      "먹는 멀미약은 탑승 1시간 전에 먹어요.",
+      "귀 뒤에 붙이는 멀미약은 효과가 늦게 나타나요. 탑승 최소 4시간 전에 붙이세요.",
+      "멀미약을 먹으면 졸리거나 입이 마르고 눈앞이 흐릿해질 수 있어요. 어린이와 어르신은 특히 주의하고, 드시는 약이 있다면 약사와 먼저 상담하세요.",
+      "멀미가 걱정되면 비닐봉지와 멀미약을 챙겨 오세요.",
+      "탑승 전에는 술을 피하고 식사는 가볍게 해요.",
+      "배 위에서는 수평선처럼 멀리 있는 고정된 곳을 바라보고 바깥 공기를 마셔요.",
+      "어지러움이 계속되거나 다른 이상 증상이 함께 나타나면 멀미로 넘기지 말고 진료를 받으세요."
+    ] },
+    { id: "etiquette",name: "마리나 에티켓", desc: "마리나와 요트 위에서 지킬 매너", items: [
+      "출항 전 안전 안내를 잘 듣고, 선장님과 승무원의 안내를 따라 주세요.",
+      "요트 위에서 움직일 때는 안전줄(세이프티 라인)을 잡고 천천히 이동해요.",
+      "요트의 신발 규정(벗거나 실내화로 갈아 신기)을 따라 주세요. 갑판을 보호하고 미끄러짐을 막기 위해서예요.",
+      "약속한 출항 시간을 지켜 주세요. 늦으면 다른 이용객 일정에도 영향을 줘요.",
+      "마리나에서는 큰 소리를 내지 않고, 다른 요트에 올라가지 않아요.",
+      "계류장(배를 대는 곳)에서는 물에 들어가지 않아요. 아이는 보호자가 가까이에서 지켜봐 주세요.",
+      "사용한 자리와 쓰레기는 정리해 주세요.",
+      "마리나 안에는 화장실이 없어요. 탑승 전에 강릉 안목 여행자센터 화장실을 미리 다녀오세요."
+    ] },
     { id: "rules",    name: "해상 안전 수칙",         desc: "구명조끼 착용 등 해상 안전 행동 요령",     items: [] }
   ],
 
@@ -457,7 +578,10 @@ const ICON = {
   spark:  '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/>',
   tool:   '<path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-6h4v6"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
-  star:   '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>'
+  star:   '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>',
+  bus:    '<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21v-3M16 21v-3"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/>',
+  car:    '<path d="M5 16l1.5-5a2 2 0 0 1 1.9-1.4h7.2a2 2 0 0 1 1.9 1.4L19 16"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><path d="M7 20v1.5M17 20v1.5"/>',
+  walk:   '<circle cx="13" cy="4" r="1.8"/><path d="M11 21l2-6-3-3 1-5 4 3 3 1"/><path d="M10 12l-2 3H5"/>'
 };
 function icon(name, size = 24) {
   return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
@@ -706,7 +830,7 @@ function pageMarina() {
 function pageYacht() {
   const facilities = isEmpty(D.facilities)
     ? preparing("시설 안내 준비 중입니다")
-    : `<div class="grid-3">${D.facilities.map(f => `<div class="card"><h3>${esc(f.name)}</h3><p>${esc(f.text)}</p></div>`).join("")}</div>`;
+    : `<div class="grid-3">${D.facilities.map(facilityCard).join("")}</div>`;
   return `
     ${pageHead("EXPERIENCE", "요트·체험", "요트 투어를 비롯한 마리나 체험과 시설을 확인하세요.")}
     <section class="section">
@@ -733,6 +857,23 @@ function pageYacht() {
     </section>`;
 }
 
+// 시설 카드: 위치·시간·요금은 있는 것만 표시
+function facilityCard(f) {
+  const rows = [
+    f.place ? `<li>${icon("pin", 16)} ${esc(f.place)}</li>` : "",
+    f.hours ? `<li>${icon("clock", 16)} ${esc(f.hours)}</li>` : ""
+  ].join("");
+  return `
+    <div class="card facility-card">
+      <div class="facility-top">
+        <h3>${esc(f.name)}</h3>
+        ${f.fee ? `<span class="fee-tag">${esc(f.fee)}</span>` : ""}
+      </div>
+      <p>${esc(f.text || "")}</p>
+      ${rows ? `<ul class="info-list">${rows}</ul>` : ""}
+    </div>`;
+}
+
 /* ---------- 예약 (준비 중) ---------- */
 function pageBooking() {
   return `
@@ -747,18 +888,39 @@ function pageBooking() {
 function pageTransport() {
   const body = isEmpty(D.transport)
     ? preparing("이동 안내 준비 중입니다", "강릉역·버스터미널에서 마리나까지 가는 방법을 정리하고 있어요.")
-    : `<div class="grid-2">${D.transport.map(t => `
-        <div class="card">
-          <h3>${esc(t.from)}에서</h3>
-          <ul class="info-list">
-            <li>${icon("route", 16)} ${esc(t.how)}</li>
-            <li>${icon("clock", 16)} ${esc(t.time)}</li>
-          </ul>
-          <p>${esc(t.text || "")}</p>
-        </div>`).join("")}</div>`;
+    : `<div class="grid-3">${D.transport.map(transportCard).join("")}</div>`;
   return `
     ${pageHead("HOW TO GET THERE", "가는 방법", "자가용이 없어도 마리나까지 쉽게 갈 수 있도록 안내해요.")}
-    <section class="section"><div class="container">${body}</div></section>`;
+    <section class="section"><div class="container">
+      ${D.transportNote && !isEmpty(D.transport) ? `<p class="notice-line">${esc(D.transportNote)}</p>` : ""}
+      ${body}
+    </div></section>`;
+}
+
+// 출발지 카드: 버스 목록 + 택시 + 도보
+function transportCard(t) {
+  const opts = t.options || [];
+  const buses = opts.filter(o => o.type === "bus");
+  const taxi = opts.find(o => o.type === "taxi");
+  const walk = opts.find(o => o.type === "walk");
+  const busRows = buses.map(b => `
+    <tr><td><span class="bus-no">${esc(b.no)}</span></td><td>${esc(b.time || "")}</td><td class="muted">${esc(b.freq || "")}</td></tr>`).join("");
+  return `
+    <div class="card transport-card">
+      <h3>${esc(t.from)}에서</h3>
+      <ul class="info-list">
+        ${t.board ? `<li>${icon("pin", 16)} 승차: ${esc(t.board)}</li>` : ""}
+        ${t.stop ? `<li>${icon("pin", 16)} 하차: ${esc(t.stop)} 정류장</li>` : ""}
+      </ul>
+      ${buses.length ? `
+        <div class="mode-title">${icon("bus", 18)} 버스 <span class="muted">${t.busFare ? "· " + esc(t.busFare) : ""}</span></div>
+        <table class="bus-table">
+          <thead><tr><th>번호</th><th>소요</th><th>운행</th></tr></thead>
+          <tbody>${busRows}</tbody>
+        </table>` : ""}
+      ${taxi ? `<div class="mode-row">${icon("car", 18)} <b>택시</b> <span>${esc(taxi.time || "")}</span><span class="muted">${esc(taxi.fare || "")}</span></div>` : ""}
+      ${walk ? `<div class="mode-row">${icon("walk", 18)} <b>도보</b> <span>${esc(walk.time || "")}</span></div>` : ""}
+    </div>`;
 }
 
 /* ---------- 주변 관광 ---------- */
