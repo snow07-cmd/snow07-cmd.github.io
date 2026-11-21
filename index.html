@@ -259,6 +259,50 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
 .safety-card.focus { border: 2px solid var(--orange); }
 .check-list { padding-left: 20px; color: var(--text); }
 
+/* 실시간 정보 (표지 겹침 영역 + 실시간 정보 페이지) */
+.hero.hero-live { padding-bottom: 120px; }
+.live-cover { margin-top: -72px; position: relative; }
+.live-more { text-align: right; margin-top: 12px; }
+.live-more a, .live-more a:visited { font-size: 14px; font-weight: 700; color: var(--chip-text); }
+.live-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: start; }
+.live-cover .card { box-shadow: 0 16px 36px rgba(11,42,63,.10); }
+.head-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.cam-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.cam-tab {
+  font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  padding: 6px 12px; border-radius: 999px; border: 0;
+  background: var(--chip-bg); color: var(--chip-text);
+}
+.cam-tab.on { background: var(--navy); color: #fff; }
+.cctv {
+  position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
+  background: linear-gradient(160deg, #123a55, #0B2A3F 60%, #08202f); color: #9FB6C2;
+}
+.cctv iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.cctv-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+.cctv-tl { position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; align-items: center; }
+.cctv-tag { background: rgba(255,255,255,.12); color: #fff; font-size: 12px; border-radius: 6px; padding: 3px 8px; }
+.cctv-br { position: absolute; bottom: 12px; right: 12px; font-size: 12px; color: #7f9aa8; }
+.live-dot {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+  color: #C26A1F; background: #FDE7D3; border-radius: 999px; padding: 3px 10px;
+}
+.live-dot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #E0802F; }
+.updated { font-size: 12px; color: #7E9AA4; }
+.wx-list { display: flex; flex-direction: column; }
+.wx-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 2px; border-bottom: 1px solid #EEF4F6; font-size: 15px; }
+.wx-row span { color: var(--sub); display: flex; gap: 8px; align-items: center; }
+.wx-row b { font-size: 17px; color: var(--navy); }
+.wx-row b.empty { color: #9DB3BC; }
+.sunset-box {
+  background: var(--navy); color: #fff; border-radius: 14px; padding: 14px 18px; margin-top: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sunset-box span { display: flex; gap: 8px; align-items: center; }
+.sunset-box b { color: var(--orange); font-size: 20px; }
+.disc { font-size: 12px !important; color: var(--sub); margin-top: 6px; }
+.alert-line { display: flex; gap: 10px; align-items: center; }
+
 /* 시설 카드 */
 .facility-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .fee-tag {
@@ -325,6 +369,9 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
   .br-pc { display: none; }
 
   .grid-3 { grid-template-columns: 1fr; }
+  .live-grid { grid-template-columns: 1fr; }
+  .hero.hero-live { padding-bottom: 96px; }
+  .live-cover { margin-top: -56px; }
   .result-grid { grid-template-columns: 1fr; }
   .result-side { position: static; }
 }
@@ -380,6 +427,28 @@ window.SITE_DATA = {
     ai: false,        // AI 코스 추천 (AI API 연결 후 true)
     booking: false,   // 앱 내 예약 (서버/DB 연결 후 true)
     reviews: false    // 탑승자 리뷰 (서버/DB 연결 후 true)
+  },
+
+  /* ---------- 2-1. 실시간 정보 (CCTV · 날씨) ----------
+     cameras: 탭 하나 = 카메라 하나. src에 영상 주소(유튜브 임베드 주소 등)를 넣으면 영상이 나와요.
+              src가 비어 있으면 "연결 준비 중" 화면이 나와요.
+     weather: value를 비워 두면 "--"로 표시돼요. 나중에 날씨 API가 이 값을 채워요. */
+  live: {
+    cameras: [
+      { id: "dock", name: "선착장",    src: "" },
+      { id: "sea",  name: "바다 방향", src: "" }
+    ],
+    provider: "[ ]",
+    updated: "",
+    sunset: "",
+    weather: [
+      { id: "temp",  label: "기온",     unit: "℃",   value: "" },
+      { id: "wind",  label: "바람",     unit: " m/s", value: "" },
+      { id: "wave",  label: "파고",     unit: " m",   value: "" },
+      { id: "water", label: "수온",     unit: "℃",   value: "" },
+      { id: "alert", label: "기상특보", unit: "",     value: "" }
+    ],
+    notice: "참고용 정보예요. 운항 여부는 업체에 꼭 확인해 주세요."
   },
 
   /* ---------- 3. 카테고리 (메인 화면 칩 7개) ----------
@@ -553,6 +622,7 @@ const MENU = [
   { path: "#/transport", label: "가는 방법" },
   { path: "#/tour",      label: "주변 관광" },
   { path: "#/safety",    label: "안전 가이드" },
+  { path: "#/live",      label: "실시간 정보" },
   { path: "#/ai",        label: "AI 코스 추천", highlight: true }
 ];
 
@@ -581,7 +651,13 @@ const ICON = {
   star:   '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>',
   bus:    '<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21v-3M16 21v-3"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/>',
   car:    '<path d="M5 16l1.5-5a2 2 0 0 1 1.9-1.4h7.2a2 2 0 0 1 1.9 1.4L19 16"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><path d="M7 20v1.5M17 20v1.5"/>',
-  walk:   '<circle cx="13" cy="4" r="1.8"/><path d="M11 21l2-6-3-3 1-5 4 3 3 1"/><path d="M10 12l-2 3H5"/>'
+  walk:   '<circle cx="13" cy="4" r="1.8"/><path d="M11 21l2-6-3-3 1-5 4 3 3 1"/><path d="M10 12l-2 3H5"/>',
+  cam:    '<path d="M3 7h12v10H3z"/><path d="M15 10l6-3v10l-6-3"/>',
+  temp:   '<path d="M10 14V5a2 2 0 1 1 4 0v9a4 4 0 1 1-4 0z"/>',
+  water:  '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  wind:   '<path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h16a3 3 0 1 1-3 3"/><path d="M3 16h8"/>',
+  alert:  '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18h.01"/>',
+  sunset: '<path d="M3 18h18M5 14a7 7 0 0 1 14 0"/><path d="M12 3v4M9 6l3 3 3-3"/>'
 };
 function icon(name, size = 24) {
   return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
@@ -641,7 +717,7 @@ function pageHome() {
     </a>`).join("");
 
   return `
-    <section class="hero">
+    <section class="hero hero-live">
       <div class="container hero-inner">
         <div class="hero-text">
           <span class="eyebrow light">GANGNEUNG MARINA</span>
@@ -649,6 +725,13 @@ function pageHome() {
           <p>체험, 요금, 가는 방법, 안전 수칙을 한곳에서 확인하고<br class="br-pc"> 내 상황을 적으면 AI가 방문 코스를 짜드립니다.</p>
         </div>
         ${aiInputCard()}
+      </div>
+    </section>
+
+    <section class="live-cover">
+      <div class="container">
+        ${liveBlock()}
+        <p class="live-more"><a href="#/live">실시간 정보 더 보기 →</a></p>
       </div>
     </section>
 
@@ -956,6 +1039,53 @@ function pageSafety(focusId) {
     <section class="section"><div class="container grid-2 safety-grid">${cards}</div></section>`;
 }
 
+/* ---------- 실시간 정보 (CCTV · 날씨) ---------- */
+// 카메라 화면: 영상 주소가 있으면 영상, 없으면 "연결 준비 중"
+function cameraView(cam) {
+  const src = (cam && cam.src || "").trim();
+  if (/^https:\/\//.test(src)) {
+    return `<div class="cctv"><iframe src="${esc(src)}" title="${esc(cam.name)} CCTV" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+  }
+  return `
+    <div class="cctv">
+      <div class="cctv-tl"><span class="live-dot">LIVE 준비 중</span><span class="cctv-tag">${esc(cam ? cam.name : "")}</span></div>
+      <div class="cctv-center">${icon("cam", 30)}<span>실시간 영상 연결 준비 중</span></div>
+      <div class="cctv-br">영상 제공: ${esc(D.live.provider || "[ ]")}</div>
+    </div>`;
+}
+
+// CCTV 카드 + 날씨 카드 (표지와 실시간 정보 페이지에서 같이 사용)
+function liveBlock() {
+  const L = D.live;
+  const cams = L.cameras || [];
+  const tabs = cams.length > 1 ? `<div class="cam-tabs" role="tablist">${cams.map((c, i) =>
+    `<button type="button" class="cam-tab ${i === 0 ? "on" : ""}" data-cam="${i}" role="tab" aria-selected="${i === 0}">${esc(c.name)}</button>`).join("")}</div>` : "";
+  const rows = (L.weather || []).map(w => `
+    <div class="wx-row"><span>${icon(w.id, 18)}${esc(w.label)}</span><b class="${w.value ? "" : "empty"}">${w.value ? esc(w.value + (w.unit || "")) : "--" + esc(w.unit || "")}</b></div>`).join("");
+  return `
+    <div class="live-grid">
+      <div class="card live-cctv">
+        <div class="head-row"><h3>마리나 CCTV</h3>${tabs}</div>
+        <div class="cam-view">${cameraView(cams[0])}</div>
+      </div>
+      <div class="card">
+        <div class="head-row"><h3>현재 날씨</h3><span class="updated">업데이트 ${esc(L.updated || "--:--")}</span></div>
+        <div class="wx-list">${rows}</div>
+        <div class="sunset-box"><span>${icon("sunset", 18)} 오늘 일몰</span><b>${esc(L.sunset || "--:--")}</b></div>
+        <p class="disc">${esc(L.notice || "")}</p>
+      </div>
+    </div>`;
+}
+
+function pageLive() {
+  return `
+    ${pageHead("LIVE", "실시간 정보", "지금 마리나 바다 상황을 영상과 날씨로 확인하세요.")}
+    <section class="section"><div class="container">
+      <div class="notice-line alert-line">${icon("alert", 18)} 기상특보 정보 준비 중 · 풍랑주의보가 내려지면 운항이 취소돼요.</div>
+      ${liveBlock()}
+    </div></section>`;
+}
+
 /* ---------- 없는 주소 ---------- */
 function pageNotFound() {
   return `<section class="section"><div class="container narrow">
@@ -1024,6 +1154,7 @@ function routerInner() {
     case "transport": html = pageTransport(); break;
     case "tour":      html = pageTour(); break;
     case "safety":    html = pageSafety(parts[1]); break;
+    case "live":      html = pageLive(); break;
     default:          html = pageNotFound();
   }
   document.getElementById("app").innerHTML = html;
@@ -1055,6 +1186,18 @@ document.addEventListener("click", e => {
     const box = document.getElementById("ai-input");
     box.value = ex.dataset.example;
     box.focus();
+    return;
+  }
+  // CCTV 탭 바꾸기
+  const tab = e.target.closest(".cam-tab");
+  if (tab) {
+    const card = tab.closest(".live-cctv");
+    card.querySelectorAll(".cam-tab").forEach(t => {
+      const on = t === tab;
+      t.classList.toggle("on", on);
+      t.setAttribute("aria-selected", on);
+    });
+    card.querySelector(".cam-view").innerHTML = cameraView(D.live.cameras[Number(tab.dataset.cam)]);
     return;
   }
   // 카테고리 항목 고르기 (여러 개 선택 가능)
