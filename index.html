@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
+  <meta name="site-version" content="v4">
+  <!-- 사이트 버전 v4 (2026-11-21) -->
+
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
   <!--
     ★ 요트핏 웹사이트 — 이 파일 하나만 있으면 사이트가 작동합니다.
@@ -303,6 +306,87 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
 .disc { font-size: 12px !important; color: var(--sub); margin-top: 6px; }
 .alert-line { display: flex; gap: 10px; align-items: center; }
 
+/* 오늘 상태 배지 */
+.title-badge { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.day-badge {
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.day-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.day-good  { background: #DDF3EA; color: #1E7A57; }
+.day-mild  { background: #FFF1CC; color: #946200; }
+.day-rough { background: #FDE2CF; color: #B2531A; }
+.day-stop  { background: #FBE0E0; color: #B42B2B; }
+.day-none  { background: #EEF4F6; color: #7E9AA4; }
+
+/* 수치 + 쉬운 말 */
+.wx-val { display: flex; align-items: center; gap: 8px; }
+.easy {
+  font-style: normal; font-size: 12px; font-weight: 500;
+  background: var(--chip-bg); color: var(--chip-text); border-radius: 999px; padding: 2px 8px;
+}
+
+/* 휴대폰 표지: 날씨 한 줄 요약 (PC에서는 숨김) */
+.live-summary { display: none; }
+.live-summary {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  padding: 14px 16px; box-shadow: 0 12px 28px rgba(11,42,63,.10);
+  flex-direction: column; gap: 8px;
+}
+.ls-top { display: flex; align-items: center; gap: 8px; }
+.ls-top > b { font-size: 15px; }
+.ls-more { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--chip-text); white-space: nowrap; }
+.ls-line { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--sub); }
+.ls-line b { color: var(--navy); }
+.ls-line em { font-style: normal; color: var(--chip-text); }
+
+/* 이번 주 날씨 */
+.week-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.week-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+}
+.week-card.today { border: 2px solid var(--orange); }
+.wk-day { display: flex; align-items: baseline; gap: 6px; }
+.wk-day span { font-size: 12px; color: var(--sub); }
+.wk-sky { font-size: 14px; color: var(--sub); }
+.wk-temp { font-size: 14px; color: var(--sub); }
+.wk-temp b { font-size: 18px; color: var(--navy); }
+.wk-info { list-style: none; font-size: 13px; color: var(--sub); display: flex; flex-direction: column; gap: 2px; }
+.wk-info li { display: flex; align-items: center; gap: 5px; }
+
+/* 한 달 날씨 (달력) */
+.cal {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px;
+}
+.cal-head { text-align: center; font-size: 12px; font-weight: 700; color: var(--sub); padding: 4px 0; }
+.cal-head.sun, .cal-date.sun { color: #C0504D; }
+.cal-head.sat, .cal-date.sat { color: #2F6FB0; }
+.cal-cell {
+  min-height: 74px; border-radius: 10px; background: var(--bg); padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 2px; font-size: 12px;
+}
+.cal-cell.blank { background: transparent; }
+.cal-cell.today { outline: 2px solid var(--orange); outline-offset: -2px; }
+.cal-date { font-weight: 700; font-size: 13px; color: var(--navy); }
+.cal-st { color: #9DB3BC; font-weight: 500; }
+.cal-temp { color: #7E9AA4; }
+.cal-cell.st-good  .cal-st { color: #1E7A57; }
+.cal-cell.st-mild  .cal-st { color: #946200; }
+.cal-cell.st-rough .cal-st { color: #B2531A; }
+.cal-cell.st-stop  .cal-st { color: #B42B2B; }
+
+/* 쉬운 말 기준표 */
+.legend ul { list-style: none; }
+.legend-days { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.legend-days li { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 14px; color: var(--sub); }
+.legend-scale { display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid #EEF4F6; font-size: 13px; }
+.legend-scale:last-child { border-bottom: 0; }
+.legend-scale > span { font-weight: 700; color: var(--navy); }
+.legend-scale ul { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--sub); }
+.legend-scale b { color: var(--chip-text); font-weight: 700; margin-right: 2px; }
+
 /* 시설 카드 */
 .facility-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .fee-tag {
@@ -370,6 +454,8 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
 
   .grid-3 { grid-template-columns: 1fr; }
   .live-grid { grid-template-columns: 1fr; }
+  .week-row { grid-template-columns: repeat(7, 132px); overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; }
+  .week-card { scroll-snap-align: start; }
   .hero.hero-live { padding-bottom: 96px; }
   .live-cover { margin-top: -56px; }
   .result-grid { grid-template-columns: 1fr; }
@@ -387,6 +473,15 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,42,6
   .page-head h1 { font-size: 26px; }
   .chip-lg { padding: 10px 16px; font-size: 15px; }
   .step-card { padding: 18px; gap: 14px; }
+  /* 휴대폰 표지: CCTV 숨기고 날씨 한 줄 요약만 */
+  .live-cover .live-pc { display: none; }
+  .live-summary { display: flex; }
+  .hero.hero-live { padding-bottom: 72px; }
+  .live-cover { margin-top: -40px; }
+  .cal { padding: 8px; gap: 4px; }
+  .cal-cell { min-height: 58px; padding: 4px; font-size: 10px; }
+  .cal-date { font-size: 12px; }
+  .cal-temp { display: none; }
   .course-title { font-size: 23px; }
 }
 
@@ -432,7 +527,10 @@ window.SITE_DATA = {
   /* ---------- 2-1. 실시간 정보 (CCTV · 날씨) ----------
      cameras: 탭 하나 = 카메라 하나. src에 영상 주소(유튜브 임베드 주소 등)를 넣으면 영상이 나와요.
               src가 비어 있으면 "연결 준비 중" 화면이 나와요.
-     weather: value를 비워 두면 "--"로 표시돼요. 나중에 날씨 API가 이 값을 채워요. */
+     weather: value를 비워 두면 "--"로 표시돼요. 나중에 날씨 API가 이 값을 채워요.
+              숫자만 적어요 (예: 기온 12, 바람 3.5, 파고 0.4). 기상특보는 글자 (예: "없음", "풍랑주의보").
+     week / month: 날짜별 예보. 비어 있으면 날짜만 나오고 값은 "--"로 표시돼요.
+              예시) { date: "2026-11-22", sky: "맑음", tmax: 13, tmin: 4, wind: 3.2, wave: 0.4, alert: "" } */
   live: {
     cameras: [
       { id: "dock", name: "선착장",    src: "" },
@@ -448,7 +546,26 @@ window.SITE_DATA = {
       { id: "water", label: "수온",     unit: "℃",   value: "" },
       { id: "alert", label: "기상특보", unit: "",     value: "" }
     ],
+    week: [],
+    month: [],
     notice: "참고용 정보예요. 운항 여부는 업체에 꼭 확인해 주세요."
+  },
+
+  /* ---------- 2-2. 날씨 쉬운 말 기준 ----------
+     수치 옆에 붙는 쉬운 말과 "오늘 상태" 배지의 기준이에요. 업체와 상의해서 숫자를 바꿔도 돼요.
+     under = 이 값보다 작으면 이 말을 써요 (마지막 줄은 그 이상 전부). */
+  easy: {
+    temp:  [ { under: 10, text: "추워요" }, { under: 17, text: "쌀쌀해요" }, { under: 26, text: "활동하기 좋아요" }, { text: "더워요" } ],
+    water: [ { under: 15, text: "차가워요" }, { under: 22, text: "시원해요" }, { text: "따뜻해요" } ],
+    wind:  [ { under: 4, text: "약해요" }, { under: 8, text: "조금 불어요" }, { under: 14, text: "강해요" }, { text: "매우 강해요" } ],
+    wave:  [ { under: 0.5, text: "잔잔해요" }, { under: 1, text: "조금 출렁여요" }, { under: 3, text: "많이 출렁여요" }, { text: "매우 높아요" } ],
+    // 오늘 상태 배지: 위에서부터 차례로 검사해서 처음 맞는 것을 보여줘요
+    day: [
+      { key: "stop",  text: "운항이 어려운 날",       short: "운항 어려움", rule: "풍랑주의보·경보, 또는 바람 14m/s 이상, 또는 파고 3m 이상", wind: 14, wave: 3 },
+      { key: "rough", text: "배가 많이 흔들리는 날",  short: "많이 흔들림", rule: "바람 8m/s 이상, 또는 파고 1m 이상", wind: 8, wave: 1 },
+      { key: "mild",  text: "배가 약간 흔들리는 날",  short: "약간 흔들림", rule: "바람 4m/s 이상, 또는 파고 0.5m 이상", wind: 4, wave: 0.5 },
+      { key: "good",  text: "요트 타기 좋은 날",      short: "타기 좋음",   rule: "바람 4m/s 미만, 그리고 파고 0.5m 미만" }
+    ]
   },
 
   /* ---------- 3. 카테고리 (메인 화면 칩 7개) ----------
@@ -730,8 +847,11 @@ function pageHome() {
 
     <section class="live-cover">
       <div class="container">
-        ${liveBlock()}
-        <p class="live-more"><a href="#/live">실시간 정보 더 보기 →</a></p>
+        <div class="live-pc">
+          ${liveBlock()}
+          <p class="live-more"><a href="#/live">실시간 정보 더 보기 →</a></p>
+        </div>
+        ${liveSummary()}
       </div>
     </section>
 
@@ -1060,8 +1180,14 @@ function liveBlock() {
   const cams = L.cameras || [];
   const tabs = cams.length > 1 ? `<div class="cam-tabs" role="tablist">${cams.map((c, i) =>
     `<button type="button" class="cam-tab ${i === 0 ? "on" : ""}" data-cam="${i}" role="tab" aria-selected="${i === 0}">${esc(c.name)}</button>`).join("")}</div>` : "";
-  const rows = (L.weather || []).map(w => `
-    <div class="wx-row"><span>${icon(w.id, 18)}${esc(w.label)}</span><b class="${w.value ? "" : "empty"}">${w.value ? esc(w.value + (w.unit || "")) : "--" + esc(w.unit || "")}</b></div>`).join("");
+  const rows = (L.weather || []).map(w => {
+    const has = String(w.value ?? "").trim() !== "";
+    const easy = has ? easyText(w.id, w.value) : "";
+    return `
+    <div class="wx-row"><span>${icon(w.id, 18)}${esc(w.label)}</span>
+      <div class="wx-val"><b class="${has ? "" : "empty"}">${has ? esc(w.value + (w.unit || "")) : "--" + esc(w.unit || "")}</b>${easy ? `<em class="easy">${esc(easy)}</em>` : ""}</div>
+    </div>`;
+  }).join("");
   return `
     <div class="live-grid">
       <div class="card live-cctv">
@@ -1069,10 +1195,120 @@ function liveBlock() {
         <div class="cam-view">${cameraView(cams[0])}</div>
       </div>
       <div class="card">
-        <div class="head-row"><h3>현재 날씨</h3><span class="updated">업데이트 ${esc(L.updated || "--:--")}</span></div>
+        <div class="head-row"><div class="title-badge"><h3>현재 날씨</h3>${dayBadge(currentStatus())}</div><span class="updated">업데이트 ${esc(L.updated || "--:--")}</span></div>
         <div class="wx-list">${rows}</div>
         <div class="sunset-box"><span>${icon("sunset", 18)} 오늘 일몰</span><b>${esc(L.sunset || "--:--")}</b></div>
         <p class="disc">${esc(L.notice || "")}</p>
+      </div>
+    </div>`;
+}
+
+/* ----- 날씨 쉬운 말 도우미 ----- */
+const toNum = v => (v === "" || v == null || isNaN(Number(v))) ? NaN : Number(v);
+function easyText(kind, value) {
+  const list = (D.easy || {})[kind];
+  const v = toNum(value);
+  if (!list || isNaN(v)) return "";
+  const hit = list.find(l => l.under === undefined || v < l.under);
+  return hit ? hit.text : "";
+}
+// 바람·파고·특보로 그날 상태 고르기 (값이 하나도 없으면 null)
+function dayStatus(wind, wave, alert) {
+  const w = toNum(wind), h = toNum(wave);
+  const a = String(alert || "");
+  const storm = /풍랑/.test(a);
+  if (isNaN(w) && isNaN(h) && !storm) return null;
+  for (const d of D.easy.day) {
+    if (d.key === "good") return d;
+    if ((d.key === "stop" && storm) || (!isNaN(w) && w >= d.wind) || (!isNaN(h) && h >= d.wave)) return d;
+  }
+  return null;
+}
+function currentValue(id) { const w = (D.live.weather || []).find(x => x.id === id); return w ? w.value : ""; }
+function currentStatus() { return dayStatus(currentValue("wind"), currentValue("wave"), currentValue("alert")); }
+function dayBadge(st, short = false) {
+  return st
+    ? `<span class="day-badge day-${st.key}">${esc(short ? st.short : st.text)}</span>`
+    : `<span class="day-badge day-none">${short ? "--" : "상태 확인 중"}</span>`;
+}
+
+/* ----- 날짜 도우미 ----- */
+const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
+function dateKey(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function findDay(list, d) { return (list || []).find(x => x.date === dateKey(d)) || {}; }
+const show = (v, unit = "") => (toNum(v) === toNum(v)) ? esc(v + unit) : "--";
+
+/* ----- 표지(휴대폰)용 날씨 한 줄 요약 ----- */
+function liveSummary() {
+  const part = (label, id, unit) => {
+    const v = currentValue(id), e = easyText(id, v);
+    return `<span>${label} <b>${show(v, unit)}</b>${e ? ` <em>${esc(e)}</em>` : ""}</span>`;
+  };
+  return `
+    <a class="live-summary" href="#/live">
+      <div class="ls-top"><b>현재 날씨</b>${dayBadge(currentStatus())}<span class="ls-more">실시간 정보 ›</span></div>
+      <div class="ls-line">${part("기온", "temp", "℃")}${part("바람", "wind", "m/s")}${part("파고", "wave", "m")}<span>일몰 <b>${esc(D.live.sunset || "--:--")}</b></span></div>
+    </a>`;
+}
+
+/* ----- 이번 주 날씨 (오늘부터 7일) ----- */
+function weekView() {
+  const today = new Date();
+  const cards = [0, 1, 2, 3, 4, 5, 6].map(i => {
+    const d = addDays(today, i), f = findDay(D.live.week, d);
+    const label = i === 0 ? "오늘" : i === 1 ? "내일" : WEEKDAY[d.getDay()] + "요일";
+    return `
+      <div class="week-card ${i === 0 ? "today" : ""}">
+        <div class="wk-day"><b>${label}</b><span>${d.getMonth() + 1}/${d.getDate()}</span></div>
+        <div class="wk-sky">${esc(f.sky || "--")}</div>
+        <div class="wk-temp"><b>${show(f.tmax, "°")}</b> / ${show(f.tmin, "°")}</div>
+        <ul class="wk-info">
+          <li>${icon("wind", 14)} ${show(f.wind, "m/s")}</li>
+          <li>${icon("wave", 14)} ${show(f.wave, "m")}</li>
+        </ul>
+        ${dayBadge(dayStatus(f.wind, f.wave, f.alert), true)}
+      </div>`;
+  }).join("");
+  return `<div class="week-row">${cards}</div>`;
+}
+
+/* ----- 한 달 날씨 (오늘부터 30일, 달력 모양) ----- */
+function monthView() {
+  const today = new Date();
+  const lead = today.getDay();   // 오늘 앞의 빈칸 (일요일 시작)
+  const head = WEEKDAY.map((w, i) => `<div class="cal-head ${i === 0 ? "sun" : i === 6 ? "sat" : ""}">${w}</div>`).join("");
+  const blanks = Array.from({ length: lead }, () => `<div class="cal-cell blank"></div>`).join("");
+  const cells = Array.from({ length: 30 }, (_, i) => {
+    const d = addDays(today, i), f = findDay(D.live.month, d);
+    const st = dayStatus(f.wind, f.wave, f.alert);
+    const label = (i === 0 || d.getDate() === 1) ? `${d.getMonth() + 1}/${d.getDate()}` : d.getDate();
+    return `
+      <div class="cal-cell ${i === 0 ? "today" : ""} ${st ? "st-" + st.key : ""}">
+        <span class="cal-date ${d.getDay() === 0 ? "sun" : d.getDay() === 6 ? "sat" : ""}">${label}</span>
+        <span class="cal-st">${st ? esc(st.short) : "--"}</span>
+        <span class="cal-temp">${show(f.tmax, "°")}/${show(f.tmin, "°")}</span>
+      </div>`;
+  }).join("");
+  return `<div class="cal">${head}${blanks}${cells}</div>`;
+}
+
+/* ----- 쉬운 말 기준표 (수치와 함께) ----- */
+function easyLegend() {
+  const range = (list, unit) => list.map((l, i) => {
+    const from = i === 0 ? null : list[i - 1].under;
+    const txt = l.under === undefined ? `${from}${unit} 이상` : from == null ? `${l.under}${unit} 미만` : `${from}~${l.under}${unit}`;
+    return `<li><b>${esc(l.text)}</b> ${esc(txt)}</li>`;
+  }).join("");
+  const days = D.easy.day.map(d => `<li>${dayBadge(d)} <span>${esc(d.rule)}</span></li>`).join("");
+  return `
+    <div class="grid-2 legend">
+      <div class="card"><h3>오늘 상태 배지</h3><ul class="legend-days">${days}</ul></div>
+      <div class="card"><h3>수치 쉬운 말</h3>
+        <div class="legend-scale"><span>바람</span><ul>${range(D.easy.wind, "m/s")}</ul></div>
+        <div class="legend-scale"><span>파고</span><ul>${range(D.easy.wave, "m")}</ul></div>
+        <div class="legend-scale"><span>기온</span><ul>${range(D.easy.temp, "℃")}</ul></div>
+        <div class="legend-scale"><span>수온</span><ul>${range(D.easy.water, "℃")}</ul></div>
       </div>
     </div>`;
 }
@@ -1083,6 +1319,18 @@ function pageLive() {
     <section class="section"><div class="container">
       <div class="notice-line alert-line">${icon("alert", 18)} 기상특보 정보 준비 중 · 풍랑주의보가 내려지면 운항이 취소돼요.</div>
       ${liveBlock()}
+
+      <h2 class="section-title mt-48">이번 주 날씨</h2>
+      <p class="section-desc">오늘부터 7일 동안의 바다 날씨예요.</p>
+      ${weekView()}
+
+      <h2 class="section-title mt-48">한 달 날씨</h2>
+      <p class="section-desc">앞으로 30일의 흐름이에요. 먼 날짜일수록 예보가 바뀔 수 있어요.</p>
+      ${monthView()}
+
+      <h2 class="section-title mt-48">날씨 쉬운 말 기준</h2>
+      <p class="section-desc">수치 옆의 쉬운 말과 오늘 상태 배지는 아래 기준으로 정해져요. 실제 운항 여부는 업체에 확인해 주세요.</p>
+      ${easyLegend()}
     </div></section>`;
 }
 
