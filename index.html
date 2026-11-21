@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v5">
-  <!-- 사이트 버전 v5 (2026-11-21) -->
+  <meta name="site-version" content="v6">
+  <!-- 사이트 버전 v6 (2026-11-21) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
   <!--
@@ -425,7 +425,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v5)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v6)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -826,7 +826,7 @@ function pageHome() {
   const chips = D.categories.map(c =>
     `<a class="chip chip-lg" href="#/category/${c.id}">${esc(c.name)}</a>`).join("");
   const quick = [
-    ["#/yacht", "boat", "요트·체험"], ["#/transport", "bus", "가는 방법"], ["#/yacht", "building", "시설"],
+    ["#/yacht", "boat", "요트·체험"], ["#/transport", "bus", "가는 방법"], ["#/marina", "building", "시설"],
     ["#/safety", "buoy", "안전 가이드"], ["#/live", "cam", "실시간 영상"]
   ].map(([h, i, t]) => `<a href="${h}">${icon(i, 26)}${t}</a>`).join("");
   const facts = (D.quickFacts || []).map(f => `
@@ -1014,25 +1014,26 @@ function pageMarina() {
   const body = isEmpty(D.marina)
     ? preparing("마리나 소개 준비 중입니다")
     : `<div class="grid-2">${D.marina.map(m => `<div class="card"><h3>${esc(m.title)}</h3><p>${esc(m.text)}</p></div>`).join("")}</div>`;
-  return `
-    ${pageHead("ABOUT", "마리나 소개", "강릉 마리나는 어떤 곳인지 알려드려요.")}
-    <section class="section"><div class="container">${body}</div></section>`;
-}
-
-/* ---------- 요트·체험 (+ 예약·리뷰 자리) ---------- */
-function pageYacht() {
   const facilities = isEmpty(D.facilities)
     ? preparing("시설 안내 준비 중입니다")
     : `<div class="grid-3">${D.facilities.map(facilityCard).join("")}</div>`;
   return `
-    ${pageHead("EXPERIENCE", "요트·체험", "요트 투어를 비롯한 마리나 체험과 시설을 확인하세요.")}
+    ${pageHead("", "마리나 소개", "강릉항 요트마리나가 어떤 곳인지, 어떤 시설이 있는지 알려 드려요.")}
+    <section class="section"><div class="container">
+      ${body}
+      <h2 class="section-title mt-48" id="facilities">마리나 시설</h2>
+      ${facilities}
+    </div></section>`;
+}
+
+/* ---------- 요트·체험 (+ 예약·리뷰 자리) ---------- */
+function pageYacht() {
+  return `
+    ${pageHead("", "요트·체험", "요트 투어를 비롯한 마리나 체험을 확인하세요.")}
     <section class="section">
       <div class="container">
         <h2 class="section-title">요트 투어·체험</h2>
         ${renderExperiences([])}
-
-        <h2 class="section-title mt-48">마리나 시설</h2>
-        ${facilities}
 
         <div class="grid-2 mt-48">
           <div class="card soon-card">
