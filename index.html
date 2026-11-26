@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v8">
-  <!-- 사이트 버전 v8 (2026-11-21) -->
+  <meta name="site-version" content="v9">
+  <!-- 사이트 버전 v9 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
   <!--
@@ -200,6 +200,10 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 .info-list li { display: flex; align-items: center; gap: 6px; }
 .notice-line { background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--primary); border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px; color: var(--sub); }
 .alert-line { display: flex; gap: 10px; align-items: center; border-left-color: var(--rough); }
+.alert-on { border-left-color: var(--stop); color: var(--ink); background: #FBEFEE; }
+.alert-off { border-left-color: var(--good); }
+.alert-off .icon { color: var(--good); }
+.credit[hidden] { display: none; }
 
 /* 준비 중 */
 .preparing { background: var(--paper); border: 1px dashed #C3CDD3; border-radius: var(--r); padding: 40px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -444,7 +448,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v8)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v9)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -521,7 +525,10 @@ window.SITE_DATA = {
     ],
     week: [],
     month: [],
-    notice: "참고용 정보예요. 운항 여부는 업체에 꼭 확인해 주세요."
+    notice: "참고용 정보예요. 운항 여부는 업체에 꼭 확인해 주세요.",
+    // 날씨 자동 업데이트 파일 (GitHub Actions가 1시간마다 새로 저장). 비우면 날씨를 불러오지 않아요.
+    weatherUrl: "https://raw.githubusercontent.com/snow07-cmd/snow07-cmd.github.io/main/weather.json",
+    source: ""
   },
 
   /* ---------- 2-2. 날씨 쉬운 말 기준 ----------
@@ -1277,7 +1284,7 @@ function liveBlock() {
         <div class="head-row"><div class="title-badge"><h3>현재 날씨</h3>${dayBadge(currentStatus())}</div><span class="updated">업데이트 ${esc(L.updated || "--:--")}</span></div>
         <div class="wx-list">${rows}</div>
         <div class="sunset-box"><span>${icon("sunset", 18)} 오늘 해 지는 시각</span><b>${esc(L.sunset || "--:--")}</b></div>
-        <p class="disc">${esc(L.notice || "")}</p>
+        <p class="disc">${esc(L.notice || "")}${L.source ? ` 날씨 정보: ${esc(L.source)} 제공.` : ""}</p>
       </div>
     </div>`;
 }
@@ -1392,11 +1399,19 @@ function easyLegend() {
     </div>`;
 }
 
+// 실시간 정보 맨 위 특보 안내
+function alertBanner() {
+  const a = String(currentValue("alert") || "").trim();
+  if (/풍랑/.test(a)) return `<div class="notice-line alert-line alert-on">${icon("alert", 18)} 지금 강릉 앞바다에 ${esc(a)}가 발효 중이에요. 요트 운항이 취소될 수 있으니 업체에 꼭 확인해 주세요.</div>`;
+  if (a) return `<div class="notice-line alert-line alert-off">${icon("check", 18)} 지금 강릉 앞바다에 풍랑특보가 없어요.</div>`;
+  return `<div class="notice-line alert-line">${icon("alert", 18)} 기상특보 정보를 준비하고 있어요. 풍랑주의보가 내려지면 운항이 취소돼요.</div>`;
+}
+
 function pageLive() {
   return `
     ${pageHead("LIVE", "실시간 정보", "지금 마리나 바다 상황을 영상과 날씨로 확인하세요.")}
     <section class="section"><div class="container">
-      <div class="notice-line alert-line">${icon("alert", 18)} 기상특보 정보를 준비하고 있어요. 풍랑주의보가 내려지면 운항이 취소돼요.</div>
+      ${alertBanner()}
       ${liveBlock()}
 
       <h2 class="section-title mt-48">이번 주 날씨</h2>
@@ -1404,7 +1419,7 @@ function pageLive() {
       ${weekView()}
 
       <h2 class="section-title mt-48">한 달 날씨</h2>
-      <p class="section-desc">앞으로 30일의 흐름이에요. 먼 날짜일수록 예보가 바뀔 수 있어요.</p>
+      <p class="section-desc">기상청 예보는 10일 뒤까지 나와요. 그 뒤 날짜는 예보가 나오면 채워지고, 먼 날짜일수록 바뀔 수 있어요.</p>
       ${monthView()}
 
       <h2 class="section-title mt-48">날씨 쉬운 말 기준</h2>
@@ -1452,6 +1467,7 @@ function renderFooter() {
       <strong>${esc(D.site.name)}</strong>
       <p>${esc(D.site.notice)}</p>
       <p>문의 ${esc(D.site.contact)}</p>
+      <p class="credit" ${D.live.source ? "" : "hidden"}>날씨 정보: ${esc(D.live.source || "")} 제공</p>
     </div>`;
 }
 
@@ -1495,7 +1511,7 @@ function routerInner() {
   // 안전 가이드 특정 항목으로 왔으면 그 위치로, 아니면 맨 위로
   const focus = parts[0] === "safety" && parts[1] && document.getElementById("safety-" + parts[1]);
   if (focus) focus.scrollIntoView({ behavior: "smooth", block: "center" });
-  else window.scrollTo(0, 0);
+  else if (!window.__keepScroll) window.scrollTo(0, 0);
 }
 
 /* ---------- 클릭·입력 처리 ---------- */
@@ -1540,9 +1556,50 @@ document.addEventListener("click", e => {
 });
 
 window.addEventListener("hashchange", router);
+
+/* ---------- 날씨 불러오기 (weather.json) ----------
+   GitHub Actions가 저장한 파일을 읽어 정보 영역의 live 칸을 채워요.
+   못 불러오면 조용히 넘어가고 지금처럼 '--'로 보여요. */
+async function loadWeather() {
+  const urls = [D.live.weatherUrl, "weather.json"].filter(Boolean);
+  for (const u of urls) {
+    try {
+      const res = await fetch(u + (u.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) continue;
+      const w = await res.json();
+      if (!w || !w.current) continue;
+      applyWeather(w);
+      return true;
+    } catch (e) { /* 다음 주소로 */ }
+  }
+  return false;
+}
+
+function applyWeather(w) {
+  const L = D.live;
+  const map = { temp: "temp", wind: "wind", wave: "wave", water: "water", alert: "alert" };
+  (L.weather || []).forEach(x => {
+    const v = w.current[map[x.id]];
+    x.value = (v === null || v === undefined) ? "" : String(v);
+  });
+  if (w.sunset) L.sunset = w.sunset;
+  if (w.updated) L.updated = w.updated;
+  if (Array.isArray(w.days)) { L.week = w.days; L.month = w.days; }
+  L.source = w.source || "기상청";
+  // 날씨가 보이는 화면이면 다시 그리기 (스크롤 위치는 그대로)
+  const h = location.hash || "#/";
+  if (h === "#/" || h === "#" || h.startsWith("#/live")) {
+    window.__keepScroll = true;   // 날씨만 바뀐 거라 스크롤은 그대로
+    router();
+    window.__keepScroll = false;
+  }
+  renderFooter();
+}
 renderHeader();
 renderFooter();
 router();
+loadWeather();
+setInterval(loadWeather, 30 * 60 * 1000);   // 30분마다 다시 확인
 
   </script>
 </body>
