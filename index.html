@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v11">
+  <meta name="site-version" content="v12">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -225,17 +225,36 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 12px; }
 
 /* ---------- 요트·체험 ---------- */
-.company { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 22px 24px; }
-.company + .company { margin-top: 20px; }
+.company { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); }
+.company + .company { margin-top: 10px; }
+.company[open] { border-color: var(--primary); }
+.company-sum { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto auto; gap: 20px; align-items: center; padding: 18px 24px; }
+.company-sum::-webkit-details-marker { display: none; }
+.company-sum:hover { background: var(--bg); }
+.company-sum:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.company[open] > .company-sum { border-bottom: 1px solid var(--line); }
+.cs-main h3 { font-size: 20px; font-weight: 900; letter-spacing: -.03em; }
+.cs-meta { font-size: 14px; color: var(--sub); margin-top: 2px; }
+.cs-price { display: grid; gap: 2px; text-align: right; font-size: 14px; color: var(--sub); }
+.cs-price b { color: var(--ink); font-size: 16px; font-weight: 900; margin-left: 6px; }
+.cs-toggle { font-size: 14px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cs-toggle::before { content: "자세히 보기"; }
+.company[open] .cs-toggle::before { content: "접기"; }
+.cs-toggle::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.company[open] .cs-toggle::after { transform: translateY(2px) rotate(-135deg); }
+.company-body { padding: 18px 24px 22px; }
 .company-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.company-head .btn-row { margin-left: auto; }
 .company-head h3 { font-size: 22px; font-weight: 900; letter-spacing: -.03em; }
 .aka { font-size: 14px; color: var(--sub); }
 .company-head .btn-row { margin-top: 0; padding-top: 0; }
-.company-info { margin: 14px 0 18px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); gap: 6px; }
+.company-info { margin: 0 0 18px; padding: 0 0 14px; border-bottom: 1px solid var(--line); gap: 6px; }
+.company-head + .company-info { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .company-info li { align-items: flex-start; }
 .company-info .icon { margin-top: 3px; }
 .company-info b { color: var(--ink); margin-right: 4px; }
 .course-group + .course-group { margin-top: 18px; }
+.company-hint { font-size: 14px; margin-bottom: 10px; }
 .cg-title { font-size: 15px; font-weight: 900; margin-bottom: 6px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .cg-title span { font-size: 13px; font-weight: 400; color: var(--sub); }
 .course-list { border-top: 2px solid var(--ink); }
@@ -452,7 +471,15 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
   .page-head { padding: 28px 0 22px; }
   .page-head h1 { font-size: 26px; }
   .panel, .card { padding: 18px; }
-  .company { padding: 16px; }
+  .company-sum { grid-template-columns: 1fr auto; grid-template-areas: "main tog" "price price"; gap: 6px 12px; padding: 14px 16px; }
+  .cs-main { grid-area: main; }
+  .cs-main h3 { font-size: 18px; }
+  .cs-meta { font-size: 13px; }
+  .cs-price { grid-area: price; display: flex; flex-wrap: wrap; gap: 2px 14px; text-align: left; font-size: 13px; }
+  .cs-price b { font-size: 15px; margin-left: 4px; }
+  .cs-toggle { grid-area: tog; align-self: start; padding-top: 6px; }
+  .cs-toggle::before, .company[open] .cs-toggle::before { content: ""; }
+  .company-body { padding: 14px 16px 18px; }
   .course-row { grid-template-columns: 1fr auto; }
   .course-row .cr-main { grid-column: 1 / -1; }
   .course-row .exp-price { text-align: right; }
@@ -471,7 +498,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v11)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v12)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -591,7 +618,7 @@ window.SITE_DATA = {
     { title: "운영 시간",
       text: "매일 10:00부터 해 질 때까지 운영해요. 계절마다 해 뜨고 지는 시간이 달라서 운항 시각도 달라져요." },
     { title: "요트 업체",
-      text: "루나로사 요트클럽, 요트갤러리 강릉, 강릉마리나호, 클럽요트마스터 4곳에서 요트 투어를 운영해요. 모두 강릉항요트마리나 선착장에서 출발해요." }
+      text: "클럽요트마스터, 루나로사 요트클럽, 요트갤러리 강릉, 강릉마리나호 4곳에서 요트 투어를 운영해요. 모두 강릉항요트마리나 선착장에서 출발해요." }
   ],
 
   /* ---------- 5. 요트 업체 ----------
@@ -600,6 +627,16 @@ window.SITE_DATA = {
      예시) { id: "[영문 이름]", name: "[업체명]", place: "[출발 장소]", capacity: "[인원]",
             reserve: "[예약 방법]", refund: "[취소 규정]", links: [ { label: "[버튼 이름]", url: "https://..." } ] } */
   companies: [
+    { id: "clubyacht",
+      name: "클럽요트마스터",
+      place: "강릉항요트마리나 선착장",
+      capacity: "최소 2명, 최대 12명",
+      reserve: "네이버 스마트스토어, 마이리얼트립",
+      refund: "풍랑주의보 등 날씨가 나쁘면 운항이 취소돼요. 전날 오전 9시까지 취소하면 전액 환불돼요.",
+      links: [
+        { label: "네이버 스마트스토어", url: "https://smartstore.naver.com/sailorsyachtclub/products/11984676378" },
+        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3884099" }
+      ] },
     { id: "lunarossa",
       name: "루나로사 요트클럽",
       place: "강릉항요트마리나 선착장",
@@ -625,7 +662,9 @@ window.SITE_DATA = {
       capacity: "최소 2명",
       reserve: "마이리얼트립",
       refund: "업체에 직접 문의해 주세요.",
-      links: [],
+      links: [
+        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3886593" }
+      ],
       schedule: [
         { months: [11, 12, 1, 2], label: "11월~2월", times: ["10:00~11:00", "11:00~12:00", "14:00~15:00", "15:00~16:00", "일몰 16:30~18:00"] },
         { months: [3, 9],         label: "3월, 9월", times: ["10:00~11:00", "11:00~12:00", "14:00~15:00", "15:00~16:00", "일몰 17:30~19:00"] },
@@ -633,16 +672,6 @@ window.SITE_DATA = {
         { months: [6],            label: "6월",      times: ["10:00~11:00", "11:00~12:00", "14:00~15:00", "15:00~16:00", "17:00~18:00", "일몰 18:30~20:00"] },
         { months: [7, 8],         label: "7~8월",    times: ["10:00~11:00", "11:00~12:00", "12:00~13:00", "13:00~14:00", "14:00~15:00", "15:00~16:00", "16:00~17:00", "17:00~18:00", "일몰 18:30~20:00"] },
         { months: [10],           label: "10월",     times: ["10:00~11:00", "11:00~12:00", "12:00~13:00", "13:00~14:00", "14:00~15:00", "15:00~16:00", "16:00~17:00", "일몰 17:00~18:30"] }
-      ] },
-    { id: "clubyacht",
-      name: "클럽요트마스터",
-      place: "강릉항요트마리나 선착장",
-      capacity: "최소 2명, 최대 12명",
-      reserve: "네이버 스마트스토어, 마이리얼트립",
-      refund: "풍랑주의보 등 날씨가 나쁘면 운항이 취소돼요. 전날 오전 9시까지 취소하면 전액 환불돼요.",
-      links: [
-        { label: "네이버 스마트스토어", url: "https://smartstore.naver.com/sailorsyachtclub/products/11984676378" },
-        { label: "마이리얼트립", url: "https://experiences.myrealtrip.com/products/3884099" }
       ] }
   ],
 
@@ -652,11 +681,24 @@ window.SITE_DATA = {
      예시) { company: "[업체 id]", type: "public", name: "[코스 이름]", duration: "[운행 시간]",
             price: "[가격]", note: "[한 줄 설명]", tags: ["노을 시간대"] } */
   experiences: [
+    // 클럽요트마스터
+    { company: "clubyacht", type: "public",  name: "오전 10시 코스",   duration: "1시간",     price: "1인 30,000원", tags: ["오전", "퍼블릭(합승)"] },
+    { company: "clubyacht", type: "public",  name: "세일링 1시간 코스", duration: "1시간",     price: "1인 40,000원", tags: ["퍼블릭(합승)"] },
+    { company: "clubyacht", type: "public",  name: "일몰 코스",        duration: "1시간 30분", price: "1인 50,000원", tags: ["노을 시간대", "노을 감상", "퍼블릭(합승)"] },
+    { company: "clubyacht", type: "public",  name: "요트 수영 코스",    duration: "2시간",     price: "1인 60,000원", tags: ["퍼블릭(합승)"] },
+    { company: "clubyacht", type: "private", name: "조조할인 코스",     duration: "1시간",     price: "250,000원", note: "가장 저렴한 전세 코스예요.", tags: ["오전", "프라이빗(단독)"] },
+    { company: "clubyacht", type: "private", name: "1시간 전세 코스 (10명)",      duration: "1시간",     price: "300,000원",   tags: ["프라이빗(단독)"] },
+    { company: "clubyacht", type: "private", name: "일몰 코스 (10명)",            duration: "1시간 30분", price: "400,000원",   tags: ["노을 시간대", "노을 감상", "프라이빗(단독)"] },
+    { company: "clubyacht", type: "private", name: "요트 수영 코스 (10명)",       duration: "2시간",     price: "500,000원",   tags: ["프라이빗(단독)"] },
+    { company: "clubyacht", type: "private", name: "5시간 전세 (8명)",            duration: "5시간",     price: "1,000,000원", tags: ["프라이빗(단독)"] },
+    { company: "clubyacht", type: "special", name: "새해 해돋이 항해 (1월 1일)",  duration: "",          price: "1인 60,000원", note: "자료 기준 2026년 1월 1일 상품이에요." },
+    { company: "clubyacht", type: "special", name: "울릉도 1박 2일 올빼미 항해",   duration: "1박 2일",   price: "1인 600,000원" },
+
     // 루나로사 요트클럽
-    { company: "lunarossa", type: "public",  name: "얼리버드 (오전 10시)", duration: "1시간",     price: "30,000원",  tags: ["오전", "퍼블릭(합승)"] },
-    { company: "lunarossa", type: "public",  name: "1시간 코스",           duration: "1시간",     price: "40,000원",  tags: ["퍼블릭(합승)"] },
-    { company: "lunarossa", type: "public",  name: "1시간 30분 코스",      duration: "1시간 30분", price: "50,000원",  tags: ["퍼블릭(합승)"] },
-    { company: "lunarossa", type: "public",  name: "일몰 코스",            duration: "1시간 30분", price: "50,000원",  tags: ["노을 시간대", "노을 감상", "퍼블릭(합승)"] },
+    { company: "lunarossa", type: "public",  name: "얼리버드 (오전 10시)", duration: "1시간",     price: "1인 30,000원",  tags: ["오전", "퍼블릭(합승)"] },
+    { company: "lunarossa", type: "public",  name: "1시간 코스",           duration: "1시간",     price: "1인 40,000원",  tags: ["퍼블릭(합승)"] },
+    { company: "lunarossa", type: "public",  name: "1시간 30분 코스",      duration: "1시간 30분", price: "1인 50,000원",  tags: ["퍼블릭(합승)"] },
+    { company: "lunarossa", type: "public",  name: "일몰 코스",            duration: "1시간 30분", price: "1인 50,000원",  tags: ["노을 시간대", "노을 감상", "퍼블릭(합승)"] },
     { company: "lunarossa", type: "private", name: "얼리버드 (오전 10시)", duration: "1시간",     price: "250,000원", tags: ["오전", "프라이빗(단독)"] },
     { company: "lunarossa", type: "private", name: "1시간 코스",           duration: "1시간",     price: "260,000원", tags: ["프라이빗(단독)"] },
     { company: "lunarossa", type: "private", name: "1시간 30분 코스",      duration: "1시간 30분", price: "320,000원", tags: ["프라이빗(단독)"] },
@@ -678,20 +720,7 @@ window.SITE_DATA = {
     { company: "marinaho", type: "public",  name: "강릉 세일링",       duration: "1시간",     price: "1인 40,000원", tags: ["퍼블릭(합승)"] },
     { company: "marinaho", type: "public",  name: "일몰 세일링",       duration: "1시간 30분", price: "1인 50,000원", tags: ["노을 시간대", "노을 감상", "퍼블릭(합승)"] },
     { company: "marinaho", type: "private", name: "강릉바다 세일링 1시간",     duration: "1시간",     price: "300,000원", tags: ["프라이빗(단독)"] },
-    { company: "marinaho", type: "private", name: "강릉바다 세일링 1시간 30분", duration: "1시간 30분", price: "400,000원", tags: ["프라이빗(단독)"] },
-
-    // 클럽요트마스터
-    { company: "clubyacht", type: "public",  name: "오전 10시 코스",   duration: "1시간",     price: "1인 30,000원", tags: ["오전", "퍼블릭(합승)"] },
-    { company: "clubyacht", type: "public",  name: "세일링 1시간 코스", duration: "1시간",     price: "1인 40,000원", tags: ["퍼블릭(합승)"] },
-    { company: "clubyacht", type: "public",  name: "일몰 코스",        duration: "1시간 30분", price: "1인 50,000원", tags: ["노을 시간대", "노을 감상", "퍼블릭(합승)"] },
-    { company: "clubyacht", type: "public",  name: "요트 수영 코스",    duration: "2시간",     price: "1인 60,000원", tags: ["퍼블릭(합승)"] },
-    { company: "clubyacht", type: "private", name: "조조할인 코스",     duration: "1시간",     price: "250,000원", note: "가장 저렴한 전세 코스예요.", tags: ["오전", "프라이빗(단독)"] },
-    { company: "clubyacht", type: "private", name: "1시간 전세 코스 (10명)",      duration: "1시간",     price: "300,000원",   tags: ["프라이빗(단독)"] },
-    { company: "clubyacht", type: "private", name: "일몰 코스 (10명)",            duration: "1시간 30분", price: "400,000원",   tags: ["노을 시간대", "노을 감상", "프라이빗(단독)"] },
-    { company: "clubyacht", type: "private", name: "요트 수영 코스 (10명)",       duration: "2시간",     price: "500,000원",   tags: ["프라이빗(단독)"] },
-    { company: "clubyacht", type: "private", name: "5시간 전세 (8명)",            duration: "5시간",     price: "1,000,000원", tags: ["프라이빗(단독)"] },
-    { company: "clubyacht", type: "special", name: "새해 해돋이 항해 (1월 1일)",  duration: "",          price: "1인 60,000원", note: "자료 기준 2026년 1월 1일 상품이에요." },
-    { company: "clubyacht", type: "special", name: "울릉도 1박 2일 올빼미 항해",   duration: "1박 2일",   price: "600,000원" }
+    { company: "marinaho", type: "private", name: "강릉바다 세일링 1시간 30분", duration: "1시간 30분", price: "400,000원", tags: ["프라이빗(단독)"] }
   ],
 
   /* ---------- 6. 마리나 시설 ----------
@@ -1133,7 +1162,12 @@ function renderExperiences(selected) {
     if (!g) groups.push(g = { id: e.company, items: [] });
     g.items.push(e);
   });
-  return groups.map(g => companyBlock((D.companies || []).find(c => c.id === g.id), g.items)).join("");
+  const order = id => { const i = (D.companies || []).findIndex(c => c.id === id); return i < 0 ? 99 : i; };
+  groups.sort((a, b) => order(a.id) - order(b.id));
+  const one = groups.length === 1;
+  return `<p class="muted company-hint">업체 이름을 누르면 코스와 요금이 펼쳐져요.</p>` +
+    groups.map(g => companyBlock((D.companies || []).find(c => c.id === g.id), g.items,
+      { filtered: selected.length > 0, open: one })).join("");
 }
 
 // 이름 끝 글자에 받침이 있으면 "이라고도", 없으면 "라고도"
@@ -1176,27 +1210,52 @@ function scheduleBox(c) {
     </div>`;
 }
 
-function companyBlock(c, items) {
-  if (!c) return `<section class="company">${courseTable(items)}</section>`;
+// 가격 글자에서 가장 싼 값 찾기 ("1인 30,000원" → 30000)
+function minPrice(items) {
+  let best = null;
+  items.forEach(e => {
+    const m = String(e.price || "").match(/([\d,]+)\s*원/);
+    if (!m) return;
+    const n = Number(m[1].replace(/,/g, ""));
+    if (n && (!best || n < best.n)) best = { n, per: /1인/.test(e.price) };
+  });
+  return best ? `${best.per ? "1인 " : ""}${best.n.toLocaleString("ko-KR")}원부터` : "";
+}
+
+// 업체 묶음: 접힌 줄(이름·코스 수·최저가) + 펼치면 공통 정보·운항 시간·코스 표
+function companyBlock(c, items, opts = {}) {
+  if (!c) return `<section class="company"><div class="company-body">${courseTable(items)}</div></section>`;
   const row = (ic, label, v) => v ? `<li>${icon(ic, 16)}<span><b>${label}</b> ${esc(v)}</span></li>` : "";
   const links = (c.links || []).filter(l => /^https:\/\//.test(l.url || ""))
     .map(l => `<a class="btn-line" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
+  const prices = COURSE_TYPES.filter(t => t.key !== "special").map(t => {
+    const v = minPrice(items.filter(e => e.type === t.key));
+    return v ? `<span>${esc(t.label)}<b>${esc(v)}</b></span>` : "";
+  }).join("");
+  const meta = [`${opts.filtered ? "조건에 맞는 코스" : "코스"} ${items.length}개`, c.capacity].filter(Boolean).join(" · ");
   return `
-    <section class="company" id="company-${esc(c.id)}">
-      <div class="company-head">
-        <div>
+    <details class="company" id="company-${esc(c.id)}"${opts.open ? " open" : ""}>
+      <summary class="company-sum">
+        <div class="cs-main">
           <h3>${esc(c.name)}</h3>
-          ${(c.aka || []).length ? `<p class="aka">${esc(c.aka.join(", "))}${rago(c.aka[c.aka.length - 1])} 불러요</p>` : ""}
+          <p class="cs-meta">${esc(meta)}</p>
         </div>
-        ${links ? `<div class="btn-row">${links}</div>` : ""}
+        <div class="cs-price">${prices}</div>
+        <span class="cs-toggle" aria-hidden="true"></span>
+      </summary>
+      <div class="company-body">
+        ${(c.aka || []).length || links ? `<div class="company-head">
+          ${(c.aka || []).length ? `<p class="aka">${esc(c.aka.join(", "))}${rago(c.aka[c.aka.length - 1])} 불러요</p>` : ""}
+          ${links ? `<div class="btn-row">${links}</div>` : ""}
+        </div>` : ""}
+        <ul class="info-list company-info">
+          ${row("pin", "출발", c.place)}${row("toilet", "인원", c.capacity)}
+          ${row("calendar", "예약", c.reserve)}${row("alert", "취소", c.refund)}
+        </ul>
+        ${scheduleBox(c)}
+        ${courseTable(items)}
       </div>
-      <ul class="info-list company-info">
-        ${row("pin", "출발", c.place)}${row("toilet", "인원", c.capacity)}
-        ${row("calendar", "예약", c.reserve)}${row("alert", "취소", c.refund)}
-      </ul>
-      ${scheduleBox(c)}
-      ${courseTable(items)}
-    </section>`;
+    </details>`;
 }
 
 // 코스 한 줄: 이름(+설명) · 운행 시간 · 가격
@@ -1722,6 +1781,13 @@ function applyWeather(w) {
   renderFooter();
 }
 renderHeader();
+// 업체 펼치기: 하나를 열면 나머지는 접기
+document.addEventListener("toggle", e => {
+  const d = e.target;
+  if (!(d instanceof HTMLDetailsElement) || !d.classList.contains("company") || !d.open) return;
+  document.querySelectorAll("details.company[open]").forEach(o => { if (o !== d) o.open = false; });
+}, true);
+
 renderFooter();
 router();
 loadWeather();
