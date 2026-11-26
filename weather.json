@@ -1,16 +1,16 @@
 {
-  "updated": "11:05",
-  "updatedAt": "2026-11-26T11:05:22.219+09:00",
+  "updated": "11:15",
+  "updatedAt": "2026-11-26T11:15:26.432+09:00",
   "source": "기상청",
   "grid": {
-    "nx": 93,
+    "nx": 94,
     "ny": 132
   },
   "current": {
-    "temp": 12.9,
-    "wind": 5,
-    "wave": 0.5,
-    "water": null,
+    "temp": 13,
+    "wind": 5.7,
+    "wave": 0.4,
+    "water": 14,
     "alert": "없음"
   },
   "sunset": "17:08",
@@ -19,32 +19,32 @@
       "date": "2026-11-26",
       "sky": "구름많음",
       "tmax": 17,
-      "wind": 3.7,
+      "wind": 4.1,
       "wave": 0.5
     },
     {
       "date": "2026-11-27",
       "sky": "맑음",
-      "tmax": 21,
+      "tmax": 20,
       "tmin": 11,
-      "wind": 4,
+      "wind": 5,
       "wave": 0.5
     },
     {
       "date": "2026-11-28",
       "sky": "맑음",
       "tmax": 11,
-      "tmin": 7,
-      "wind": 5.4,
-      "wave": 0.5
+      "tmin": 8,
+      "wind": 5.7,
+      "wave": 1
     },
     {
       "date": "2026-11-29",
       "sky": "맑음",
       "tmax": 11,
-      "tmin": 0,
+      "tmin": 2,
       "wind": 1,
-      "wave": 0.5
+      "wave": 1.5
     },
     {
       "date": "2026-11-30",
