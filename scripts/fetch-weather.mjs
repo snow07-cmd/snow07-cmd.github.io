@@ -11,12 +11,13 @@ import { readFile, writeFile } from "node:fs/promises";
 
 /* ---------- 설정 (필요하면 여기만 고치세요) ---------- */
 const CONFIG = {
-  lat: 37.7717, lon: 128.9476,        // 강릉항요트마리나 위치 (위도, 경도)
+  lat: 37.773225, lon: 128.94735,    // 안목해변 관측 위치 (해수욕장 날씨 목록 기준, 마리나 바로 옆)
+  grid: { nx: 94, ny: 132 },          // 기상청 격자 (해수욕장 목록의 공식 값. 비우면 위경도로 계산)
   midLandReg: "11D20000",             // 중기육상예보 구역: 강원도영동
   midTaReg: "11D20501",               // 중기기온 지점: 강릉
   midSeaReg: "12C20000",              // 중기해상예보 구역: 동해중부
   alertAreas: ["강원중부앞바다"],       // 이 구역에 풍랑특보가 있으면 '운항이 어려운 날'
-  beachNum: "",                       // 해수욕장 번호 (목록 확인 후 입력, 비우면 건너뜀)
+  beachNum: "174",                    // 해수욕장 번호 (안목해변)
   out: "weather.json"
 };
 const BASE = process.env.KMA_BASE || "https://apis.data.go.kr/1360000";
@@ -193,7 +194,7 @@ async function getBeach(now) {
 async function main() {
   if (!KEY) { console.log("KMA_KEY가 없어 날씨 업데이트를 건너뜁니다."); return; }
   const now = kstNow();
-  const grid = toGrid(CONFIG.lat, CONFIG.lon);
+  const grid = CONFIG.grid && CONFIG.grid.nx ? CONFIG.grid : toGrid(CONFIG.lat, CONFIG.lon);
   await chooseKey(() => getNow(grid, now));
   let prev = {};
   try { prev = JSON.parse(await readFile(CONFIG.out, "utf8")); } catch {}
