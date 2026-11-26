@@ -70,7 +70,10 @@ async function call(path, params) {
   let json;
   try { json = JSON.parse(text); } catch { throw new Error(`${path}: JSON이 아님 (${text.slice(0, 120).replace(/\s+/g, " ")})`); }
   const code = json?.response?.header?.resultCode;
-  if (code !== "00") throw new Error(`${path}: ${code} ${json?.response?.header?.resultMsg}`);
+  if (code !== "00") {
+    const msg = json?.response?.header ? `${code} ${json.response.header.resultMsg}` : `HTTP ${res.status} ${text.slice(0, 160).replace(/\s+/g, " ")}`;
+    throw new Error(`${path}: ${msg}`);
+  }
   const item = json?.response?.body?.items?.item;
   return Array.isArray(item) ? item : item ? [item] : [];
 }
