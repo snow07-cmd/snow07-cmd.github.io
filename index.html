@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v9">
-  <!-- 사이트 버전 v9 (2026-11-26) -->
+  <meta name="site-version" content="v10">
+  <!-- 사이트 버전 v10 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
   <!--
@@ -367,6 +367,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 .cal-cell.today { box-shadow: inset 0 0 0 2px var(--primary); }
 .cal-date { font-weight: 700; font-size: 13px; color: var(--ink); }
 .cal-st { color: var(--faint); }
+.cal-sky { color: var(--sub); }
 .cal-temp { color: var(--faint); }
 .cal-cell.st-good .cal-st { color: #2F7A55; } .cal-cell.st-mild .cal-st { color: #8E6B00; }
 .cal-cell.st-rough .cal-st { color: #A2541E; } .cal-cell.st-stop .cal-st { color: #A43A36; }
@@ -448,7 +449,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v9)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v10)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -1341,7 +1342,9 @@ function liveSummary() {
 /* ----- 이번 주 날씨 (오늘부터 7일) ----- */
 function weekView() {
   const today = new Date();
-  const cards = [0, 1, 2, 3, 4, 5, 6].map(i => {
+  const n = Math.min(7, forecastDays());
+  if (!n) return preparing("날씨 예보를 불러오고 있어요", "예보가 들어오면 날짜별로 보여 드려요.");
+  const cards = Array.from({ length: n }, (_, i) => i).map(i => {
     const d = addDays(today, i), f = findDay(D.live.week, d);
     const label = i === 0 ? "오늘" : i === 1 ? "내일" : WEEKDAY[d.getDay()] + "요일";
     return `
@@ -1359,20 +1362,33 @@ function weekView() {
   return `<div class="week-row">${cards}</div>`;
 }
 
-/* ----- 한 달 날씨 (오늘부터 30일, 달력 모양) ----- */
+/* ----- 앞으로 날씨 (달력 모양, 예보가 있는 날짜까지만) ----- */
+function hasForecast(f) {
+  return ["sky", "tmax", "tmin", "wind", "wave"].some(k => f[k] !== undefined && f[k] !== null && f[k] !== "");
+}
+// 오늘부터 예보가 있는 마지막 날까지의 날짜 수 (예보가 없으면 0)
+function forecastDays() {
+  const today = new Date();
+  let last = -1;
+  for (let i = 0; i < 31; i++) if (hasForecast(findDay(D.live.month, addDays(today, i)))) last = i;
+  return last + 1;
+}
 function monthView() {
+  const n = forecastDays();
+  if (!n) return preparing("날씨 예보를 불러오고 있어요", "예보가 들어오면 날짜별로 보여 드려요.");
   const today = new Date();
   const lead = today.getDay();   // 오늘 앞의 빈칸 (일요일 시작)
   const head = WEEKDAY.map((w, i) => `<div class="cal-head ${i === 0 ? "sun" : i === 6 ? "sat" : ""}">${w}</div>`).join("");
   const blanks = Array.from({ length: lead }, () => `<div class="cal-cell blank"></div>`).join("");
-  const cells = Array.from({ length: 30 }, (_, i) => {
+  const cells = Array.from({ length: n }, (_, i) => {
     const d = addDays(today, i), f = findDay(D.live.month, d);
     const st = dayStatus(f.wind, f.wave, f.alert);
     const label = (i === 0 || d.getDate() === 1) ? `${d.getMonth() + 1}/${d.getDate()}` : d.getDate();
     return `
       <div class="cal-cell ${i === 0 ? "today" : ""} ${st ? "st-" + st.key : ""}">
         <span class="cal-date ${d.getDay() === 0 ? "sun" : d.getDay() === 6 ? "sat" : ""}">${label}</span>
-        <span class="cal-st">${st ? esc(st.short) : "--"}</span>
+        ${f.sky ? `<span class="cal-sky">${esc(f.sky)}</span>` : ""}
+        ${st ? `<span class="cal-st">${esc(st.short)}</span>` : ""}
         <span class="cal-temp">${show(f.tmax, "°")}/${show(f.tmin, "°")}</span>
       </div>`;
   }).join("");
@@ -1418,8 +1434,8 @@ function pageLive() {
       <p class="section-desc">오늘부터 7일 동안의 바다 날씨예요.</p>
       ${weekView()}
 
-      <h2 class="section-title mt-48">한 달 날씨</h2>
-      <p class="section-desc">기상청 예보는 10일 뒤까지 나와요. 그 뒤 날짜는 예보가 나오면 채워지고, 먼 날짜일수록 바뀔 수 있어요.</p>
+      <h2 class="section-title mt-48">${forecastDays() ? `앞으로 ${forecastDays()}일 날씨` : "앞으로 날씨"}</h2>
+      <p class="section-desc">기상청 예보가 있는 날짜까지만 보여 드려요. 먼 날짜일수록 예보가 바뀔 수 있어요.</p>
       ${monthView()}
 
       <h2 class="section-title mt-48">날씨 쉬운 말 기준</h2>
