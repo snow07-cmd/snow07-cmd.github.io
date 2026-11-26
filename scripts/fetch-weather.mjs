@@ -60,7 +60,22 @@ function calcSunset(dateKst, lat, lon) {
 }
 
 /* ---------- API 호출 ---------- */
-const KEY = RAW_KEY.includes("%") ? decodeURIComponent(RAW_KEY) : RAW_KEY;   // Encoding 키를 넣어도 동작
+// 칸 하나에 키를 여러 줄로 넣어도 동작: 줄·띄어쓰기로 나눠 후보로 만들고, 맞는 키를 찾아 써요.
+// Encoding 키(%2B 등이 들어간 키)를 넣어도 자동으로 풀어서 써요.
+const KEY_CANDIDATES = [...new Set(RAW_KEY.split(/\s+/).filter(Boolean).map(k => {
+  try { return k.includes("%") ? decodeURIComponent(k) : k; } catch { return k; }
+}))];
+let KEY = KEY_CANDIDATES[0] || "";
+async function chooseKey(probe) {
+  if (KEY_CANDIDATES.length <= 1) return;
+  for (const k of KEY_CANDIDATES) {
+    KEY = k;
+    try { await probe(); console.log(`키 후보 ${KEY_CANDIDATES.length}개 중 ${KEY_CANDIDATES.indexOf(k) + 1}번째 키를 사용해요.`); return; }
+    catch (e) { if (!/SERVICE_KEY|등록되지 않은/.test(e.message)) { console.log(`키 후보 ${KEY_CANDIDATES.indexOf(k) + 1}번째 사용 (응답: ${e.message.slice(0, 80)})`); return; } }
+  }
+  KEY = KEY_CANDIDATES[0];
+  console.warn(`키 후보 ${KEY_CANDIDATES.length}개 모두 '등록되지 않은 서비스키'예요.`);
+}
 async function call(path, params) {
   const url = new URL(`${BASE}/${path}`);
   const q = { serviceKey: KEY, pageNo: "1", numOfRows: "1000", dataType: "JSON", ...params };
@@ -179,6 +194,7 @@ async function main() {
   if (!KEY) { console.log("KMA_KEY가 없어 날씨 업데이트를 건너뜁니다."); return; }
   const now = kstNow();
   const grid = toGrid(CONFIG.lat, CONFIG.lon);
+  await chooseKey(() => getNow(grid, now));
   let prev = {};
   try { prev = JSON.parse(await readFile(CONFIG.out, "utf8")); } catch {}
   const prevCur = prev.current || {};
