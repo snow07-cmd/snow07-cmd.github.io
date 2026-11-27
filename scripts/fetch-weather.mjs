@@ -104,7 +104,8 @@ async function getNow(grid, now) {
   const items = await call("VilageFcstInfoService_2.0/getUltraSrtNcst",
     { base_date: ymd(t), base_time: `${String(t.getUTCHours()).padStart(2, "0")}00`, ...grid });
   const v = c => num(items.find(i => i.category === c)?.obsrValue);
-  return { temp: v("T1H"), wind: v("WSD") };
+  const pty = items.find(i => i.category === "PTY")?.obsrValue;
+  return { temp: v("T1H"), wind: v("WSD"), pty: pty == null ? null : (PTY[String(pty)] || "") };
 }
 
 /* ---------- 2. 단기예보: 오늘~3일 ---------- */
@@ -233,7 +234,8 @@ async function main() {
       wind: pickNum(nowObs.wind, prevCur.wind),
       wave: pickNum(beach.wave, short.waveNow, days[0]?.wave, prevCur.wave),
       water: pickNum(beach.water, prevCur.water),
-      alert: alert || ""
+      alert: alert || "",
+      pty: nowObs.pty != null ? nowObs.pty : (prevCur.pty || "")   // 지금 비·눈 (없으면 "")
     },
     sunset: beach.sunset || calcSunset(now, CONFIG.lat, CONFIG.lon),
     days: days.length ? days : (prev.days || [])

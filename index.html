@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v16">
+  <meta name="site-version" content="v17">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -590,22 +590,61 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
    v15 휴대폰 먼저: 첫 화면(수평선) · 좋은 시간 · 요트 카드 · 안목 코스 · 아래 탭
    ===================================================================== */
 body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui, sans-serif; }
-.hero { position: relative; overflow: hidden; color: #fff; min-height: 560px; }
-.hero-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #5B8DA5 0%, #9CC0CE 58%, #CFE0E5 70%); }
-.sky-dawn .hero-sky { background: linear-gradient(180deg, #4E6E8E 0%, #A9B9CF 52%, #F2D2B8 70%); }
-.sky-sunset .hero-sky { background: linear-gradient(180deg, #4F7D96 0%, #A7BFC6 40%, #EBC7A2 62%, #F0B27F 70%); }
-.sky-night .hero-sky { background: linear-gradient(180deg, #0F2330 0%, #1D3A48 55%, #2C4F61 70%); }
-.hero-sun { position: absolute; right: 18%; top: 54%; width: 64px; height: 64px; border-radius: 50%; background: #FFF3DC; opacity: .9; }
-.sky-sunset .hero-sun { background: #FBD9AE; top: 57%; }
-.sky-night .hero-sun { width: 40px; height: 40px; background: #E8EEF2; opacity: .85; top: 22%; box-shadow: inset -10px -4px 0 0 #1D3A48; }
-.hero-boat { position: absolute; left: 14%; top: calc(66% - 50px); color: #1D3A48; }
-.sky-night .hero-boat { color: #0B1A23; }
-.hero-boat .icon { fill: rgba(255, 255, 255, .92); }
-.hero-wave { position: absolute; left: 0; width: 100%; top: calc(66% - 20px); height: 60px; fill: #3E6F86; }
-.hero-sea { position: absolute; left: 0; right: 0; top: calc(66% + 30px); bottom: 0; background: linear-gradient(180deg, #3E6F86 0%, #24495A 100%); }
-.sky-night .hero-wave { fill: #1F4152; } .sky-night .hero-sea { background: linear-gradient(180deg, #1F4152, #0F2330); }
-.hero-in { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 560px; padding-top: 36px; padding-bottom: 24px; }
-.hero-kicker { font-size: 14px; opacity: .92; }
+.hero { position: relative; overflow: hidden; color: #fff; min-height: 560px; --sea: 64%; }
+.hero-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #4F86A0 0%, #8DB7C8 45%, #CFE3EA var(--sea)); }
+.sky-dawn .hero-sky { background: linear-gradient(180deg, #3E5E80 0%, #9AAFC9 45%, #F3D4BA var(--sea)); }
+.sky-sunset .hero-sky { background: linear-gradient(180deg, #3F6F8A 0%, #9DB7C0 35%, #EBC39C 55%, #F3A970 var(--sea)); }
+.sky-night .hero-sky { background: linear-gradient(180deg, #0B1B26 0%, #16303D 50%, #24495A var(--sea)); }
+.p-rain .hero-sky, .p-snow .hero-sky { filter: saturate(.6) brightness(.92); }
+.orb { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
+.orb.sun { width: 62px; height: 62px; border-radius: 50%; background: radial-gradient(circle, #FFF8E6 0 55%, #FFE7B8 70%, rgba(255, 231, 184, 0) 72%);
+  box-shadow: 0 0 40px 18px rgba(255, 238, 200, .45); }
+.sky-sunset .orb.sun, .sky-dawn .orb.sun { background: radial-gradient(circle, #FFE3B8 0 55%, #FFC38A 70%, rgba(255, 195, 138, 0) 72%); box-shadow: 0 0 50px 22px rgba(255, 190, 130, .45); }
+.p-rain .orb.sun, .p-snow .orb.sun { opacity: .45; }
+.orb.moon { width: 58px; height: 58px; filter: drop-shadow(0 0 14px rgba(244, 239, 217, .45)); }
+.orb.moon svg { width: 100%; height: 100%; }
+.stars i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; opacity: .7; animation: twinkle 3.6s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: .2; } }
+.clouds i { position: absolute; height: 26px; border-radius: 26px; background: rgba(255, 255, 255, .78); filter: blur(.3px); animation: drift 60s linear infinite; }
+.clouds i::before, .clouds i::after { content: ""; position: absolute; bottom: 8px; border-radius: 50%; background: inherit; }
+.clouds i::before { left: 18%; width: 46%; height: 34px; } .clouds i::after { left: 46%; width: 36%; height: 26px; }
+.clouds .c1 { width: 110px; top: 44%; left: 4%; opacity: .75; } .clouds .c2 { width: 84px; top: 50%; left: 46%; animation-duration: 80s; opacity: .7; } .clouds .c3 { width: 130px; top: 38%; left: 72%; animation-duration: 95s; opacity: .6; }
+.sky-night .clouds i { background: rgba(150, 170, 182, .35); }
+.p-rain .clouds i, .p-snow .clouds i { background: rgba(214, 224, 230, .9); }
+@keyframes drift { from { transform: translateX(-30px); } to { transform: translateX(60px); } }
+.glint { position: absolute; left: 50%; width: 46%; top: var(--sea); height: 36%; transform: translateX(-50%);
+  background: repeating-linear-gradient(180deg, rgba(255, 214, 170, .55) 0 2px, transparent 2px 9px); mask-image: radial-gradient(ellipse at top, #000 20%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at top, #000 20%, transparent 70%); z-index: 2; }
+.wave { position: absolute; left: 0; width: 200%; animation: swell calc(var(--dur) * 3) linear infinite; }
+.wave.back { top: calc(var(--sea) - 26px); height: 34px; fill: #5D8FA4; opacity: .9; animation-direction: reverse; }
+.wave.front { top: calc(var(--sea) - 12px); height: 34px; fill: #3E6F86; z-index: 3; }
+.sky-night .wave.back { fill: #2A5163; } .sky-night .wave.front { fill: #1F4152; }
+.sky-sunset .wave.back { fill: #6E93A1; }
+@keyframes swell { to { transform: translateX(-50%); } }
+.hero-sea { position: absolute; left: 0; right: 0; top: calc(var(--sea) + 10px); bottom: 0; background: linear-gradient(180deg, #3E6F86 0%, #24495A 100%); z-index: 3; }
+.sky-night .hero-sea { background: linear-gradient(180deg, #1F4152, #0F2330); }
+.yacht { position: absolute; left: 12%; top: calc(var(--sea) - 66px); width: 88px; height: 78px; z-index: 2; transform-origin: 50% 85%;
+  animation: bob var(--dur) ease-in-out infinite; }
+.yacht svg { width: 100%; height: 100%; display: block; }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(calc(var(--rock) * -1)); } 50% { transform: translateY(var(--lift)) rotate(var(--rock)); } }
+.mode-stop .yacht { left: calc(min(36%, 240px) - 6px); }
+.pier { position: absolute; left: 0; top: calc(var(--sea) - 30px); width: min(36%, 240px); height: 46px; z-index: 4; }
+.precip { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--sea) + 30px); z-index: 2; pointer-events: none; -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.35) 0, #000 45%, #000 85%, transparent); mask-image: linear-gradient(180deg, rgba(0,0,0,.35) 0, #000 45%, #000 85%, transparent); }
+.p-rain .precip { background-image: linear-gradient(104deg, transparent 0 48%, rgba(255, 255, 255, .55) 49% 51%, transparent 52%), linear-gradient(104deg, transparent 0 48%, rgba(255, 255, 255, .35) 49% 51%, transparent 52%);
+  background-size: 28px 46px, 19px 31px; animation: rain .5s linear infinite; opacity: .55; }
+@keyframes rain { to { background-position: -10px 46px, -7px 31px; } }
+.p-snow .precip { background-image: radial-gradient(circle, #fff 0 1.6px, transparent 2.2px), radial-gradient(circle, rgba(255, 255, 255, .8) 0 1.1px, transparent 1.6px);
+  background-size: 46px 46px, 29px 29px; animation: snow 7s linear infinite; }
+@keyframes snow { to { background-position: 30px 460px, -20px 290px; } }
+.hero-in { position: relative; z-index: 5; display: flex; flex-direction: column; min-height: 560px; padding-top: 30px; padding-bottom: 24px; }
+.hero-kicker { font-size: 14px; opacity: .95; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.hero-note { font-size: 12px; font-weight: 700; background: rgba(255, 255, 255, .2); border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; padding: 3px 10px; backdrop-filter: blur(2px); }
+@media (prefers-reduced-motion: reduce) { .wave, .yacht, .clouds i, .precip, .stars i { animation: none !important; } }
+@media (max-width: 600px) {
+  .hero, .hero-in { min-height: 500px; }
+  .hero { --sea: 63%; }
+  .yacht { width: 80px; height: 71px; top: calc(var(--sea) - 60px); left: 9%; }
+  .orb.sun { width: 52px; height: 52px; } .orb.moon { width: 48px; height: 48px; }
+}
 .hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -.045em; line-height: 1.2; margin-top: 8px; text-shadow: 0 1px 14px rgba(20, 45, 58, .22); }
 .hero-stats { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255, 255, 255, .3); padding-top: 12px; max-width: 640px; }
 .hero-stats span { display: block; font-size: 12px; opacity: .85; }
@@ -711,7 +750,7 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
   .places { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
-  .hero, .hero-in { min-height: 540px; }
+  .hero, .hero-in { min-height: 500px; }
   .hero-in { padding-top: 28px; }
   .hero h1 { font-size: 34px; }
   .hero-stats b { font-size: 17px; }
@@ -774,7 +813,7 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v16)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v17)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -842,6 +881,7 @@ window.SITE_DATA = {
     provider: "[ ]",
     updated: "",
     sunset: "",
+    pty: "",        // 지금 비·눈 (기상청 초단기실황, 비어 있으면 없음)
     weather: [
       { id: "temp",  label: "기온",     unit: "℃",   value: "" },
       { id: "wind",  label: "바람",     unit: " m/s", value: "" },
@@ -2388,26 +2428,116 @@ function skyClass(now = new Date()) {
   if (m < 8 * 60) return "sky-dawn";
   return "sky-day";
 }
-const HERO_TITLE = { good: "요트 타기\n좋은 날이에요", mild: "배가 조금\n흔들리는 날이에요", rough: "배가 많이\n흔들리는 날이에요", stop: "오늘은 요트 운항이\n어려울 수 있어요" };
+const HERO_TITLE = { good: "요트 타기\n좋은 날이에요", mild: "배가 조금\n흔들리는 날이에요", rough: "배가 많이\n흔들리는 날이에요", stop: "오늘은 요트가\n항구에서 쉬어 가요" };
+// 첫 화면 바다 그림: 날씨(파도·특보·비·눈)와 시각(해·달 모양과 위치)에 맞춰 바뀌어요.
+// 미리보기: 주소 끝에 ?preview=rough,rain,night 처럼 붙이면 그 상태로 그려요 (calm·mild·rough·stop / rain·snow·cloud / dawn·day·sunset·night)
+function sunTimes(date, lat = 37.773225, lon = 128.94735) {
+  const R = Math.PI / 180;
+  const day = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 864e5);
+  const g = 2 * Math.PI / 365 * (day - 1 + 0.5);
+  const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  const ha = Math.acos(Math.cos(90.833 * R) / (Math.cos(lat * R) * Math.cos(decl)) - Math.tan(lat * R) * Math.tan(decl)) / R;
+  const rise = (720 - 4 * (lon + ha) - eqt + 540) % 1440, set = (720 - 4 * (lon - ha) - eqt + 540) % 1440;
+  const real = hm(D.live.sunset);
+  return { rise, set: isNaN(real) ? set : real };
+}
+// 달 모양 (0 = 그믐/새달, 0.5 = 보름)
+function moonPhase(date) {
+  const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
+  const d = (date.getTime() - ref) / 864e5;
+  return ((d % syn) + syn) % syn / syn;
+}
+function moonSVG(p, r = 20) {
+  const k = Math.cos(2 * Math.PI * p), wax = p < 0.5, rx = Math.max(0.01, Math.abs(k) * r);
+  const lit = `M0 ${-r} A${r} ${r} 0 0 ${wax ? 1 : 0} 0 ${r} A${rx} ${r} 0 0 ${(k > 0) === wax ? 0 : 1} 0 ${-r} Z`;
+  return `<svg viewBox="${-r - 8} ${-r - 8} ${2 * r + 16} ${2 * r + 16}" aria-hidden="true">
+    <circle r="${r}" fill="#6E8796" opacity=".35"/><path d="${lit}" fill="#F4EFD9"/>
+    <circle cx="${r * .25}" cy="${-r * .3}" r="${r * .12}" fill="#000" opacity=".05"/><circle cx="${-r * .3}" cy="${r * .25}" r="${r * .18}" fill="#000" opacity=".05"/></svg>`;
+}
+const moonName = p => p < .03 || p > .97 ? "그믐달" : p < .22 ? "초승달" : p < .28 ? "상현달" : p < .47 ? "차오르는 달" : p < .53 ? "보름달" : p < .72 ? "기우는 달" : p < .78 ? "하현달" : "그믐달";
+
+function wavePath(amp, w = 800, h = 40) {
+  const mid = h / 2, seg = 50;
+  let d = `M0 ${mid}`;
+  for (let x = 0, i = 0; x < w; x += seg, i++) d += ` q ${seg / 2} ${i % 2 ? amp : -amp} ${seg} 0`;
+  return d + ` V${h} H0 Z`;
+}
+function yachtSVG(moored, night) {
+  const hull = night ? "#132A36" : "#FFFFFF", stripe = night ? "#E9C46A" : "#2C5A6E", sail = night ? "#C9D6DD" : "#FFFFFF", jib = night ? "#AFC1CB" : "#EAF1F4";
+  return `<svg viewBox="0 0 90 80" aria-hidden="true">
+    ${moored
+      ? `<line x1="45" y1="10" x2="45" y2="57" stroke="#22323B" stroke-width="2"/><path d="M45 50 L45 22 L50 50 Z" fill="${sail}" opacity=".9"/><path d="M45 10 l10 4 -10 4 z" fill="#C2524B"/>`
+      : `<line x1="45" y1="6" x2="45" y2="57" stroke="#22323B" stroke-width="2"/><path d="M47 8 C62 24 70 40 72 54 L47 54 Z" fill="${sail}"/><path d="M43 12 C34 26 26 40 20 54 L43 54 Z" fill="${jib}"/>`}
+    <path d="M6 57 H84 L75 69 Q45 73 15 69 Z" fill="${hull}" stroke="#22323B" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M10 62 H80" stroke="${stripe}" stroke-width="2.5"/>
+    <rect x="34" y="51" width="18" height="6" rx="2" fill="${hull}" stroke="#22323B" stroke-width="1.5"/>
+    ${night ? `<rect x="38" y="52.5" width="4" height="3" fill="#FFD27A"/><rect x="44" y="52.5" width="4" height="3" fill="#FFD27A"/>` : ""}
+  </svg>`;
+}
+function pierSVG() {
+  return `<svg class="pier" viewBox="0 0 200 46" preserveAspectRatio="xMaxYMid meet" aria-hidden="true">
+    <rect x="0" y="22" width="190" height="8" rx="2" fill="#7A5B43"/><rect x="0" y="30" width="190" height="3" fill="#5E4533"/>
+    ${[12, 60, 108, 156, 186].map(x => `<rect x="${x - 3}" y="18" width="7" height="26" fill="#5E4533"/>`).join("")}
+    <circle cx="186" cy="18" r="4" fill="#3F2E22"/>
+    <path d="M186 18 Q205 30 222 34" stroke="#D9C9A8" stroke-width="2" fill="none"/>
+  </svg>`;
+}
+
 function heroSea() {
-  const st = currentStatus();
-  const wave = toNum(currentValue("wave"));
-  const amp = isNaN(wave) ? 6 : Math.max(3, Math.min(16, 4 + wave * 8));   // 파도가 높을수록 물결도 커요
-  const path = `M0 ${20} ` + Array.from({ length: 7 }, (_, i) => `q 32 ${i % 2 ? amp : -amp} 64 0`).join(" ") + " V60 H0 Z";
+  const params = new URLSearchParams((location.hash.split("?")[1]) || "");
+  const pv = (params.get("preview") || "").split(",").filter(Boolean);
+  let st = currentStatus();
+  const now = new Date(), nm = now.getHours() * 60 + now.getMinutes();
+  const { rise, set } = sunTimes(now);
+  // 바다 상태 → 그림 모드
+  let mode = st ? { good: "calm", mild: "mild", rough: "rough", stop: "stop" }[st.key] : "calm";
+  ["calm", "mild", "rough", "stop"].forEach(m => { if (pv.includes(m)) { mode = m; st = D.easy.day.find(d => d.key === { calm: "good", mild: "mild", rough: "rough", stop: "stop" }[m]); } });
+  // 하늘
+  let sky = nm < rise - 30 || nm > set + 40 ? "night" : nm < rise + 60 ? "dawn" : nm > set - 90 ? "sunset" : "day";
+  ["dawn", "day", "sunset", "night"].forEach(s => { if (pv.includes(s)) sky = s; });
+  // 비·눈·구름
+  const pty = String(D.live.pty || "");
+  let precip = /눈/.test(pty) && !/빗방울/.test(pty) ? "snow" : /비|빗방울|소나기/.test(pty) ? "rain" : "";
+  if (pv.includes("rain")) precip = "rain"; if (pv.includes("snow")) precip = "snow";
+  const todaySky = String((findDay(D.live.week, now) || {}).sky || "");
+  const cloudy = precip || /흐림|구름/.test(todaySky) || pv.includes("cloud");
+  const P = { calm: [3, 1.2, -2, 5], mild: [6, 3, -4, 3.6], rough: [11, 7, -8, 2.4], stop: [2, .6, -1, 6] }[mode];
+  const night = sky === "night";
+  // 해·달 위치 (호를 그리며 이동)
+  let orb = "";
+  if (night) {
+    const span = (rise + 1440 - set) % 1440 || 1, f = ((nm - set + 1440) % 1440) / span;
+    const p = moonPhase(now);
+    orb = `<div class="orb moon" style="left:${58 + f * 32}%;top:${52 - Math.sin(Math.PI * Math.min(Math.max(f, 0), 1)) * 14}%" title="${moonName(p)}">${moonSVG(p)}</div>`;
+  } else {
+    const f = Math.min(Math.max((nm - rise) / (set - rise), 0), 1);
+    orb = `<div class="orb sun" style="left:${50 + f * 40}%;top:${58 - Math.sin(Math.PI * f) * 18}%"></div>`;
+  }
+  const stars = night ? `<div class="stars">${Array.from({ length: 18 }, (_, i) => `<i style="left:${(i * 37) % 97}%;top:${(i * 23) % 50 + 3}%;animation-delay:${(i % 5) * .7}s"></i>`).join("")}</div>` : "";
+  const clouds = cloudy ? `<div class="clouds"><i class="c1"></i><i class="c2"></i><i class="c3"></i></div>` : "";
   const stat = (label, id, unit) => {
     const v = currentValue(id), e = easyText(id, v);
     return `<div><span>${label}</span><b>${show(v, unit)}</b><em>${esc(e || "확인 중")}</em></div>`;
   };
-  const now = new Date();
   const title = st ? HERO_TITLE[st.key] : "오늘 강릉 바다를\n확인하고 있어요";
+  const note = mode === "stop" ? "운항 여부는 업체에 꼭 확인해 주세요"
+    : precip === "rain" ? "비가 와도 요트는 떠요 · 우비를 챙기세요"
+    : precip === "snow" ? "눈이 와도 요트는 떠요 · 따뜻하게 입으세요"
+    : night ? `오늘 밤은 ${moonName(moonPhase(now))}` : "";
   return `
-    <section class="hero ${skyClass(now)}">
-      <div class="hero-sky"><i class="hero-sun"></i></div>
-      <div class="hero-boat">${icon("boat", 56)}</div>
-      <svg class="hero-wave" viewBox="0 0 448 60" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>
+    <section class="hero scene sky-${sky} mode-${mode} ${precip ? "p-" + precip : ""}" style="--amp:${P[0]};--rock:${P[1]}deg;--lift:${P[2]}px;--dur:${P[3]}s">
+      <div class="hero-sky"></div>
+      ${stars}${orb}${clouds}
+      ${sky === "sunset" && !cloudy ? `<div class="glint"></div>` : ""}
+      <svg class="wave back" viewBox="0 0 800 40" preserveAspectRatio="none" aria-hidden="true"><path d="${wavePath(P[0] * .7)}"/></svg>
+      ${mode === "stop" ? pierSVG() : ""}
+      <div class="yacht">${yachtSVG(mode === "stop", night)}</div>
+      <svg class="wave front" viewBox="0 0 800 40" preserveAspectRatio="none" aria-hidden="true"><path d="${wavePath(P[0])}"/></svg>
       <div class="hero-sea"></div>
+      ${precip ? `<div class="precip"></div>` : ""}
       <div class="container hero-in">
-        <p class="hero-kicker">강릉항 요트마리나 · 오늘 바다 ${esc(D.live.updated ? D.live.updated + " 기준" : "")}</p>
+        <p class="hero-kicker">강릉항 요트마리나${note ? ` <span class="hero-note">${esc(note)}</span>` : ""}</p>
         <h1>${esc(title).replace(/\n/g, "<br>")}</h1>
         <div class="hero-stats">
           ${stat("바람", "wind", "m/s")}${stat("파도", "wave", "m")}${stat("기온", "temp", "°")}
@@ -2727,6 +2857,7 @@ function applyWeather(w) {
     const v = w.current[map[x.id]];
     x.value = (v === null || v === undefined) ? "" : String(v);
   });
+  L.pty = w.current.pty || "";
   if (w.sunset) L.sunset = w.sunset;
   if (w.updated) L.updated = w.updated;
   if (Array.isArray(w.days)) { L.week = w.days; L.month = w.days; }
