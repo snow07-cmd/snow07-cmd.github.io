@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v15">
+  <meta name="site-version" content="v16">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -730,12 +730,51 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
   .ptabs a { flex: 0 0 auto; }
 }
 
+/* ---------- v16 문장으로 코스 짜기 ---------- */
+.ask-block { scroll-margin-top: 76px; }
+.ask { margin-top: 14px; background: var(--paper); border: 2px solid var(--cover); border-radius: 18px; padding: 16px; }
+.ask-label { display: block; font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+.ask-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: stretch; }
+.ask textarea { font: inherit; font-size: 16px; line-height: 1.5; resize: none; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--bg); color: var(--ink); min-height: 76px; }
+.ask textarea:focus { outline: 2px solid var(--primary); outline-offset: 0; background: var(--paper); }
+.ask-go { font: inherit; font-size: 16px; font-weight: 800; border: 0; border-radius: 12px; padding: 0 20px; background: var(--cover); color: #fff; cursor: pointer; min-height: 52px; }
+.ask-go:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.ask-ex { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.ask-ex button { font: inherit; font-size: 13px; color: var(--sub); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; text-align: left; }
+.booked { margin-top: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.booked summary { cursor: pointer; padding: 14px 16px; font-weight: 700; color: var(--primary); list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.booked summary::-webkit-details-marker { display: none; }
+.booked summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .15s; }
+.booked[open] summary::after { transform: rotate(-135deg); }
+.booked-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: end; padding: 0 16px 16px; }
+.booked-form label { display: grid; gap: 4px; font-size: 13px; color: var(--sub); font-weight: 700; }
+.booked-form select, .booked-form input { font: inherit; font-size: 15px; height: 46px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; background: var(--paper); color: var(--ink); min-width: 0; }
+.booked-form .ask-go { height: 46px; min-height: 46px; }
+.pl-read { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--sub); margin-bottom: 10px; }
+.pl-read b { color: var(--ink); margin-right: 2px; }
+.pl-read span { background: var(--soft); color: var(--primary); font-weight: 700; border-radius: 999px; padding: 3px 10px; }
+.pl-move { list-style: none; padding: 0 0 12px 70px; position: relative; font-size: 12px; color: var(--sub); }
+.pl-move::before { content: ""; position: absolute; left: 57px; top: -12px; bottom: 0; width: 2px; background: repeating-linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px); }
+.pl-move span { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); border: 1px dashed var(--line); border-radius: 999px; padding: 3px 10px; }
+.pl-alts { margin-top: 6px; display: grid; gap: 6px; }
+.pl-alts p { font-size: 13px; font-weight: 700; color: var(--sub); }
+.pl-alt { font: inherit; text-align: left; display: grid; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; color: var(--ink); }
+.pl-alt b { font-size: 14px; } .pl-alt span { font-size: 12px; color: var(--sub); }
+#planner { margin-top: 16px; }
+@media (max-width: 600px) {
+  .ask { padding: 14px 12px; margin-left: -6px; margin-right: -6px; }
+  .ask-row { grid-template-columns: 1fr; }
+  .booked-form { grid-template-columns: 1fr 1fr; }
+  .booked-form label:first-child, .booked-form .ask-go { grid-column: 1 / -1; }
+  .pl-move { padding-left: 64px; } .pl-move::before { left: 53px; }
+}
+
   </style>
 </head>
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v15)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v16)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -1194,7 +1233,7 @@ const MENU = [
   { path: "#/tour",      label: "안목 주변" },
   { path: "#/safety",    label: "안전 가이드" },
   { path: "#/live",      label: "실시간 정보" },
-  { path: "#/plan",      label: "안목 코스 짜기", highlight: true }
+  { path: "#/plan",      label: "코스 짜기", highlight: true }
 ];
 
 /* ---------- 작은 도우미 함수 ---------- */
@@ -1955,16 +1994,24 @@ function pageNotFound() {
 }
 
 /* =====================================================================
-   안목 코스 추천 (규칙 방식, 돈 안 드는 추천)
-   요트 출항 시각 → 내리는 시각 → 그 시각에 문 연 가까운 곳을 오늘 바다 상태에 맞춰 이어 줘요.
+   안목 코스 추천 (문장으로 짜기, 규칙 방식)
+   문장 → 조건 읽기 → 맞춤 요트 → 내리는 시각 → 식당 1시간 30분 / 카페 1시간 30분 → (밤이면 야경)
    ===================================================================== */
 const hm = s => { const m = String(s || "").match(/(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : NaN; };
 const fmt = min => { const h = Math.floor(min / 60) % 24, m = Math.round(min % 60); return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`; };
+const r10 = m => Math.ceil(m / 10) * 10;   // 10분 단위로 맞추기 (올림)
 const durMin = s => { const t = String(s || ""); const h = t.match(/(\d+)\s*시간/), m = t.match(/(\d+)\s*분/); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0) || 60; };
+const durText = m => `${m >= 60 ? Math.floor(m / 60) + "시간" : ""}${m % 60 ? " " + (m % 60) + "분" : ""}`.trim();
+const STAY = { food: 90, cafe: 90, walk: 30 };
 const PLAN_SLOTS = [ { key: "am", label: "오전" }, { key: "pm", label: "오후" }, { key: "sunset", label: "노을" } ];
-const PLAN_PARTY = [ { key: "couple", label: "연인" }, { key: "family", label: "가족·아이" }, { key: "friends", label: "친구" }, { key: "pet", label: "반려동물" } ];
+const PLAN_PARTY = [ { key: "couple", label: "연인·부부" }, { key: "family", label: "가족" }, { key: "friends", label: "친구" }, { key: "pet", label: "반려동물" }, { key: "solo", label: "혼자" } ];
+const FOOD_WORDS = [ ["대게", /대게|게요리|킹크랩/], ["회", /회\b|횟집|회 먹|회를|물회|해산물/], ["버거", /버거|햄버거/], ["돈까스", /돈까스|돈가스|까스/], ["닭강정", /닭강정|치킨/], ["미역국", /미역국|국밥|해장/] ];
+const PLAN_EXAMPLES = [
+  "여자친구랑 내일 노을 보면서 요트 타고 저녁 먹고 싶어요",
+  "아이 둘이랑 오전에 타요. 멀미가 조금 걱정돼요",
+  "강아지랑 같이 탈 수 있는 요트 찾아요. 차로 가요"
+];
 
-// 가게가 그 요일·시각에 열려 있나 (stay = 머무를 시간, 닫기 전 그만큼 남아야 해요)
 function openAt(p, date, min, stay = 40) {
   if (!p.hours) return true;
   const wd = date.getDay();
@@ -1972,7 +2019,7 @@ function openAt(p, date, min, stay = 40) {
   return p.hours.some(h => {
     if (!String(h.d).includes(String(wd))) return false;
     const o = hm(h.o), c = hm(h.lo || h.c);
-    return min >= o && min + Math.min(stay, 30) <= c;
+    return min >= o && min + Math.min(stay, 60) <= c;
   });
 }
 function openNowText(p, date = new Date()) {
@@ -1982,22 +2029,17 @@ function openNowText(p, date = new Date()) {
   return openAt(p, date, min, 0) ? "지금 영업 중" : "지금은 문 닫음";
 }
 function mapLinks(p) {
-  const kakao = "https://map.kakao.com/link/search/" + encodeURIComponent(p.name.replace(/\s*\(.*\)$/, "") + " 강릉");
+  const kakao = "https://map.kakao.com/link/search/" + encodeURIComponent(p.name + " 강릉");
   return `<div class="maplinks">${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">네이버 지도</a>` : ""}<a href="${kakao}" target="_blank" rel="noopener">카카오맵</a></div>`;
 }
-
-// 날씨 (오늘 = 지금 값, 내일 = 예보)
 function planWeather(dayOffset) {
   if (dayOffset === 0) {
     return { temp: toNum(currentValue("temp")), wind: toNum(currentValue("wind")), wave: toNum(currentValue("wave")),
              water: toNum(currentValue("water")), alert: currentValue("alert"), st: currentStatus() };
   }
   const f = findDay(D.live.week, addDays(new Date(), dayOffset));
-  return { temp: toNum(f.tmax), wind: toNum(f.wind), wave: toNum(f.wave), water: NaN, alert: f.alert || "",
-           st: dayStatus(f.wind, f.wave, f.alert) };
+  return { temp: toNum(f.tmax), wind: toNum(f.wind), wave: toNum(f.wave), water: NaN, alert: f.alert || "", st: dayStatus(f.wind, f.wave, f.alert) };
 }
-
-// 노을 코스 출항 시각: 업체 운항표의 '일몰' 칸 → 없으면 해 지는 시각 40분 전
 function sunsetDepart(date) {
   const m = date.getMonth() + 1;
   for (const c of D.companies || []) {
@@ -2008,179 +2050,321 @@ function sunsetDepart(date) {
   const ss = hm(D.live.sunset);
   return isNaN(ss) ? 16 * 60 + 30 : Math.floor((ss - 40) / 10) * 10;
 }
+const slotTime = (slot, date) => slot === "am" ? 10 * 60 : slot === "pm" ? 14 * 60 : sunsetDepart(date);
 
-// 기본값: 지금 시각으로 고르기 (지났으면 내일)
-function defaultPlan() {
+// 문장에서 조건 읽기
+function parseQuery(text) {
+  const t = String(text || "");
+  const o = { q: t, found: [] };
+  const hit = (k, v, label) => { o[k] = v; o.found.push(label); };
+  if (/모레/.test(t)) hit("day", 2, "모레");
+  else if (/내일/.test(t)) hit("day", 1, "내일");
+  else if (/오늘|지금/.test(t)) hit("day", 0, "오늘");
+  else if (/주말|토요일|일요일/.test(t)) {
+    const now = new Date(), want = /일요일/.test(t) ? 0 : 6;
+    hit("day", (want - now.getDay() + 7) % 7, /일요일/.test(t) ? "일요일" : "토요일");
+  }
+  const tm = t.match(/(오전|오후|아침|저녁)?\s*(\d{1,2})\s*시(\s*반|\s*(\d{1,2})\s*분)?/);
+  if (tm) {
+    let h = Number(tm[2]); const min = tm[3] ? (/반/.test(tm[3]) ? 30 : Number(tm[4] || 0)) : 0;
+    if ((tm[1] === "오후" || tm[1] === "저녁" || (!tm[1] && h < 9)) && h < 12) h += 12;
+    hit("time", h * 60 + min, `${fmt(h * 60 + min)} 출항`);
+  }
+  if (/노을|일몰|해\s*질|해\s*지는|석양|선셋/.test(t)) hit("slot", "sunset", "노을");
+  else if (/오전|아침|일찍|모닝/.test(t)) hit("slot", "am", "오전");
+  else if (/오후|점심|낮/.test(t)) hit("slot", "pm", "오후");
+  if (/강아지|반려|댕댕|멍멍|고양이|애견/.test(t)) hit("party", "pet", "반려동물");
+  else if (/아이|아기|애들|아들|딸|가족|부모님|엄마|아빠|어르신|유모차/.test(t)) hit("party", "family", "가족");
+  else if (/여자\s*친구|남자\s*친구|여친|남친|연인|커플|애인|부부|와이프|아내|남편|신혼|데이트|기념일|프러포즈|프로포즈/.test(t)) hit("party", "couple", "연인·부부");
+  else if (/친구|동기|동료|회사|단체/.test(t)) hit("party", "friends", "친구");
+  else if (/혼자|혼행|나홀로/.test(t)) hit("party", "solo", "혼자");
+  if (/차\s*로|자차|자가용|운전|렌트|렌터카|주차/.test(t)) hit("car", true, "차로 와요");
+  else if (/버스|기차|KTX|ktx|대중교통|뚜벅/.test(t)) hit("car", false, "대중교통");
+  if (/멀미/.test(t)) hit("sick", true, "멀미 걱정");
+  if (/프라이빗|단독|우리끼리|우리만|전세/.test(t)) hit("private", true, "프라이빗");
+  if (/저렴|싸게|가성비|싼/.test(t)) hit("cheap", true, "저렴하게");
+  if (/와인/.test(t)) hit("wine", true, "와인");
+  if (/수영/.test(t)) hit("swim", true, "요트 수영");
+  for (const [k, re] of FOOD_WORDS) if (re.test(t)) { hit("food", k, k); break; }
+  if (!o.food && /밥|식사|먹|맛집|저녁|점심/.test(t)) hit("meal", true, "식사");
+  if (/빵|베이커리|디저트/.test(t)) hit("bakery", true, "빵·디저트");
+  if (/(점심|아침|밥|식사|브런치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(t) && !/(타고|탄\s*(뒤|후|다음)|내려서)[^.]{0,10}(점심|밥|식사)/.test(t)) hit("preMeal", true, "타기 전 식사");
+  const n = t.match(/(\d+)\s*(명|인)/); if (n) hit("people", Number(n[1]), `${n[1]}명`);
+  return o;
+}
+
+// 지금 시각 기준 기본값 (지났으면 내일)
+function defaultWhen() {
   const now = new Date(), min = now.getHours() * 60 + now.getMinutes();
-  const sd = sunsetDepart(now);
   if (min < 9 * 60) return { day: 0, slot: "am" };
   if (min < 13 * 60) return { day: 0, slot: "pm" };
-  if (min < sd - 60) return { day: 0, slot: "sunset" };
+  if (min < sunsetDepart(now) - 60) return { day: 0, slot: "sunset" };
   return { day: 1, slot: "sunset" };
 }
-
-function yachtCandidates(o) {
-  const all = D.experiences || [];
-  const tag = (e, t) => (e.tags || []).includes(t);
-  let list;
-  if (o.party === "pet") list = all.filter(e => tag(e, "반려동물 동반"));
-  else list = all.filter(e => e.type === "public");
-  if (o.slot === "am") list = list.filter(e => tag(e, "오전")).concat(list.filter(e => !tag(e, "오전") && !tag(e, "노을 시간대")));
-  else if (o.slot === "sunset") list = list.filter(e => tag(e, "노을 시간대"));
-  else list = list.filter(e => !tag(e, "오전") && !tag(e, "노을 시간대"));
-  if (!list.length) list = all.filter(e => e.type !== "special");
-  const price = e => { const m = String(e.price || "").match(/([\d,]+)\s*원/); return m ? Number(m[1].replace(/,/g, "")) : 1e9; };
-  const order = id => (D.companies || []).findIndex(c => c.id === id);
-  list = [...new Set(list)];
-  return list.sort((a, b) => (o.sick ? durMin(a.duration) - durMin(b.duration) : 0) || price(a) - price(b) || order(a.company) - order(b.company));
+function fillDefaults(o) {
+  const d = defaultWhen(), now = new Date(), nm = now.getHours() * 60 + now.getMinutes();
+  if (!o.slot) o.slot = o.time != null ? (o.time < 12 * 60 ? "am" : o.time >= sunsetDepart(now) - 30 ? "sunset" : "pm") : d.slot;
+  if (o.day == null) {
+    const said = o.found.some(f => /노을|오전|오후|출항/.test(f));
+    o.day = said ? (nm > (o.time ?? slotTime(o.slot, now)) - 60 ? 1 : 0) : d.day;
+  }
+  if (!o.party) o.party = "couple";
+  if (o.car == null) o.car = false;
+  return o;
 }
 
-// 코스 만들기
+// 맞춤 요트 고르기 (점수 순)
+function rankYachts(o) {
+  const tag = (e, t) => (e.tags || []).includes(t);
+  const price = e => { const m = String(e.price || "").match(/([\d,]+)\s*원/); return m ? Number(m[1].replace(/,/g, "")) : 1e9; };
+  const order = id => (D.companies || []).findIndex(c => c.id === id);
+  const list = (D.experiences || []).filter(e => e.type !== "special").map(e => {
+    let s = 0;
+    const wantPrivate = o.private || o.party === "pet";
+    if (o.party === "pet") s += tag(e, "반려동물 동반") ? 100 : -100;
+    s += (e.type === "private") === !!wantPrivate ? 20 : -20;
+    if (o.slot === "am") s += tag(e, "오전") ? 30 : tag(e, "노을 시간대") ? -30 : 0;
+    if (o.slot === "sunset") s += tag(e, "노을 시간대") ? 30 : -30;
+    if (o.slot === "pm") s += (!tag(e, "오전") && !tag(e, "노을 시간대")) ? 30 : -10;
+    if (o.wine) s += /와인/.test(e.name) ? 40 : 0;
+    if (o.swim) s += /수영/.test(e.name) ? 40 : -5;
+    if (o.sick) s += durMin(e.duration) <= 60 ? 10 : -10;
+    if (o.cheap) s -= price(e) / 20000;
+    return { e, s, p: price(e), c: order(e.company) };
+  });
+  return list.sort((a, b) => b.s - a.s || a.p - b.p || a.c - b.c).map(x => x.e);
+}
+
+// 일정 만들기
 function makePlan(o) {
   const date = addDays(new Date(), o.day);
   const w = planWeather(o.day);
   const sunset = hm(D.live.sunset);
-  const why = [];
-  const steps = [];
+  const P = D.places || { cafe: [], food: [], walk: [] };
+  const why = [], steps = [], used = new Set(), swaps = o.swaps || {};
   const storm = /풍랑/.test(w.alert) || (w.st && w.st.key === "stop");
   const cold = (w.temp < 12) || (w.wind >= 8) || (w.water < 15);
-  const P = D.places || { cafe: [], food: [], walk: [] };
-  const used = new Set();
-  const swaps = o.swaps || {};
+  if (w.st) why.push(`${["오늘", "내일", "모레"][o.day] || "그날"} 바다: ${w.st.text}${isNaN(w.wind) ? "" : ` (바람 ${w.wind}m/s${isNaN(w.wave) ? "" : `, 파도 ${w.wave}m`})`}`);
 
-  if (w.st) why.push(`${o.day ? "내일" : "오늘"} 바다: ${w.st.text}${isNaN(w.wind) ? "" : ` (바람 ${w.wind}m/s${isNaN(w.wave) ? "" : `, 파도 ${w.wave}m`})`}`);
-
+  let pick, ranked = [], dep;
+  if (o.booked) {
+    pick = D.experiences[o.booked.i];
+    dep = o.booked.t;
+    why.push("예약하신 요트와 출항 시각에 맞춰 내린 뒤 일정을 짰어요.");
+  } else {
+    ranked = rankYachts(o);
+    pick = ranked[(o.yacht || 0) % Math.max(ranked.length, 1)];
+    dep = o.time != null ? o.time : slotTime(o.slot, date);
+  }
+  const comp = pick && (D.companies || []).find(c => c.id === pick.company);
   let t;
-  if (storm) {
-    why.push("풍랑특보나 강한 바람으로 요트 운항이 어려울 수 있어 실내 위주로 바꿨어요. 운항이 취소되면 업체가 연락하고 환불해 줘요.");
-    t = o.slot === "am" ? 10 * 60 : o.slot === "pm" ? 13 * 60 : (isNaN(sunset) ? 16 * 60 : sunset - 60);
+  if (storm && !o.booked) {
+    why.push("풍랑특보나 강한 바람으로 요트 운항이 어려울 수 있어요. 운항이 취소되면 업체가 연락하고 환불해 줘요. 요트 대신 실내 위주로 짰어요.");
+    t = dep;
     steps.push({ kind: "arrive", time: t, title: "안목 도착", sub: o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요" });
   } else {
-    const cands = yachtCandidates(o);
-    const pick = cands[(o.yacht || 0) % Math.max(cands.length, 1)];
-    const comp = pick && (D.companies || []).find(c => c.id === pick.company);
-    const dep = o.slot === "am" ? 10 * 60 : o.slot === "pm" ? 14 * 60 : sunsetDepart(date);
     const dur = durMin(pick && pick.duration);
-    steps.push({ kind: "arrive", time: dep - 60, title: "강릉항 요트마리나 도착",
-      sub: [o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요",
-            "화장실은 안목 여행자센터에서 미리", o.sick ? "먹는 멀미약은 지금 (탑승 1시간 전)" : ""].filter(Boolean).join(" · ") });
-    steps.push({ kind: "yacht", time: dep, title: pick ? `${comp ? comp.name + " " : ""}${pick.name}` : "요트 투어", exp: pick, comp,
-      sub: pick ? `${pick.duration || ""}${pick.price ? " · " + pick.price : ""}` : "", count: cands.length });
-    if (o.slot === "sunset" && !isNaN(sunset) && sunset > dep && sunset < dep + dur) {
-      steps.push({ kind: "sun", time: sunset, title: "바다 위에서 노을", sub: "요트 위에서 해 지는 걸 봐요. 바람막이를 챙기세요." });
+    if (o.preMeal) {   // 타기 전에 식사: 출항 1시간 전 도착에 맞춰 거꾸로 계산
+      const fp = o.food ? (p => (p.menu || "") === o.food) : o.party === "family" ? (p => /돈까스|버거|미역국/.test(p.menu || "")) : null;
+      const ok = P.food.filter(p => openAt(p, date, Math.floor((dep - 60 - STAY.food - (p.walk || 0)) / 10) * 10, STAY.food))
+        .sort((a, b) => ((fp && fp(b)) - (fp && fp(a))) || (a.walk || 0) - (b.walk || 0));
+      const p = ok[(swaps.pre || 0) % Math.max(ok.length, 1)];
+      if (p) {
+        used.add(p.name);
+        const st = Math.floor((dep - 60 - STAY.food - Math.max(2, p.walk || 0)) / 10) * 10;
+        steps.push({ kind: "food", time: st, end: st + STAY.food, place: p, title: p.name, sub: `${st < 15 * 60 ? "점심" : "식사"} 먼저${o.food ? ` · ${o.food}` : ""}`, alt: ok.length, idx: "pre" });
+        steps.push({ kind: "move", text: `마리나까지 걸어서 약 ${Math.max(2, p.walk || 0)}분` });
+      } else why.push("타기 전 식사는 그 시간에 문 연 식당이 없어 넣지 못했어요.");
     }
-    if (o.sick) why.push("멀미 걱정이 있어 짧은 코스를 먼저 골랐어요.");
-    if (o.party === "pet") why.push("반려동물과 탈 수 있는 코스만 골랐어요. 가게는 반려동물 동반이 되는지 미리 확인해 주세요.");
+    steps.push({ kind: "arrive", time: dep - 60, title: "강릉항 요트마리나 도착",
+      sub: [o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요", "화장실은 안목 여행자센터에서 미리",
+            o.sick ? "먹는 멀미약은 지금 (탑승 1시간 전)" : ""].filter(Boolean).join(" · ") });
+    steps.push({ kind: "yacht", time: dep, end: dep + dur, title: pick ? pick.name : "요트 투어", exp: pick, comp, booked: !!o.booked,
+      sub: pick ? [comp && comp.name, pick.duration, pick.price].filter(Boolean).join(" · ") : "" });
+    if (!isNaN(sunset) && sunset > dep && sunset < dep + dur) steps.push({ kind: "sun", time: sunset, title: "바다 위에서 노을", sub: "요트 위에서 해 지는 걸 봐요. 바람막이를 챙기세요." });
     t = dep + dur + 10;   // 내려서 정리하는 10분
+    if (o.sick) why.push("멀미 걱정이 있어 짧은 코스를 먼저 골랐어요.");
+    if (o.party === "pet") why.push("반려동물과 탈 수 있는 코스를 골랐어요. 가게는 반려동물 동반이 되는지 미리 확인해 주세요.");
   }
-
-  // 다음 장소 고르기 (문 연 곳 중 가까운 순, '바꾸기'로 다음 후보)
-  const choose = (kind, list, stay, reason, idx) => {
-    const ok = list.filter(p => !used.has(p.name) && openAt(p, date, t + (p.walk || 0), stay))
-                   .sort((a, b) => (a.walk || 0) - (b.walk || 0));
+  let at = 0;   // 지금 위치: 마리나에서 걸어서 몇 분 거리인지
+  const isMeal = m => (m >= 11 * 60 && m < 14 * 60) || (m >= 17 * 60 && m < 20 * 60);
+  const choose = (kind, list, reason, idx, prefer) => {
+    const ok = list.filter(p => !used.has(p.name) && openAt(p, date, r10(t + Math.abs((p.walk || 0) - at)), STAY[kind]))
+      .map(p => ({ p, s: (prefer && prefer(p) ? -100 : 0) + Math.abs((p.walk || 0) - at) }))
+      .sort((a, b) => a.s - b.s).map(x => x.p);
     if (!ok.length) return false;
     const p = ok[(swaps[idx] || 0) % ok.length];
     used.add(p.name);
-    t += p.walk || 0;
-    steps.push({ kind, time: t, place: p, title: p.name, sub: reason, alt: ok.length, idx });
-    t += stay;
+    const mv = Math.max(2, Math.abs((p.walk || 0) - at));
+    steps.push({ kind: "move", text: `걸어서 약 ${mv}분` });
+    t = r10(t + mv);
+    steps.push({ kind, time: t, end: t + STAY[kind], place: p, title: p.name, sub: reason, alt: ok.length, idx });
+    t += STAY[kind]; at = p.walk || 0;
     return true;
   };
-  const mealTime = m => (m >= 11 * 60 && m <= 13 * 60 + 30) || (m >= 17 * 60 && m <= 19 * 60 + 30);
-  let i = 0;
-  const firstCafe = storm || cold || o.sick;
-  if (firstCafe) choose("cafe", P.cafe, 50, storm ? "바깥 대신 실내에서 쉬어 가요" : o.sick ? "가까운 곳에서 먼저 쉬어 가요" : "바닷바람에 식은 몸, 따뜻한 음료로", i++);
-  if (mealTime(t) || (t < 17 * 60 && t + 90 >= 17 * 60 && t >= 16 * 60)) {
-    if (t < 17 * 60 && !mealTime(t)) t = 17 * 60;
-    const fam = o.party === "family";
-    const foods = fam ? P.food.slice().sort((a, b) => (/돈까스|버거|미역국/.test(b.menu || "") - /돈까스|버거|미역국/.test(a.menu || ""))) : P.food;
-    choose("food", foods, 60, t >= 17 * 60 ? "저녁 식사" : "점심 식사", i++);
+  const foodPrefer = o.food ? (p => (p.menu || "") === o.food)
+    : o.party === "family" ? (p => /돈까스|버거|미역국/.test(p.menu || "")) : null;
+  const cafePrefer = o.bakery ? (p => /브레드|빵|베이커리/.test(p.name)) : null;
+  const mealLabel = m => m >= 17 * 60 ? "저녁 식사" : "점심 식사";
+  let ateMeal = false;
+  if (isMeal(r10(t)) && !(o.preMeal && r10(t) < 15 * 60)) {
+    ateMeal = choose("food", P.food, `${mealLabel(r10(t))}${o.food ? ` · ${o.food}` : ""}`, 0, foodPrefer);
+    choose("cafe", P.cafe, "식사 뒤 바다 보며 커피 한 잔", 1, cafePrefer);
+  } else {
+    choose("cafe", P.cafe, cold || storm ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔", 0, cafePrefer);
+    if (isMeal(r10(t)) || (!o.preMeal && (o.meal || o.food) && t < 20 * 60)) {
+      if (!isMeal(r10(t)) && t < 17 * 60) t = 17 * 60;
+      ateMeal = choose("food", P.food, `${mealLabel(r10(t))}${o.food ? ` · ${o.food}` : ""}`, 1, foodPrefer);
+    }
   }
-  if (!firstCafe) choose("cafe", P.cafe, 50, "바다 보며 커피 한 잔", i++);
-  // 노을·야경
+  if ((o.food || o.meal) && !ateMeal && !o.preMeal) why.push("말씀하신 식사는 이 시간대에 문 연 가게가 없어 넣지 못했어요. 시간대를 바꿔 보세요.");
+  // 노을·야경 (밤 9시 30분 전까지만)
   const walks = P.walk || [];
-  if (!storm && w.wind < 14) {
-    if (!isNaN(sunset) && t < sunset && sunset - t < 120 && o.slot !== "sunset") {
-      t = sunset - 15;
-      const beach = walks.find(x => !x.night);
-      if (beach) steps.push({ kind: "walk", time: t, place: beach, title: "안목해변에서 노을 보기", sub: `해 지는 시각 ${D.live.sunset}` });
-      t = sunset + 20;
-    }
-    if (!isNaN(sunset) && t >= sunset) {
-      const bridge = walks.find(x => x.night);
-      if (bridge) steps.push({ kind: "walk", time: t, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸어요" });
-    }
+  if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30) {
+    const bridge = walks.find(x => x.night);
+    if (bridge) { steps.push({ kind: "move", text: "걸어서 마리나 쪽으로" }); t = r10(t); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
   }
-  if (cold && !storm) why.push(`바람과 바다가 차가운 편이라 내린 뒤 따뜻한 실내를 먼저 넣었어요.`);
-  why.push("가게는 그 시각에 문을 여는 곳 중 마리나에서 가까운 순으로 골랐어요.");
-  return { o, date, steps, why, storm };
+  if (cold && !storm) why.push("바람과 바다가 차가운 편이라 따뜻한 실내를 넣었어요.");
+  why.push(`식당과 카페는 1시간 30분씩 잡았어요. 그 시각에 문 여는 곳 중 가까운 순으로 골랐어요.`);
+  why.push("장소 사이 걷는 시간은 마리나에서의 거리로 어림했어요.");
+  return { o, date, steps, why, storm, ranked, pick };
 }
 
-const STEP_LABEL = { arrive: "도착", yacht: "요트", sun: "해 지는 시각", cafe: "카페", food: "식사", walk: "산책" };
+const STEP_LABEL = { arrive: "도착", yacht: "요트", sun: "해 지는 시각", cafe: "카페", food: "식당", walk: "산책" };
 function planStep(s) {
-  const walk = s.place ? (s.place.walkText || (s.place.walk ? `걸어서 ${s.place.walk}분` : "")) : "";
-  const swap = (s.kind === "yacht" && s.count > 1) ? `<button type="button" class="pl-swap" data-swap="yacht">다른 요트</button>`
+  if (s.kind === "move") return `<li class="pl-move"><span>${icon("walk", 14)} ${esc(s.text)}</span></li>`;
+  const swap = (s.kind === "yacht" && !s.booked && window.__plan && (window.__plan.rankedLen || 0) > 1) ? `<button type="button" class="pl-swap" data-swap="yacht">다른 요트</button>`
              : (s.alt > 1 ? `<button type="button" class="pl-swap" data-swap="${s.idx}">다른 곳</button>` : "");
+  const when = s.end ? `${fmt(s.time)}~${fmt(s.end)}` : fmt(s.time);
+  const stay = s.end && s.kind !== "yacht" ? ` · ${durText(s.end - s.time)}` : "";
   return `
     <li class="pl-it pl-${s.kind}">
-      <time>${fmt(s.kind === "yacht" || s.kind === "sun" ? s.time : Math.round(s.time / 5) * 5)}</time><i class="pl-dot"></i>
+      <time>${fmt(s.time)}</time><i class="pl-dot"></i>
       <div class="pl-box">
-        <small>${STEP_LABEL[s.kind]}${walk ? ` · ${esc(walk)}` : ""}${s.place && s.place.menu ? ` · ${esc(s.place.menu)}` : ""}</small>
+        <small>${STEP_LABEL[s.kind]}${s.place && s.place.menu ? ` · ${esc(s.place.menu)}` : ""}${s.end ? ` · ${when}${stay}` : ""}</small>
         <h3>${esc(s.title)}</h3>
         ${s.sub ? `<p>${esc(s.sub)}</p>` : ""}
-        ${(s.place && s.place.link) || s.kind === "yacht" || swap ? `<div class="pl-row">${s.place && s.place.link ? mapLinks(s.place) : s.kind === "yacht" ? `<a class="pl-more" href="#/yacht" data-company="${esc(s.comp ? s.comp.id : "")}">코스·예약 보기</a>` : "<span></span>"}${swap}</div>` : ""}
+        ${(s.place && s.place.link) || s.kind === "yacht" || swap ? `<div class="pl-row">${s.place && s.place.link ? mapLinks(s.place) : s.kind === "yacht" ? `<a class="pl-more" href="#/yacht" data-company="${esc(s.comp ? s.comp.id : "")}">${s.booked ? "업체 안내 보기" : "코스·예약 보기"}</a>` : "<span></span>"}${swap}</div>` : ""}
       </div>
     </li>`;
 }
 
-function plannerHTML(full) {
-  const o = window.__plan || (window.__plan = Object.assign({ party: "couple", car: false, sick: false, yacht: 0, swaps: {} }, defaultPlan()));
+// 문장 입력창 + "이미 예약했어요"
+function askBox(q = "") {
+  const exps = (D.experiences || []).map((e, i) => ({ e, i })).filter(x => x.e.type !== "special");
+  const opts = (D.companies || []).map(c => `<optgroup label="${esc(c.name)}">${exps.filter(x => x.e.company === c.id)
+    .map(x => `<option value="${x.i}">${esc(x.e.name)} (${esc(x.e.duration || "")})</option>`).join("")}</optgroup>`).join("");
+  return `
+    <form class="ask" data-plan-form>
+      <label for="plan-q" class="ask-label">어떤 하루를 보내고 싶으세요?</label>
+      <div class="ask-row">
+        <textarea id="plan-q" name="q" rows="2" placeholder="${esc(PLAN_EXAMPLES[0])}">${esc(q)}</textarea>
+        <button type="submit" class="ask-go">코스 짜기</button>
+      </div>
+      <div class="ask-ex">${PLAN_EXAMPLES.map(x => `<button type="button" data-plan-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+    </form>
+    <details class="booked">
+      <summary>요트를 이미 예약했어요</summary>
+      <form class="booked-form" data-booked-form>
+        <label>예약한 코스<select name="i">${opts}</select></label>
+        <label>출항 시각<input type="time" name="t" value="16:30" step="600"></label>
+        <label>날짜<select name="d"><option value="0">오늘</option><option value="1">내일</option><option value="2">모레</option></select></label>
+        <button type="submit" class="ask-go">내린 뒤 일정 짜기</button>
+      </form>
+    </details>`;
+}
+
+// 결과 (읽은 조건 칩 + 추천 요트 + 시간표)
+function planResultHTML() {
+  const o = window.__plan;
+  if (!o) return "";
   const plan = makePlan(o);
+  o.rankedLen = plan.ranked.length;
   const seg = (name, list, cur) => list.map(x => `<button type="button" class="pl-opt ${cur === x.key ? "on" : ""}" data-pl="${name}" data-val="${x.key}" aria-pressed="${cur === x.key}">${x.label}</button>`).join("");
   const tog = (name, label) => `<button type="button" class="pl-opt ${o[name] ? "on" : ""}" data-pl="${name}" data-val="toggle" aria-pressed="${!!o[name]}">${label}</button>`;
   const d = plan.date;
+  const alts = !o.booked && plan.ranked.length > 1 ? plan.ranked.filter(e => e !== plan.pick).slice(0, 2) : [];
+  const altHTML = alts.length ? `<div class="pl-alts"><p>다른 요트 후보</p>${alts.map(e => {
+    const c = (D.companies || []).find(x => x.id === e.company);
+    return `<button type="button" class="pl-alt" data-alt="${D.experiences.indexOf(e)}"><b>${esc(e.name)}</b><span>${esc([c && c.name, e.duration, e.price].filter(Boolean).join(" · "))}</span></button>`;
+  }).join("")}</div>` : "";
   return `
     <div class="planner" id="planner">
+      ${o.booked ? `<p class="pl-read">예약한 요트 기준으로 짰어요.</p>` : `
+      <div class="pl-read"><b>읽은 조건</b>${o.found.length ? o.found.map(f => `<span>${esc(f)}</span>`).join("") : "<em>특별한 조건이 없어 기본값으로 짰어요</em>"}</div>
       <div class="pl-controls">
         <div class="pl-seg">${seg("day", [{ key: 0, label: "오늘" }, { key: 1, label: "내일" }], o.day)}<span class="pl-gap"></span>${seg("slot", PLAN_SLOTS, o.slot)}</div>
         <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("car", "차로 와요")}${tog("sick", "멀미 걱정")}</div>
-      </div>
-      ${plan.storm ? `<div class="pl-alert">${icon("alert", 18)}<span>요트 운항이 어려울 수 있는 날이에요. 실내 위주 코스로 바꿨어요.</span></div>` : ""}
+      </div>`}
+      ${plan.storm && !o.booked ? `<div class="pl-alert">${icon("alert", 18)}<span>요트 운항이 어려울 수 있는 날이에요. 실내 위주 코스로 바꿨어요.</span></div>` : ""}
       <p class="pl-date">${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAY[d.getDay()]})</p>
       <ol class="pl-list">${plan.steps.map(planStep).join("")}</ol>
+      ${altHTML}
       <details class="pl-why"><summary>이렇게 짠 이유</summary><ul>${plan.why.map(x => `<li>${esc(x)}</li>`).join("")}</ul></details>
-      <div class="pl-actions">
-        <button type="button" class="pl-share" data-share>일행에게 공유</button>
-        ${full ? "" : `<a class="pl-full" href="#/plan">안목 코스 크게 보기</a>`}
-      </div>
+      <div class="pl-actions"><button type="button" class="pl-share" data-share>일행에게 공유</button></div>
       <p class="pl-note">출항 시각과 영업시간은 자료 기준이에요. 예약할 때 업체에, 가게는 방문 전에 확인해 주세요.</p>
     </div>`;
 }
 function rerenderPlanner() {
   const box = document.getElementById("planner");
-  if (box) box.outerHTML = plannerHTML(location.hash.startsWith("#/plan"));
+  if (box) box.outerHTML = planResultHTML();
 }
+// 주소에서 계획 읽기: #/plan?q=문장  또는  #/plan?book=코스번호&t=16:30&d=1
+function planFromParams(params) {
+  if (params.get("book") != null) {
+    const i = Number(params.get("book")), tt = hm(params.get("t")), d = Number(params.get("d") || 0);
+    if (!D.experiences[i] || isNaN(tt)) return null;
+    return { booked: { i, t: tt }, day: d, found: [], swaps: {}, party: "couple", car: false };
+  }
+  const q = (params.get("q") || "").trim();
+  if (!q) return null;
+  return Object.assign(fillDefaults(parseQuery(q)), { yacht: 0, swaps: {} });
+}
+
+document.addEventListener("submit", e => {
+  const f = e.target.closest && e.target.closest("[data-plan-form], [data-booked-form]");
+  if (!f) return;
+  e.preventDefault();
+  if (f.matches("[data-plan-form]")) {
+    const q = f.q.value.trim() || f.q.placeholder;
+    location.hash = "#/plan?q=" + encodeURIComponent(q);
+  } else {
+    location.hash = `#/plan?book=${f.i.value}&t=${encodeURIComponent(f.t.value || "16:30")}&d=${f.d.value}`;
+  }
+});
+document.addEventListener("change", e => {
+  const s = e.target.closest && e.target.closest("[data-booked-form] select[name=i]");
+  if (!s) return;
+  const ex = D.experiences[Number(s.value)], f = s.form;
+  if (!ex) return;
+  const tag = t => (ex.tags || []).includes(t);
+  f.t.value = fmt(tag("노을 시간대") ? sunsetDepart(new Date()) : tag("오전") ? 600 : 840);
+});
 document.addEventListener("click", e => {
-  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], .pl-more");
+  const ex = e.target.closest && e.target.closest("[data-plan-ex]");
+  if (ex) { const box = document.getElementById("plan-q"); box.value = ex.dataset.planEx; box.focus(); return; }
+  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], .pl-more, .pl-alt");
   if (!b) return;
   const o = window.__plan;
   if (b.matches(".pl-more")) { if (b.dataset.company) window.__expCompany = b.dataset.company; return; }
   if (b.matches("[data-share]")) { sharePlan(); return; }
-  if (b.matches(".pl-swap")) {
+  if (!o) return;
+  if (b.matches(".pl-alt")) { const ex2 = D.experiences[Number(b.dataset.alt)]; o.yacht = (makePlan(o).ranked.indexOf(ex2)); o.swaps = {}; }
+  else if (b.matches(".pl-swap")) {
     if (b.dataset.swap === "yacht") o.yacht = (o.yacht || 0) + 1;
     else o.swaps[b.dataset.swap] = (o.swaps[b.dataset.swap] || 0) + 1;
   } else {
     const k = b.dataset.pl, v = b.dataset.val;
-    if (v === "toggle") o[k] = !o[k];
-    else o[k] = k === "day" ? Number(v) : v;
+    if (v === "toggle") o[k] = !o[k]; else o[k] = k === "day" ? Number(v) : v;
+    if (k === "slot") o.time = null;
     o.yacht = 0; o.swaps = {};
   }
   rerenderPlanner();
 });
 async function sharePlan() {
   const plan = makePlan(window.__plan);
-  const text = plan.steps.map(s => `${fmt(s.kind === "yacht" || s.kind === "sun" ? s.time : Math.round(s.time / 5) * 5)} ${s.title}`).join("\n");
-  const url = location.origin + location.pathname + "#/plan";
+  const text = plan.steps.filter(s => s.kind !== "move").map(s => `${fmt(s.time)} ${s.title}`).join("\n");
+  const url = location.href;
   const data = { title: "요트핏 안목 코스", text: `${plan.date.getMonth() + 1}월 ${plan.date.getDate()}일 안목 코스\n${text}`, url };
   try {
     if (navigator.share) { await navigator.share(data); return; }
@@ -2231,7 +2415,7 @@ function heroSea() {
         </div>
         <div class="hero-btns">
           <a class="hero-btn main" href="#/yacht">오늘 탈 요트 보기</a>
-          <a class="hero-btn" href="#/plan">안목 코스 짜기</a>
+          <a class="hero-btn" href="#ask" data-scroll-ask>문장으로 코스 짜기</a>
         </div>
       </div>
     </section>`;
@@ -2282,9 +2466,15 @@ function pageHome() {
   return `
     ${heroSea()}
     <div class="container home">
+      <section class="hblock ask-block" id="ask">
+        <div class="hhead"><h2>문장으로 코스 짜기</h2></div>
+        <p class="hlead">하고 싶은 걸 편하게 적어 주세요. 맞춤 요트부터, 내린 뒤 식당과 카페까지 이어 드려요.</p>
+        ${askBox()}
+      </section>
+
       <section class="hblock">
         <div class="hhead"><h2>오늘은 이 시간이 좋아요</h2><a href="#/live">이번 주 날씨</a></div>
-        <p class="hlead">날씨와 해 지는 시각으로 골랐어요. 누르면 그 시간으로 코스를 짜요.</p>
+        <p class="hlead">날씨와 해 지는 시각으로 골랐어요. 누르면 그 시간으로 코스를 짜 드려요.</p>
         ${goodSlots()}
       </section>
 
@@ -2292,12 +2482,6 @@ function pageHome() {
         <div class="hhead"><h2>요트 고르기</h2><a href="#/yacht">전체 코스</a></div>
         <p class="hlead">강릉항에서 출발하는 요트 ${(D.companies || []).length}곳</p>
         ${yachtStrip()}
-      </section>
-
-      <section class="hblock">
-        <div class="hhead"><h2>요트에서 내리면, 안목에서</h2></div>
-        <p class="hlead">요트 내리는 시각과 오늘 바다에 맞춰 다음 갈 곳을 이어 드려요.</p>
-        ${plannerHTML(false)}
       </section>
 
       <div class="two">
@@ -2318,11 +2502,16 @@ function pageHome() {
     </div>`;
 }
 
-// 안목 코스 페이지 (아래 탭 '안목 코스')
-function pagePlan() {
+// 안목 코스 페이지 (문장 입력 → 결과)
+function pagePlan(params) {
+  const key = location.hash;
+  if (window.__planKey !== key) { window.__plan = planFromParams(params); window.__planKey = key; }
+  const q = params.get("q") || "";
   return `
-    ${pageHead("", "안목 코스 짜기", "요트 타는 시간과 오늘 바다에 맞춰, 내린 뒤 갈 곳까지 이어 드려요.")}
-    <section class="section"><div class="container narrow">${plannerHTML(true)}
+    ${pageHead("", "안목 코스 짜기", "문장으로 적으면 맞춤 요트부터 내린 뒤 식당·카페까지 이어 드려요.")}
+    <section class="section"><div class="container narrow">
+      ${askBox(q)}
+      ${window.__plan ? planResultHTML() : ""}
       <p class="pl-more-link"><a href="#/tour">안목 카페·식당 전체 보기</a></p>
     </div></section>`;
 }
@@ -2379,14 +2568,14 @@ document.addEventListener("click", e => {
   if (y) { window.__expCompany = y.dataset.company; return; }
   const s = e.target.closest && e.target.closest(".slot[data-slot]");
   if (s) {
-    const o = window.__plan;
-    o.slot = s.dataset.slot; o.yacht = 0; o.swaps = {};
+    const label = { am: "오전", pm: "오후", sunset: "노을 시간에" }[s.dataset.slot];
     const nm = new Date().getHours() * 60 + new Date().getMinutes();
-    const t = s.dataset.slot === "am" ? 600 : s.dataset.slot === "pm" ? 840 : sunsetDepart(new Date());
-    o.day = nm > t - 60 ? 1 : 0;
-    rerenderPlanner();
-    document.getElementById("planner")?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    const day = nm > slotTime(s.dataset.slot, new Date()) - 60 ? "내일" : "오늘";
+    location.hash = "#/plan?q=" + encodeURIComponent(`${day} ${label} 요트 타고 싶어요`);
+    return;
   }
+  const a = e.target.closest && e.target.closest("[data-scroll-ask]");
+  if (a) { e.preventDefault(); document.getElementById("ask")?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); document.getElementById("plan-q")?.focus({ preventScroll: true }); }
 });
 
 /* =====================================================================
@@ -2443,9 +2632,9 @@ function routerInner() {
   let html;
   switch (parts[0]) {
     case undefined:   html = pageHome(); break;
-    case "result":    html = pagePlan(); break;
-    case "ai":        html = pagePlan(); break;
-    case "plan":      html = pagePlan(); break;
+    case "result":    html = pagePlan(params); break;
+    case "ai":        html = pagePlan(params); break;
+    case "plan":      html = pagePlan(params); break;
     case "category":  html = pageCategory(parts[1]); break;
     case "marina":    html = pageMarina(); break;
     case "yacht":     html = pageYacht(); break;
