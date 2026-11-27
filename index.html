@@ -2222,7 +2222,7 @@ function makePlan(o) {
   const walks = P.walk || [];
   if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30) {
     const bridge = walks.find(x => x.night);
-    if (bridge) { steps.push({ kind: "move", text: "걸어서 마리나 쪽으로" }); t = r10(t); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
+    if (bridge) { steps.push({ kind: "move", text: `걸어서 약 ${Math.max(2, at)}분` }); t = r10(t + Math.max(2, at)); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
   }
   if (cold && !storm) why.push("바람과 바다가 차가운 편이라 따뜻한 실내를 넣었어요.");
   why.push(`식당과 카페는 1시간 30분씩 잡았어요. 그 시각에 문 여는 곳 중 가까운 순으로 골랐어요.`);
