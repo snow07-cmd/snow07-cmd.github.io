@@ -148,7 +148,7 @@
       const ap = tm[1];
       if ((ap === "오후" || ap === "저녁" || ap === "밤" || (ap === "낮" && h < 6) || (!ap && h < 9)) && h < 12) h += 12;
       const v = h * 60 + mi;
-      if (tm[6]) { hit("endBy", v, `${fmt(v)}까지`); }
+      if (tm[6]) { hit("endBy", v, `${fmt(v)}까지`); if (/기차|ktx|KTX|버스|비행기/.test(tm[6])) o.endTravel = true; }
       else if (o.time == null && v >= 6 * 60 && v <= 21 * 60) hit("time", v, `${fmt(v)} 출항`);
     }
     if (o.time == null && /정오/.test(sq)) hit("time", 12 * 60, "12:00 출항");
@@ -303,6 +303,9 @@
     return keyed.concat(rest);
   }
 
+  // 끝나는 시각 전에 둘 여유: 기차·버스 시각이면 이동 시간까지 (대중교통 50분, 차 30분), 아니면 20분
+  const endBuffer = o => o.endTravel ? (o.car ? 30 : 50) : 20;
+
   /* ---------- 내린 뒤 일정 ---------- */
   // ctx: { o, wd, t(내려서 정리한 뒤 시각), w:{cold,rain,storm}, P:{cafe,food}, used:Set, at, swaps, endBy }
   function planAfter(ctx) {
@@ -311,7 +314,7 @@
     const used = ctx.used || new Set(), swaps = ctx.swaps || {};
     let t = ctx.t, at = ctx.at || 0;
     const steps = [], notes = [], cands = [];
-    const limit = Math.min(DAY_END, o.endBy != null ? o.endBy - 20 : DAY_END);
+    const limit = Math.min(DAY_END, o.endBy != null ? o.endBy - endBuffer(o) : DAY_END);
     const choose = (kind, list, base, idx) => {
       let ok = (list || []).filter(p => !used.has(p.name)).map(p => {
         const mv = Math.max(2, Math.abs((p.walk || 0) - at)), st = r10(t + mv);
@@ -349,7 +352,7 @@
       }
     }
     if (wantMeal && !ateMeal && !o.preMeal) notes.push(o.endBy != null ? "끝나는 시각 안에 식사를 넣을 시간이 모자라요." : "말씀하신 식사는 이 시간대에 문 연 가게가 없어 넣지 못했어요. 시간대를 바꿔 보세요.");
-    if (o.endBy != null) notes.push(`${fmt(o.endBy)}까지 떠날 수 있게 20분 여유를 두고 끝냈어요.`);
+    if (o.endBy != null) notes.push(o.endTravel ? `${fmt(o.endBy)} ${o.car ? "출발" : "기차·버스"}에 맞춰 ${o.car ? "" : "강릉역·터미널까지 버스 시간(약 35분)과 "}여유를 두고 ${fmt(o.endBy - endBuffer(o))}까지 끝냈어요.` : `${fmt(o.endBy)}까지 떠날 수 있게 20분 여유를 두고 끝냈어요.`);
     return { steps, t, at, ateMeal, notes, cands, waited };
   }
 
@@ -468,6 +471,6 @@
       move: { kind: "move", text: `마리나까지 걸어서 약 ${x.mv}분` } };
   }
 
-  root.YF = { planBeforeFast, order, fitScore, rng, PICK, parse, score, profile, planAfter, planAfterFast, planBefore, openAt, simple, keyAfter, keyBefore, lookup, weatherClass,
+  root.YF = { endBuffer, planBeforeFast, order, fitScore, rng, PICK, parse, score, profile, planAfter, planAfterFast, planBefore, openAt, simple, keyAfter, keyBefore, lookup, weatherClass,
     DIM, STAY, hm, fmt, r10, isMeal, TAG_TEXT, PARTY_LABEL };
 })(typeof window !== "undefined" ? window : globalThis);
