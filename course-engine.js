@@ -316,10 +316,13 @@
     const steps = [], notes = [], cands = [];
     const limit = Math.min(DAY_END, o.endBy != null ? o.endBy - endBuffer(o) : DAY_END);
     const choose = (kind, list, base, idx) => {
-      let ok = (list || []).filter(p => !used.has(p.name)).map(p => {
+      const pool = stay => (list || []).filter(p => !used.has(p.name)).map(p => {
         const mv = Math.max(2, Math.abs((p.walk || 0) - at)), st = r10(t + mv);
         return { p, mv, st, sc: fitScore(p, kind, o, w, at) };
-      }).filter(x => openAt(x.p, wd, x.st, STAY[kind]) && x.st + STAY[kind] <= limit);
+      }).filter(x => openAt(x.p, wd, x.st, stay) && x.st + stay <= limit);
+      let stay = STAY[kind], ok = pool(stay);
+      // 끝나는 시각(기차 등) 때문에 식사가 안 들어가면 식사만 1시간으로 줄여서 넣어요
+      if (!ok.length && kind === "food" && o.endBy != null) { stay = 60; ok = pool(stay); if (ok.length) notes.push("떠나는 시각에 맞춰 식사는 1시간으로 잡았어요."); }
       if (!ok.length) return false;
       cands.push({ kind, names: ok.slice().sort((a, b) => b.sc - a.sc || a.mv - b.mv).slice(0, kind === "cafe" ? 15 : 8).map(x => x.p.name) });
       ok = order(ok, kind, o, `${kind}${idx}${t}`);
@@ -332,8 +335,8 @@
         b2 = base.replace(` · ${o.food}`, "") + ` · ${o.food} 가게가 이 시각엔 쉬어서 대신`;
         notes.push(`${o.food} 가게가 그 시각에 문을 닫아 다른 식당을 넣었어요.`);
       }
-      steps.push({ kind, time: t, end: t + STAY[kind], place: x.p, title: x.p.name, sub: reasonOf(x.p, kind, o, w, b2), alt: ok.length, idx });
-      t += STAY[kind]; at = x.p.walk || 0;
+      steps.push({ kind, time: t, end: t + stay, place: x.p, title: x.p.name, sub: reasonOf(x.p, kind, o, w, b2), alt: ok.length, idx });
+      t += stay; at = x.p.walk || 0;
       return true;
     };
     const cold = w.cold || w.rain || w.storm;
