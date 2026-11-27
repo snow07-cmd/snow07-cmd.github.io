@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v17">
+  <meta name="site-version" content="v18">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -1255,6 +1255,9 @@ window.SITE_DATA = {
 
   </script>
 
+  <script src="course-dict.js"></script>
+  <script src="course-engine.js"></script>
+  <script src="course-cases.js"></script>
   <script>
 /* =====================================================================
    요트핏 동작 파일 (app.js)
@@ -2044,12 +2047,14 @@ const durMin = s => { const t = String(s || ""); const h = t.match(/(\d+)\s*시�
 const durText = m => `${m >= 60 ? Math.floor(m / 60) + "시간" : ""}${m % 60 ? " " + (m % 60) + "분" : ""}`.trim();
 const STAY = { food: 90, cafe: 90, walk: 30 };
 const PLAN_SLOTS = [ { key: "am", label: "오전" }, { key: "pm", label: "오후" }, { key: "sunset", label: "노을" } ];
-const PLAN_PARTY = [ { key: "couple", label: "연인·부부" }, { key: "family", label: "가족" }, { key: "friends", label: "친구" }, { key: "pet", label: "반려동물" }, { key: "solo", label: "혼자" } ];
+const PLAN_PARTY = [ { key: "couple", label: "연인·부부" }, { key: "family", label: "아이와" }, { key: "senior", label: "어르신과" }, { key: "friends", label: "친구" }, { key: "group", label: "단체" }, { key: "solo", label: "혼자" } ];
 const FOOD_WORDS = [ ["대게", /대게|게요리|킹크랩/], ["회", /회\b|횟집|회 먹|회를|물회|해산물/], ["버거", /버거|햄버거/], ["돈까스", /돈까스|돈가스|까스/], ["닭강정", /닭강정|치킨/], ["미역국", /미역국|국밥|해장/] ];
 const PLAN_EXAMPLES = [
   "여자친구랑 내일 노을 보면서 요트 타고 저녁 먹고 싶어요",
   "아이 둘이랑 오전에 타요. 멀미가 조금 걱정돼요",
-  "강아지랑 같이 탈 수 있는 요트 찾아요. 차로 가요"
+  "강아지랑 같이 탈 수 있는 요트 찾아요. 차로 가요",
+  "부모님 모시고 토요일 오후에 타고 7시 기차 타야 해요",
+  "친구 4명이랑 노을 보고 피맥, 버스로 가요"
 ];
 
 function openAt(p, date, min, stay = 40) {
@@ -2075,10 +2080,12 @@ function mapLinks(p) {
 function planWeather(dayOffset) {
   if (dayOffset === 0) {
     return { temp: toNum(currentValue("temp")), wind: toNum(currentValue("wind")), wave: toNum(currentValue("wave")),
-             water: toNum(currentValue("water")), alert: currentValue("alert"), st: currentStatus() };
+             water: toNum(currentValue("water")), alert: currentValue("alert"), st: currentStatus(),
+             rain: /비|눈|빗방울|소나기/.test(String(D.live.pty || "")) };
   }
   const f = findDay(D.live.week, addDays(new Date(), dayOffset));
-  return { temp: toNum(f.tmax), wind: toNum(f.wind), wave: toNum(f.wave), water: NaN, alert: f.alert || "", st: dayStatus(f.wind, f.wave, f.alert) };
+  return { temp: toNum(f.tmax), wind: toNum(f.wind), wave: toNum(f.wave), water: NaN, alert: f.alert || "", st: dayStatus(f.wind, f.wave, f.alert),
+           rain: /비|눈|소나기/.test(String(f.sky || "")) };
 }
 function sunsetDepart(date) {
   const m = date.getMonth() + 1;
@@ -2092,45 +2099,9 @@ function sunsetDepart(date) {
 }
 const slotTime = (slot, date) => slot === "am" ? 10 * 60 : slot === "pm" ? 14 * 60 : sunsetDepart(date);
 
-// 문장에서 조건 읽기
+// 문장에서 조건 읽기: 표현 사전(course-dict.js) + 엔진(course-engine.js)
 function parseQuery(text) {
-  const t = String(text || "");
-  const o = { q: t, found: [] };
-  const hit = (k, v, label) => { o[k] = v; o.found.push(label); };
-  if (/모레/.test(t)) hit("day", 2, "모레");
-  else if (/내일/.test(t)) hit("day", 1, "내일");
-  else if (/오늘|지금/.test(t)) hit("day", 0, "오늘");
-  else if (/주말|토요일|일요일/.test(t)) {
-    const now = new Date(), want = /일요일/.test(t) ? 0 : 6;
-    hit("day", (want - now.getDay() + 7) % 7, /일요일/.test(t) ? "일요일" : "토요일");
-  }
-  const tm = t.match(/(오전|오후|아침|저녁)?\s*(\d{1,2})\s*시(\s*반|\s*(\d{1,2})\s*분)?/);
-  if (tm) {
-    let h = Number(tm[2]); const min = tm[3] ? (/반/.test(tm[3]) ? 30 : Number(tm[4] || 0)) : 0;
-    if ((tm[1] === "오후" || tm[1] === "저녁" || (!tm[1] && h < 9)) && h < 12) h += 12;
-    hit("time", h * 60 + min, `${fmt(h * 60 + min)} 출항`);
-  }
-  if (/노을|일몰|해\s*질|해\s*지는|석양|선셋/.test(t)) hit("slot", "sunset", "노을");
-  else if (/오전|아침|일찍|모닝/.test(t)) hit("slot", "am", "오전");
-  else if (/오후|점심|낮/.test(t)) hit("slot", "pm", "오후");
-  if (/강아지|반려|댕댕|멍멍|고양이|애견/.test(t)) hit("party", "pet", "반려동물");
-  else if (/아이|아기|애들|아들|딸|가족|부모님|엄마|아빠|어르신|유모차/.test(t)) hit("party", "family", "가족");
-  else if (/여자\s*친구|남자\s*친구|여친|남친|연인|커플|애인|부부|와이프|아내|남편|신혼|데이트|기념일|프러포즈|프로포즈/.test(t)) hit("party", "couple", "연인·부부");
-  else if (/친구|동기|동료|회사|단체/.test(t)) hit("party", "friends", "친구");
-  else if (/혼자|혼행|나홀로/.test(t)) hit("party", "solo", "혼자");
-  if (/차\s*로|자차|자가용|운전|렌트|렌터카|주차/.test(t)) hit("car", true, "차로 와요");
-  else if (/버스|기차|KTX|ktx|대중교통|뚜벅/.test(t)) hit("car", false, "대중교통");
-  if (/멀미/.test(t)) hit("sick", true, "멀미 걱정");
-  if (/프라이빗|단독|우리끼리|우리만|전세/.test(t)) hit("private", true, "프라이빗");
-  if (/저렴|싸게|가성비|싼/.test(t)) hit("cheap", true, "저렴하게");
-  if (/와인/.test(t)) hit("wine", true, "와인");
-  if (/수영/.test(t)) hit("swim", true, "요트 수영");
-  for (const [k, re] of FOOD_WORDS) if (re.test(t)) { hit("food", k, k); break; }
-  if (!o.food && /밥|식사|먹|맛집|저녁|점심/.test(t)) hit("meal", true, "식사");
-  if (/빵|베이커리|디저트/.test(t)) hit("bakery", true, "빵·디저트");
-  if (/(점심|아침|밥|식사|브런치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(t) && !/(타고|탄\s*(뒤|후|다음)|내려서)[^.]{0,10}(점심|밥|식사)/.test(t)) hit("preMeal", true, "타기 전 식사");
-  const n = t.match(/(\d+)\s*(명|인)/); if (n) hit("people", Number(n[1]), `${n[1]}명`);
-  return o;
+  return YF.parse(text, new Date());
 }
 
 // 지금 시각 기준 기본값 (지났으면 내일)
@@ -2148,8 +2119,17 @@ function fillDefaults(o) {
     const said = o.found.some(f => /노을|오전|오후|출항/.test(f));
     o.day = said ? (nm > (o.time ?? slotTime(o.slot, now)) - 60 ? 1 : 0) : d.day;
   }
-  if (!o.party) o.party = "couple";
+  if (!o.party || o.party === "pet") o.party = "couple";
   if (o.car == null) o.car = false;
+  o.wants = o.wants || {}; o.body = o.body || {};
+  // "○○ 예약했어요" + 업체 이름 → 그 업체 코스로 내린 뒤 일정
+  if (o.bookedText && o.company && !o.booked) {
+    const tag = (e, t) => (e.tags || []).includes(t);
+    const list = (D.experiences || []).map((e, i) => ({ e, i })).filter(x => x.e.company === o.company && x.e.type !== "special")
+      .sort((x, y) => ((o.slot === "sunset" ? tag(y.e, "노을 시간대") - tag(x.e, "노을 시간대") : o.slot === "am" ? tag(y.e, "오전") - tag(x.e, "오전") : 0))
+        || (((y.e.type === "private") === !!o.private) - ((x.e.type === "private") === !!o.private)));
+    if (list[0]) o.booked = { i: list[0].i, t: o.time != null ? o.time : slotTime(o.slot, addDays(new Date(), o.day)) };
+  }
   return o;
 }
 
@@ -2160,8 +2140,13 @@ function rankYachts(o) {
   const order = id => (D.companies || []).findIndex(c => c.id === id);
   const list = (D.experiences || []).filter(e => e.type !== "special").map(e => {
     let s = 0;
-    const wantPrivate = o.private || o.party === "pet";
-    if (o.party === "pet") s += tag(e, "반려동물 동반") ? 100 : -100;
+    const pet = o.pet || o.party === "pet";
+    const wantPrivate = o.private || pet || (o.people || 0) >= 9;
+    if (pet) s += tag(e, "반려동물 동반") ? 100 : -100;
+    if (o.company) s += e.company === o.company ? 60 : 0;
+    const w = o.wants || {}, b = o.body || {};
+    if (o.senior || o.kid || b.pregnant || b.water || b.walkHard || w.shortRide) s += durMin(e.duration) <= 60 ? 12 : -6;
+    if (w.longRide) s += durMin(e.duration) >= 120 ? 15 : 0;
     s += (e.type === "private") === !!wantPrivate ? 20 : -20;
     if (o.slot === "am") s += tag(e, "오전") ? 30 : tag(e, "노을 시간대") ? -30 : 0;
     if (o.slot === "sunset") s += tag(e, "노을 시간대") ? 30 : -30;
@@ -2173,6 +2158,20 @@ function rankYachts(o) {
     return { e, s, p: price(e), c: order(e.company) };
   });
   return list.sort((a, b) => b.s - a.s || a.p - b.p || a.c - b.c).map(x => x.e);
+}
+
+// 출발지에 맞는 버스 안내
+function busLine(from) {
+  const key = { station: "강릉역", terminal: "터미널", wolhwa: "월화거리" }[from];
+  const tr = key && (D.transport || []).find(x => x.from.includes(key));
+  const bus = tr && (tr.options || []).filter(x => x.type === "bus").sort((a, b) => (parseInt(String(b.freq).replace(/\D/g, "")) || 0) - (parseInt(String(a.freq).replace(/\D/g, "")) || 0))[0];
+  return bus ? `${tr.from.replace(/^강릉\s+/, "")}에서 ${bus.no}번 버스 ${bus.time}, 안목커피거리 정류장에서 내려요` : "버스는 안목커피거리 정류장에서 내려요";
+}
+// 합승(1인 요금) 총액
+function totalPrice(e, people) {
+  const m = String(e.price || "").match(/^1인\s*([\d,]+)원/);
+  if (!m || !people || people < 2) return "";
+  return `${people}명 ${(Number(m[1].replace(/,/g, "")) * people).toLocaleString("ko-KR")}원`;
 }
 
 // 일정 만들기
@@ -2204,68 +2203,52 @@ function makePlan(o) {
     steps.push({ kind: "arrive", time: t, title: "안목 도착", sub: o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요" });
   } else {
     const dur = durMin(pick && pick.duration);
-    if (o.preMeal) {   // 타기 전에 식사: 출항 1시간 전 도착에 맞춰 거꾸로 계산
-      const fp = o.food ? (p => (p.menu || "") === o.food) : o.party === "family" ? (p => /돈까스|버거|미역국/.test(p.menu || "")) : null;
-      const ok = P.food.filter(p => openAt(p, date, Math.floor((dep - 60 - STAY.food - (p.walk || 0)) / 10) * 10, STAY.food))
-        .sort((a, b) => ((fp && fp(b)) - (fp && fp(a))) || (a.walk || 0) - (b.walk || 0));
-      const p = ok[(swaps.pre || 0) % Math.max(ok.length, 1)];
-      if (p) {
-        used.add(p.name);
-        const st = Math.floor((dep - 60 - STAY.food - Math.max(2, p.walk || 0)) / 10) * 10;
-        steps.push({ kind: "food", time: st, end: st + STAY.food, place: p, title: p.name, sub: `${st < 15 * 60 ? "점심" : "식사"} 먼저${o.food ? ` · ${o.food}` : ""}`, alt: ok.length, idx: "pre" });
-        steps.push({ kind: "move", text: `마리나까지 걸어서 약 ${Math.max(2, p.walk || 0)}분` });
-      } else why.push("타기 전 식사는 그 시간에 문 연 식당이 없어 넣지 못했어요.");
+    if (o.preMeal) {   // 타기 전에 식사: 표(course-cases.js)에서 바로 찾고, 없으면 그 자리에서 계산
+      const bctx = { o, wd: date.getDay(), dep, P, w, swaps };
+      const r = YF.planBeforeFast(bctx) || YF.planBefore(bctx);
+      if (r) { used.add(r.x.p.name); steps.push(r.step); steps.push(r.move); }
+      else why.push("타기 전 식사는 그 시간에 문 연 식당이 없어 넣지 못했어요.");
     }
     steps.push({ kind: "arrive", time: dep - 60, title: "강릉항 요트마리나 도착",
-      sub: [o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요", "화장실은 안목 여행자센터에서 미리",
+      sub: [o.car ? "강릉항 공영주차장 (24시간 무료)" : busLine(o.from), "화장실은 안목 여행자센터에서 미리",
             o.sick ? "먹는 멀미약은 지금 (탑승 1시간 전)" : ""].filter(Boolean).join(" · ") });
     steps.push({ kind: "yacht", time: dep, end: dep + dur, title: pick ? pick.name : "요트 투어", exp: pick, comp, booked: !!o.booked,
-      sub: pick ? [comp && comp.name, pick.duration, pick.price].filter(Boolean).join(" · ") : "" });
+      sub: pick ? [comp && comp.name, pick.duration, pick.price, totalPrice(pick, o.people)].filter(Boolean).join(" · ") : "" });
     if (!isNaN(sunset) && sunset > dep && sunset < dep + dur) steps.push({ kind: "sun", time: sunset, title: "바다 위에서 노을", sub: "요트 위에서 해 지는 걸 봐요. 바람막이를 챙기세요." });
     t = dep + dur + 10;   // 내려서 정리하는 10분
     if (o.sick) why.push("멀미 걱정이 있어 짧은 코스를 먼저 골랐어요.");
-    if (o.party === "pet") why.push("반려동물과 탈 수 있는 코스를 골랐어요. 가게는 반려동물 동반이 되는지 미리 확인해 주세요.");
+    if (o.pet || o.party === "pet") why.push("반려동물과 탈 수 있는 코스를 골랐어요. 가게는 반려동물 동반이 되는지 미리 확인해 주세요.");
   }
-  let at = 0;   // 지금 위치: 마리나에서 걸어서 몇 분 거리인지
-  const isMeal = m => (m >= 11 * 60 && m < 14 * 60) || (m >= 17 * 60 && m < 20 * 60);
-  const choose = (kind, list, reason, idx, prefer) => {
-    const ok = list.filter(p => !used.has(p.name) && openAt(p, date, r10(t + Math.abs((p.walk || 0) - at)), STAY[kind]))
-      .map(p => ({ p, s: (prefer && prefer(p) ? -100 : 0) + Math.abs((p.walk || 0) - at) }))
-      .sort((a, b) => a.s - b.s).map(x => x.p);
-    if (!ok.length) return false;
-    const p = ok[(swaps[idx] || 0) % ok.length];
-    used.add(p.name);
-    const mv = Math.max(2, Math.abs((p.walk || 0) - at));
-    steps.push({ kind: "move", text: `걸어서 약 ${mv}분` });
-    t = r10(t + mv);
-    steps.push({ kind, time: t, end: t + STAY[kind], place: p, title: p.name, sub: reason, alt: ok.length, idx });
-    t += STAY[kind]; at = p.walk || 0;
-    return true;
-  };
-  const foodPrefer = o.food ? (p => (p.menu || "") === o.food)
-    : o.party === "family" ? (p => /돈까스|버거|미역국/.test(p.menu || "")) : null;
-  const cafePrefer = o.bakery ? (p => /브레드|빵|베이커리/.test(p.name)) : null;
-  const mealLabel = m => m >= 17 * 60 ? "저녁 식사" : "점심 식사";
-  let ateMeal = false;
-  if (isMeal(r10(t)) && !(o.preMeal && r10(t) < 15 * 60)) {
-    ateMeal = choose("food", P.food, `${mealLabel(r10(t))}${o.food ? ` · ${o.food}` : ""}`, 0, foodPrefer);
-    choose("cafe", P.cafe, "식사 뒤 바다 보며 커피 한 잔", 1, cafePrefer);
-  } else {
-    choose("cafe", P.cafe, cold || storm ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔", 0, cafePrefer);
-    if (isMeal(r10(t)) || (!o.preMeal && (o.meal || o.food) && t < 20 * 60)) {
-      if (!isMeal(r10(t)) && t < 17 * 60) t = 17 * 60;
-      ateMeal = choose("food", P.food, `${mealLabel(r10(t))}${o.food ? ` · ${o.food}` : ""}`, 1, foodPrefer);
-    }
-  }
-  if ((o.food || o.meal) && !ateMeal && !o.preMeal) why.push("말씀하신 식사는 이 시간대에 문 연 가게가 없어 넣지 못했어요. 시간대를 바꿔 보세요.");
+  // 내린 뒤 카페·식당: 경우의 수 표(course-cases.js)에서 바로 꺼내고, 특별한 요청이 있으면 엔진이 그 자리에서 계산
+  const wx = { cold, rain: !!w.rain, storm };
+  const actx = { o, wd: date.getDay(), t, w: wx, P, used, at: 0, swaps };
+  const after = (!storm && YF.planAfterFast(actx)) || YF.planAfter(Object.assign(actx, { used }));
+  steps.push(...after.steps);
+  t = after.t; let at = after.at;
+  why.push(...after.notes);
+  if (after.fromTable) why.push("카페·식당은 미리 계산해 둔 경우의 수 표에서 골랐어요.");
   // 노을·야경 (밤 9시 30분 전까지만)
   const walks = P.walk || [];
-  if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30) {
+  const endLimit = o.endBy != null ? o.endBy - 20 : 22 * 60;
+  if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30 && t + 32 <= endLimit && !o.noAfter) {
     const bridge = walks.find(x => x.night);
     if (bridge) { steps.push({ kind: "move", text: `걸어서 약 ${Math.max(2, at)}분` }); t = r10(t + Math.max(2, at)); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
   }
+  else if (!storm && !isNaN(sunset) && t < sunset && t + 32 <= Math.min(sunset + 20, endLimit) && (o.wants.walkLove || o.wants.photo || o.wants.anniv) && !o.noAfter) {
+    const beach = walks.find(x => !x.night);
+    if (beach) { steps.push({ kind: "move", text: `걸어서 약 ${Math.max(2, at)}분` }); t = r10(t + Math.max(2, at)); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: beach, title: "안목해변 노을 산책", sub: "해 지기 전 해변을 걸으며 사진도 남겨요" }); }
+  }
   if (cold && !storm) why.push("바람과 바다가 차가운 편이라 따뜻한 실내를 넣었어요.");
-  why.push(`식당과 카페는 1시간 30분씩 잡았어요. 그 시각에 문 여는 곳 중 가까운 순으로 골랐어요.`);
+  if (w.rain && !storm) why.push("비·눈 소식이 있어 가까운 실내를 먼저 넣었어요. 비가 와도 요트는 떠요. 운항은 업체에 확인해 주세요.");
+  const bd = o.body || {};
+  if (bd.wheel || bd.stroller) why.push("휠체어·유모차 탑승은 업체에 미리 문의해 주세요. 마리나에는 경사로가 없어요. 가게는 엘리베이터가 있는 곳·가까운 곳 위주로 골랐어요.");
+  if (bd.pregnant) why.push("임산부도 탈 수 있지만, 짧은 코스와 가까운 실내 위주로 짰어요. 몸 상태에 맞춰 업체와 상의해 주세요.");
+  if (bd.water) why.push("구명조끼를 꼭 입고, 선장님 안내를 따르면 돼요. 짧은 코스를 먼저 골랐어요.");
+  if (o.kid) why.push("아이는 보호자가 가까이에서 지켜봐 주세요. 계류장 물가는 위험해요.");
+  if (o.people && pick && pick.type !== "private" && o.people >= 9) why.push(`${o.people}명이면 합승 코스 정원을 넘을 수 있어요. 전세 코스를 업체에 문의해 주세요.`);
+  const cap = pick && String(pick.name + " " + (pick.note || "")).match(/(\d+)\s*명/);
+  if (o.people && cap && pick.type === "private" && o.people > Number(cap[1])) why.push(`이 전세 코스는 최대 ${cap[1]}명이에요. ${o.people}명이면 업체에 꼭 문의해 주세요.`);
+  why.push(`식당과 카페는 1시간 30분씩 잡았어요. 그 시각에 문 여는 곳 중 상황에 맞는 특징(웹 후기 조사)과 거리를 함께 보고 골랐어요.`);
   why.push("장소 사이 걷는 시간은 마리나에서의 거리로 어림했어요.");
   return { o, date, steps, why, storm, ranked, pick };
 }
@@ -2334,14 +2317,14 @@ function planResultHTML() {
       <div class="pl-read"><b>읽은 조건</b>${o.found.length ? o.found.map(f => `<span>${esc(f)}</span>`).join("") : "<em>특별한 조건이 없어 기본값으로 짰어요</em>"}</div>
       <div class="pl-controls">
         <div class="pl-seg">${seg("day", [{ key: 0, label: "오늘" }, { key: 1, label: "내일" }], o.day)}<span class="pl-gap"></span>${seg("slot", PLAN_SLOTS, o.slot)}</div>
-        <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("car", "차로 와요")}${tog("sick", "멀미 걱정")}</div>
+        <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("pet", "반려동물")}${tog("car", "차로 와요")}${tog("sick", "멀미 걱정")}</div>
       </div>`}
       ${plan.storm && !o.booked ? `<div class="pl-alert">${icon("alert", 18)}<span>요트 운항이 어려울 수 있는 날이에요. 실내 위주 코스로 바꿨어요.</span></div>` : ""}
       <p class="pl-date">${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAY[d.getDay()]})</p>
       <ol class="pl-list">${plan.steps.map(planStep).join("")}</ol>
       ${altHTML}
       <details class="pl-why"><summary>이렇게 짠 이유</summary><ul>${plan.why.map(x => `<li>${esc(x)}</li>`).join("")}</ul></details>
-      <div class="pl-actions"><button type="button" class="pl-share" data-share>일행에게 공유</button></div>
+      <div class="pl-actions"><button type="button" class="pl-share" data-share>일행에게 공유</button><button type="button" class="pl-full" data-reroll>다른 코스 보기</button></div>
       <p class="pl-note">출항 시각과 영업시간은 자료 기준이에요. 예약할 때 업체에, 가게는 방문 전에 확인해 주세요.</p>
     </div>`;
 }
@@ -2350,15 +2333,36 @@ function rerenderPlanner() {
   if (box) box.outerHTML = planResultHTML();
 }
 // 주소에서 계획 읽기: #/plan?q=문장  또는  #/plan?book=코스번호&t=16:30&d=1
+// 카페·식당 고르기의 무작위 번호(seed): 주소에 &s= 로 남겨서, 공유한 링크는 같은 코스가 보여요
+const newSeed = () => Math.floor(Math.random() * 1e9);
+function seedFromParams(params) {
+  let s = Number(params.get("s"));
+  if (!s) {
+    s = newSeed();
+    const h = location.hash + (location.hash.includes("?") ? "&" : "?") + "s=" + s;
+    try { history.replaceState(null, "", h); window.__planKey = h; } catch (e) { /* 주소 못 바꿔도 괜찮아요 */ }
+  }
+  return s;
+}
+// 최근에 추천한 카페는 덜 나오게 (이 휴대폰에만 저장)
+function recentCafes() { try { return JSON.parse(localStorage.getItem("yf_recent_cafes") || "[]"); } catch (e) { return []; } }
+function rememberCafes(o) {
+  try {
+    const names = makePlan(o).steps.filter(x => x.kind === "cafe").map(x => x.title);
+    const list = [...names, ...recentCafes().filter(n => !names.includes(n))].slice(0, 6);
+    localStorage.setItem("yf_recent_cafes", JSON.stringify(list));
+  } catch (e) { /* 저장 못 해도 괜찮아요 */ }
+}
 function planFromParams(params) {
+  const seed = seedFromParams(params), recent = recentCafes();
   if (params.get("book") != null) {
     const i = Number(params.get("book")), tt = hm(params.get("t")), d = Number(params.get("d") || 0);
     if (!D.experiences[i] || isNaN(tt)) return null;
-    return { booked: { i, t: tt }, day: d, found: [], swaps: {}, party: "couple", car: false };
+    return { booked: { i, t: tt }, day: d, found: [], swaps: {}, party: "couple", car: false, wants: {}, body: {}, seed, recent };
   }
   const q = (params.get("q") || "").trim();
   if (!q) return null;
-  return Object.assign(fillDefaults(parseQuery(q)), { yacht: 0, swaps: {} });
+  return Object.assign(fillDefaults(parseQuery(q)), { yacht: 0, swaps: {}, seed, recent });
 }
 
 document.addEventListener("submit", e => {
@@ -2383,12 +2387,19 @@ document.addEventListener("change", e => {
 document.addEventListener("click", e => {
   const ex = e.target.closest && e.target.closest("[data-plan-ex]");
   if (ex) { const box = document.getElementById("plan-q"); box.value = ex.dataset.planEx; box.focus(); return; }
-  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], .pl-more, .pl-alt");
+  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], [data-reroll], .pl-more, .pl-alt");
   if (!b) return;
   const o = window.__plan;
   if (b.matches(".pl-more")) { if (b.dataset.company) window.__expCompany = b.dataset.company; return; }
   if (b.matches("[data-share]")) { sharePlan(); return; }
   if (!o) return;
+  if (b.matches("[data-reroll]")) {   // 같은 조건으로 카페·식당만 새로 뽑기
+    o.seed = newSeed(); o.swaps = {};
+    const h = location.hash.replace(/([?&])s=\d+/, "$1s=" + o.seed);
+    try { history.replaceState(null, "", h); window.__planKey = h; } catch (err) { /* 괜찮아요 */ }
+    rerenderPlanner(); rememberCafes(o);
+    return;
+  }
   if (b.matches(".pl-alt")) { const ex2 = D.experiences[Number(b.dataset.alt)]; o.yacht = (makePlan(o).ranked.indexOf(ex2)); o.swaps = {}; }
   else if (b.matches(".pl-swap")) {
     if (b.dataset.swap === "yacht") o.yacht = (o.yacht || 0) + 1;
@@ -2635,7 +2646,11 @@ function pageHome() {
 // 안목 코스 페이지 (문장 입력 → 결과)
 function pagePlan(params) {
   const key = location.hash;
-  if (window.__planKey !== key) { window.__plan = planFromParams(params); window.__planKey = key; }
+  if (window.__planKey !== key) {
+    window.__planKey = key;
+    window.__plan = planFromParams(params);
+    if (window.__plan) rememberCafes(window.__plan);
+  }
   const q = params.get("q") || "";
   return `
     ${pageHead("", "안목 코스 짜기", "문장으로 적으면 맞춤 요트부터 내린 뒤 식당·카페까지 이어 드려요.")}
