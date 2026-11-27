@@ -1,6 +1,6 @@
 {
-  "updated": "06:08",
-  "updatedAt": "2026-11-28T06:08:19.684+09:00",
+  "updated": "06:37",
+  "updatedAt": "2026-11-28T06:37:42.806+09:00",
   "source": "기상청",
   "grid": {
     "nx": 94,
@@ -48,52 +48,7 @@
       "wave": 0.5
     },
     {
-      "date": "2026-12-02",
-      "sky": "흐림",
-      "tmax": 14,
-      "tmin": 5,
-      "wind": null,
-      "wave": 2
-    },
-    {
-      "date": "2026-12-03",
-      "sky": "흐림",
-      "tmax": 14,
-      "tmin": 8,
-      "wind": null,
-      "wave": 2
-    },
-    {
-      "date": "2026-12-04",
-      "sky": "흐림",
-      "tmax": 14,
-      "tmin": 7,
-      "wind": null,
-      "wave": 1.5
-    },
-    {
-      "date": "2026-12-05",
-      "sky": "흐림",
-      "tmax": 12,
-      "tmin": 6,
-      "wind": null,
-      "wave": 2
-    },
-    {
-      "date": "2026-12-06",
-      "sky": "흐림",
-      "tmax": 11,
-      "tmin": 4,
-      "wind": null,
-      "wave": 1.5
-    },
-    {
-      "date": "2026-12-07",
-      "sky": "흐리고 비",
-      "tmax": 11,
-      "tmin": 5,
-      "wind": null,
-      "wave": 3
+      "date": "2026-12-02"
     }
   ]
 }
