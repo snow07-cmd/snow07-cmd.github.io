@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v13">
+  <meta name="site-version" content="v14">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -534,12 +534,63 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
   .cal-temp { display: none; }
 }
 
+/* ---------- 요트 업체 카드 + 코스 승선권 ---------- */
+.cc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.cc { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.cc:hover { border-color: var(--primary); }
+.cc:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.cc[aria-pressed="true"] { border: 2px solid var(--primary); padding: 17px; }
+.cc h3 { font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
+.cc .cnt { font-size: 13px; color: var(--sub); margin-top: 2px; }
+.cc-feat { display: flex; flex-wrap: wrap; gap: 4px; }
+.cc-feat span { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--soft); border-radius: 4px; padding: 2px 7px; }
+.cc-price { display: grid; gap: 2px; font-size: 13px; color: var(--sub); border-top: 1px solid var(--line); padding-top: 10px; }
+.cc-price b { color: var(--ink); font-size: 15px; font-weight: 900; margin-left: 4px; }
+.cc-more { margin-top: auto; font-size: 14px; font-weight: 700; color: var(--primary); }
+.cc[aria-pressed="true"] .cc-more { color: var(--ink); }
+.cd { margin-top: 16px; background: var(--paper); border: 2px solid var(--primary); border-radius: 10px; padding: 22px 24px; scroll-margin-top: 84px; }
+.cd-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cd-head h3 { font-size: 22px; font-weight: 900; letter-spacing: -.03em; }
+.cd-head .btn-row { margin: 0; padding: 0; }
+.cd .company-info { margin: 14px 0 0; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cd .schedule { margin-top: 14px; }
+.cd .cg-title { margin: 20px 0 8px; }
+.tk-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tk { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.tk-top { padding: 14px 16px 12px; }
+.tk-type { font-size: 12px; font-weight: 700; color: var(--primary); }
+.tk-type.private { color: #7A5A2E; }
+.tk-type.special { color: var(--stop); }
+.tk h4 { font-size: 16px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; line-height: 1.35; }
+.tk-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.tk-badges span { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--soft); border-radius: 4px; padding: 1px 6px; }
+.tk-note { font-size: 13px; color: var(--sub); margin-top: 6px; }
+.tk-cut { position: relative; border-top: 2px dashed var(--line); margin-top: auto; }
+.tk-cut::before, .tk-cut::after { content: ""; position: absolute; top: -9px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); border: 1px solid var(--line); }
+.tk-cut::before { left: -9px; }
+.tk-cut::after { right: -9px; }
+.tk-bot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 10px 16px 14px; }
+.tk-dur { font-size: 13px; color: var(--sub); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.tk-price { font-size: 18px; font-weight: 900; letter-spacing: -.02em; text-align: right; }
+.tk-price small { font-size: 12px; font-weight: 700; color: var(--sub); margin-right: 3px; }
+@media (max-width: 900px) { .cc-grid, .tk-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .cc-grid { gap: 8px; }
+  .cc { padding: 14px; gap: 10px; }
+  .cc[aria-pressed="true"] { padding: 13px; }
+  .cc h3 { font-size: 17px; }
+  .cc-price b { display: block; margin-left: 0; }
+  .cc-cap, .cc-more { display: none; }
+  .cd { padding: 16px; }
+  .tk-row { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v13)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v14)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -1193,22 +1244,33 @@ function pageCategory(id) {
 // 체험 목록 그리기 (선택한 조건으로 거르고, 같은 업체끼리 묶기)
 function renderExperiences(selected) {
   if (isEmpty(D.experiences)) return preparing("체험 정보 준비 중입니다", "강릉 마리나 체험 정보를 모으고 있어요.");
+  const groups = expGroups(selected);
+  if (groups.length === 0) return preparing("조건에 맞는 체험이 없어요", "다른 조건을 골라 보세요.");
+  window.__expSel = selected;
+  const keep = groups.find(g => g.id === window.__expCompany);
+  const cur = keep || groups[0];
+  window.__expCompany = cur.id;
+  return `
+    <div class="exp-cards">
+      <p class="muted company-hint">업체 카드를 누르면 아래에 코스가 나와요.</p>
+      <div class="cc-grid">${groups.map(g => companyCard(g, g.id === cur.id, selected.length > 0)).join("")}</div>
+      <div class="cd" id="exp-detail">${companyDetail(cur)}</div>
+    </div>`;
+}
+
+// 조건에 맞는 코스를 업체별로 묶기 (업체 순서 = companies 순서)
+function expGroups(selected) {
   const list = selected.length
     ? D.experiences.filter(e => selected.every(s => (e.tags || []).includes(s)))
     : D.experiences;
-  if (list.length === 0) return preparing("조건에 맞는 체험이 없어요", "다른 조건을 골라 보세요.");
+  const order = id => { const i = (D.companies || []).findIndex(c => c.id === id); return i < 0 ? 99 : i; };
   const groups = [];
   list.forEach(e => {
     let g = groups.find(x => x.id === e.company);
-    if (!g) groups.push(g = { id: e.company, items: [] });
+    if (!g) groups.push(g = { id: e.company, c: (D.companies || []).find(c => c.id === e.company), items: [] });
     g.items.push(e);
   });
-  const order = id => { const i = (D.companies || []).findIndex(c => c.id === id); return i < 0 ? 99 : i; };
-  groups.sort((a, b) => order(a.id) - order(b.id));
-  const one = groups.length === 1;
-  return `<p class="muted company-hint">업체 이름을 누르면 코스와 요금이 펼쳐져요.</p>` +
-    groups.map(g => companyBlock((D.companies || []).find(c => c.id === g.id), g.items,
-      { filtered: selected.length > 0, open: one })).join("");
+  return groups.sort((a, b) => order(a.id) - order(b.id));
 }
 
 // 이름 끝 글자에 받침이 있으면 "이라고도", 없으면 "라고도"
@@ -1223,18 +1285,6 @@ const COURSE_TYPES = [
   { key: "private", label: "프라이빗", desc: "우리 일행만 타요 (요금은 전세 기준)" },
   { key: "special", label: "특별 패키지", desc: "" }
 ];
-function courseTable(items) {
-  const known = COURSE_TYPES.map(t => t.key);
-  const groups = COURSE_TYPES.map(t => ({ ...t, list: items.filter(e => e.type === t.key) }))
-    .concat([{ key: "etc", label: "", desc: "", list: items.filter(e => !known.includes(e.type)) }])
-    .filter(g => g.list.length);
-  return groups.map(g => `
-    <div class="course-group">
-      ${g.label ? `<h4 class="cg-title">${esc(g.label)}${g.desc ? `<span>${esc(g.desc)}</span>` : ""}</h4>` : ""}
-      <div class="course-list">${g.list.map(experienceCard).join("")}</div>
-    </div>`).join("");
-}
-
 function scheduleBox(c) {
   if (isEmpty(c.schedule)) return "";
   const m = new Date().getMonth() + 1;
@@ -1263,55 +1313,82 @@ function minPrice(items) {
   return best ? `${best.per ? "1인 " : ""}${best.n.toLocaleString("ko-KR")}원부터` : "";
 }
 
-// 업체 묶음: 접힌 줄(이름·코스 수·최저가) + 펼치면 공통 정보·운항 시간·코스 표
-function companyBlock(c, items, opts = {}) {
-  if (!c) return `<section class="company"><div class="company-body">${courseTable(items)}</div></section>`;
+// 업체 특징 (코스 태그에서 모아요)
+function companyFeatures(items) {
+  const has = t => items.some(e => (e.tags || []).includes(t));
+  const f = [];
+  if (has("오전")) f.push("오전 코스");
+  if (has("노을 시간대")) f.push("노을 코스");
+  if (has("반려동물 동반")) f.push("반려동물 가능");
+  if (items.some(e => e.type === "special")) f.push("특별 패키지");
+  return f;
+}
+
+// 업체 카드: 이름·코스 수·특징·최저가
+function companyCard(g, on, filtered) {
+  const c = g.c || { id: g.id, name: g.id };
+  const prices = COURSE_TYPES.filter(t => t.key !== "special").map(t => {
+    const v = minPrice(g.items.filter(e => e.type === t.key));
+    return v ? `<span>${esc(t.label)}<b>${esc(v)}</b></span>` : "";
+  }).join("");
+  const feats = companyFeatures(g.items).map(f => `<span>${esc(f)}</span>`).join("");
+  return `
+    <button type="button" class="cc" data-company="${esc(g.id)}" aria-pressed="${on}">
+      <div>
+        <h3>${esc(c.name)}</h3>
+        <p class="cnt">${filtered ? "조건에 맞는 코스" : "코스"} ${g.items.length}개${c.capacity ? `<span class="cc-cap">, ${esc(c.capacity)}</span>` : ""}</p>
+      </div>
+      ${feats ? `<div class="cc-feat">${feats}</div>` : ""}
+      ${prices ? `<div class="cc-price">${prices}</div>` : ""}
+      <span class="cc-more">${on ? "코스 보는 중" : "코스 보기"}</span>
+    </button>`;
+}
+
+// 고른 업체의 안내 + 코스 승선권
+function companyDetail(g) {
+  const c = g.c || { name: g.id };
   const row = (ic, label, v) => v ? `<li>${icon(ic, 16)}<span><b>${label}</b> ${esc(v)}</span></li>` : "";
   const links = (c.links || []).filter(l => /^https:\/\//.test(l.url || ""))
     .map(l => `<a class="btn-line" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
-  const prices = COURSE_TYPES.filter(t => t.key !== "special").map(t => {
-    const v = minPrice(items.filter(e => e.type === t.key));
-    return v ? `<span>${esc(t.label)}<b>${esc(v)}</b></span>` : "";
-  }).join("");
-  const meta = [`${opts.filtered ? "조건에 맞는 코스" : "코스"} ${items.length}개`, c.capacity].filter(Boolean).join(" · ");
+  const groups = COURSE_TYPES.map(t => ({ t, list: g.items.filter(e => e.type === t.key) }))
+    .concat([{ t: { label: "기타", desc: "" }, list: g.items.filter(e => !COURSE_TYPES.some(t => t.key === e.type)) }])
+    .filter(x => x.list.length);
   return `
-    <details class="company" id="company-${esc(c.id)}"${opts.open ? " open" : ""}>
-      <summary class="company-sum">
-        <div class="cs-main">
-          <h3>${esc(c.name)}</h3>
-          <p class="cs-meta">${esc(meta)}</p>
-        </div>
-        <div class="cs-price">${prices}</div>
-        <span class="cs-toggle" aria-hidden="true"></span>
-      </summary>
-      <div class="company-body">
-        ${(c.aka || []).length || links ? `<div class="company-head">
-          ${(c.aka || []).length ? `<p class="aka">${esc(c.aka.join(", "))}${rago(c.aka[c.aka.length - 1])} 불러요</p>` : ""}
-          ${links ? `<div class="btn-row">${links}</div>` : ""}
-        </div>` : ""}
-        <ul class="info-list company-info">
-          ${row("pin", "출발", c.place)}${row("toilet", "인원", c.capacity)}
-          ${row("calendar", "예약", c.reserve)}${row("alert", "취소", c.refund)}
-        </ul>
-        ${scheduleBox(c)}
-        ${courseTable(items)}
-      </div>
-    </details>`;
+    <div class="cd-head">
+      <h3>${esc(c.name)}</h3>
+      ${links ? `<div class="btn-row">${links}</div>` : ""}
+    </div>
+    ${(c.aka || []).length ? `<p class="aka">${esc(c.aka.join(", "))}${rago(c.aka[c.aka.length - 1])} 불러요</p>` : ""}
+    <ul class="info-list company-info">
+      ${row("pin", "출발", c.place)}${row("toilet", "인원", c.capacity)}
+      ${row("calendar", "예약", c.reserve)}${row("alert", "취소", c.refund)}
+    </ul>
+    ${scheduleBox(c)}
+    ${groups.map(x => `
+      <h4 class="cg-title">${esc(x.t.label)}${x.t.desc ? `<span>${esc(x.t.desc)}</span>` : ""}</h4>
+      <div class="tk-row">${x.list.map(experienceCard).join("")}</div>`).join("")}`;
 }
 
-// 코스 한 줄: 이름(+설명) · 운행 시간 · 가격
+// 코스 승선권: 종류·이름·표시 / 절취선 / 운행 시간·요금
 function experienceCard(e) {
-  const badge = { "오전": "오전", "노을 시간대": "노을", "반려동물 동반": "반려동물 가능" };
-  const badges = (e.tags || []).filter(t => badge[t]).map(t => `<span class="cr-badge">${badge[t]}</span>`).join("");
+  const B = { "오전": "오전", "노을 시간대": "노을", "반려동물 동반": "반려동물 가능" };
+  const T = { public: "퍼블릭", private: "프라이빗", special: "특별 패키지" };
+  const badges = (e.tags || []).filter(t => B[t]).map(t => `<span>${B[t]}</span>`).join("");
+  const m = String(e.price || "").match(/^1인\s*(.*)$/);
+  const price = m ? `<small>1인</small>${esc(m[1])}` : esc(e.price || "업체 문의");
   return `
-    <div class="exp-card course-row">
-      <div class="cr-main">
-        <h3>${esc(e.name)}${badges}</h3>
-        ${e.note ? `<p class="exp-note">${esc(e.note)}</p>` : ""}
+    <div class="tk exp-card">
+      <div class="tk-top">
+        <p class="tk-type ${esc(e.type || "")}">${T[e.type] || ""}</p>
+        <h4>${esc(e.name)}</h4>
+        ${badges ? `<div class="tk-badges">${badges}</div>` : ""}
+        ${e.note ? `<p class="tk-note">${esc(e.note)}</p>` : ""}
       </div>
-      <div class="cr-dur">${e.duration ? `${icon("clock", 14)} ${esc(e.duration)}` : ""}</div>
-      <div class="cr-price exp-price">${esc(e.price || "업체 문의")}</div>
-      ${D.features.booking ? `<a class="btn-orange sm" href="#/booking">예약하기</a>` : ""}
+      <div class="tk-cut"></div>
+      <div class="tk-bot">
+        <span class="tk-dur">${e.duration ? `${icon("clock", 14)} ${esc(e.duration)}` : ""}</span>
+        <span class="tk-price exp-price">${price}</span>
+      </div>
     </div>`;
 }
 
@@ -1876,12 +1953,24 @@ function applyWeather(w) {
   renderFooter();
 }
 renderHeader();
-// 업체 펼치기: 하나를 열면 나머지는 접기
-document.addEventListener("toggle", e => {
-  const d = e.target;
-  if (!(d instanceof HTMLDetailsElement) || !d.classList.contains("company") || !d.open) return;
-  document.querySelectorAll("details.company[open]").forEach(o => { if (o !== d) o.open = false; });
-}, true);
+// 업체 카드 누르면 아래 코스만 바꿔 그리기 (화면 위치 그대로, 휴대폰은 코스 위치로 이동)
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest(".cc");
+  if (!b) return;
+  const wrap = b.closest(".exp-cards");
+  const g = expGroups(window.__expSel || []).find(x => x.id === b.dataset.company);
+  if (!wrap || !g) return;
+  window.__expCompany = g.id;
+  wrap.querySelectorAll(".cc").forEach(x => {
+    const on = x === b;
+    x.setAttribute("aria-pressed", String(on));
+    const more = x.querySelector(".cc-more");
+    if (more) more.textContent = on ? "코스 보는 중" : "코스 보기";
+  });
+  const d = wrap.querySelector("#exp-detail");
+  d.innerHTML = companyDetail(g);
+  if (window.innerWidth <= 640) d.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+});
 
 // 안전 가이드 단계 버튼: 표지판만 바꿔 그리기 (화면 위치 그대로)
 document.addEventListener("click", e => {
