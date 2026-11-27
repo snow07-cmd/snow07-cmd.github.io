@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 보안: 이 사이트가 불러올 수 있는 곳을 정해 둬요 (외부 스크립트·플러그인 차단, 날씨는 GitHub에서만, 폼은 이 사이트로만) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://raw.githubusercontent.com; frame-src https:; media-src https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v18">
+  <meta name="site-version" content="v18.5">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -15,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" integrity="sha384-GIdEBaqGN9mNkDkMkzMHW8EKUqtpPIe/sLj1X7DIrnc9uPtLROJgmuDlh+3rBw0j" crossorigin="anonymous">
   <style>
 /* =====================================================================
    요트핏 디자인 (v5, 안내 사이트형 / 회청색)
@@ -1615,7 +1618,7 @@ function companyDetail(g) {
   const c = g.c || { name: g.id };
   const row = (ic, label, v) => v ? `<li>${icon(ic, 16)}<span><b>${label}</b> ${esc(v)}</span></li>` : "";
   const links = (c.links || []).filter(l => /^https:\/\//.test(l.url || ""))
-    .map(l => `<a class="btn-line" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
+    .map(l => `<a class="btn-line" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`).join("");
   const groups = COURSE_TYPES.map(t => ({ t, list: g.items.filter(e => e.type === t.key) }))
     .concat([{ t: { label: "기타", desc: "" }, list: g.items.filter(e => !COURSE_TYPES.some(t => t.key === e.type)) }])
     .filter(x => x.list.length);
@@ -1841,7 +1844,7 @@ function pageSafety(focusId) {
 function cameraView(cam) {
   const src = (cam && cam.src || "").trim();
   if (/^https:\/\//.test(src)) {
-    return `<div class="cctv"><iframe src="${esc(src)}" title="${esc(cam.name)} CCTV" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+    return `<div class="cctv"><iframe src="${esc(src)}" title="${esc(cam.name)} CCTV" allow="autoplay; fullscreen" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="no-referrer"></iframe></div>`;
   }
   return `
     <div class="cctv">
@@ -2080,9 +2083,11 @@ function openNowText(p, date = new Date()) {
   if ((p.off || []).includes(date.getDay())) return "오늘 휴무";
   return openAt(p, date, min, 0) ? "지금 영업 중" : "지금은 문 닫음";
 }
+// 자료에서 온 링크는 https 주소만 걸어요 (javascript: 같은 주소 차단)
+const safeUrl = u => { const v = String(u || "").trim(); return /^https:\/\/[^\s"'<>]+$/i.test(v) ? v : ""; };
 function mapLinks(p) {
   const kakao = "https://map.kakao.com/link/search/" + encodeURIComponent(p.name + " 강릉");
-  return `<div class="maplinks">${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">네이버 지도</a>` : ""}<a href="${kakao}" target="_blank" rel="noopener">카카오맵</a></div>`;
+  return `<div class="maplinks">${safeUrl(p.link) ? `<a href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener noreferrer">네이버 지도</a>` : ""}<a href="${kakao}" target="_blank" rel="noopener">카카오맵</a></div>`;
 }
 function planWeather(dayOffset) {
   if (dayOffset === 0) {
@@ -2338,7 +2343,7 @@ function faqAnswer(k, o) {
     capacity: () => (D.companies || []).map(c => `${c.name}: ${c.capacity}`).join(" / "),
     price: () => { const pub = exps.filter(e => e.type === "public").sort((a, b) => won(a) - won(b)), pri = exps.filter(e => e.type === "private").sort((a, b) => won(a) - won(b));
       return `합승(1인)은 ${pub[0] ? pub[0].price.replace("1인 ", "") : ""}부터, 전세(일행 전체)는 ${pri[0] ? pri[0].price : ""}부터예요. 가장 싼 합승: ${list(pub.slice(0, 2))}${o.people ? `. ${o.people}명이면 합승 ${(won(pub[0]) * o.people).toLocaleString("ko-KR")}원부터` : ""}.`; },
-    book: () => (D.companies || []).map(c => `${c.name}: ${(c.links || []).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(", ")}`).join(" / "),
+    book: () => (D.companies || []).map(c => `${c.name}: ${(c.links || []).filter(l => safeUrl(l.url)).map(l => `<a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`).join(", ")}`).join(" / "),
     duration: () => `코스마다 1시간, 1시간 30분, 2시간이 많고, 전세는 5시간 코스도 있어요. 일몰 코스는 1시간 30분이에요.`,
     courses: () => (D.companies || []).map(c => `${c.name} ${exps.filter(e => e.company === c.id).length}개`).join(" · ") + ` 코스가 있어요. 위 일정의 '다른 요트'나 '요트·체험' 화면에서 비교해 보세요.`,
     wine: () => { const ws = exps.filter(e => /와인/.test(e.name)); return ws.length ? `와인 코스: ${list(ws)}` : "와인 코스는 업체에 문의해 주세요."; },
