@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v14">
+  <meta name="site-version" content="v15">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
 /* =====================================================================
    요트핏 디자인 (v5, 안내 사이트형 / 회청색)
@@ -585,12 +586,156 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
   .tk-row { grid-template-columns: 1fr; }
 }
 
+/* =====================================================================
+   v15 휴대폰 먼저: 첫 화면(수평선) · 좋은 시간 · 요트 카드 · 안목 코스 · 아래 탭
+   ===================================================================== */
+body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui, sans-serif; }
+.hero { position: relative; overflow: hidden; color: #fff; min-height: 560px; }
+.hero-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #5B8DA5 0%, #9CC0CE 58%, #CFE0E5 70%); }
+.sky-dawn .hero-sky { background: linear-gradient(180deg, #4E6E8E 0%, #A9B9CF 52%, #F2D2B8 70%); }
+.sky-sunset .hero-sky { background: linear-gradient(180deg, #4F7D96 0%, #A7BFC6 40%, #EBC7A2 62%, #F0B27F 70%); }
+.sky-night .hero-sky { background: linear-gradient(180deg, #0F2330 0%, #1D3A48 55%, #2C4F61 70%); }
+.hero-sun { position: absolute; right: 18%; top: 54%; width: 64px; height: 64px; border-radius: 50%; background: #FFF3DC; opacity: .9; }
+.sky-sunset .hero-sun { background: #FBD9AE; top: 57%; }
+.sky-night .hero-sun { width: 40px; height: 40px; background: #E8EEF2; opacity: .85; top: 22%; box-shadow: inset -10px -4px 0 0 #1D3A48; }
+.hero-boat { position: absolute; left: 14%; top: calc(66% - 50px); color: #1D3A48; }
+.sky-night .hero-boat { color: #0B1A23; }
+.hero-boat .icon { fill: rgba(255, 255, 255, .92); }
+.hero-wave { position: absolute; left: 0; width: 100%; top: calc(66% - 20px); height: 60px; fill: #3E6F86; }
+.hero-sea { position: absolute; left: 0; right: 0; top: calc(66% + 30px); bottom: 0; background: linear-gradient(180deg, #3E6F86 0%, #24495A 100%); }
+.sky-night .hero-wave { fill: #1F4152; } .sky-night .hero-sea { background: linear-gradient(180deg, #1F4152, #0F2330); }
+.hero-in { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 560px; padding-top: 36px; padding-bottom: 24px; }
+.hero-kicker { font-size: 14px; opacity: .92; }
+.hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -.045em; line-height: 1.2; margin-top: 8px; text-shadow: 0 1px 14px rgba(20, 45, 58, .22); }
+.hero-stats { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255, 255, 255, .3); padding-top: 12px; max-width: 640px; }
+.hero-stats span { display: block; font-size: 12px; opacity: .85; }
+.hero-stats b { display: block; font-size: 19px; font-weight: 800; margin-top: 2px; }
+.hero-stats em { display: block; font-style: normal; font-size: 12px; opacity: .85; }
+.hero-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; max-width: 640px; }
+.hero-btn { display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 14px; font-size: 16px; font-weight: 700; color: #fff; border: 1px solid rgba(255, 255, 255, .5); }
+.hero-btn.main { background: #fff; color: var(--cover); border-color: #fff; }
+.hero-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+.home { padding-bottom: 24px; }
+.hblock { margin-top: 36px; }
+.hhead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.hhead h2 { font-size: 22px; font-weight: 800; letter-spacing: -.035em; }
+.hhead a { font-size: 14px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+.hlead { font-size: 14px; color: var(--sub); margin-top: 4px; }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.slot { text-align: left; font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 14px; cursor: pointer; }
+.slot small { display: block; font-size: 12px; color: var(--sub); }
+.slot b { display: block; font-size: 22px; font-weight: 800; margin: 2px 0 4px; }
+.slot span { display: block; font-size: 13px; color: var(--sub); }
+.slot.best { border: 2px solid #E39A58; padding: 13px; }
+.slot.best small { color: #A9622A; font-weight: 700; }
+.slot:focus-visible, .ycard:focus-visible, .pl-opt:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ystrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+.ycard { display: block; color: inherit; }
+.ycard-photo { aspect-ratio: 5 / 3; border-radius: 14px; overflow: hidden; display: grid; place-items: center; color: rgba(255, 255, 255, .85);
+  background: linear-gradient(160deg, hsl(calc((195 + var(--hue)) * 1deg) 30% 64%) 0%, #3E6F86 55%, #24495A 100%); }
+.ycard-photo img { width: 100%; height: 100%; object-fit: cover; }
+.ycard h3 { font-size: 16px; font-weight: 800; margin-top: 10px; }
+.ycard p { font-size: 13px; color: var(--sub); margin-top: 2px; }
+.ycard p b { color: var(--ink); }
+.ycard-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.ycard-tags span { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--soft); border-radius: 999px; padding: 2px 8px; }
+
+/* 안목 코스 */
+.planner { margin-top: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 16px; scroll-margin-top: 76px; }
+.pl-controls { display: grid; gap: 8px; }
+.pl-seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pl-gap { width: 6px; }
+.pl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pl-opt { font: inherit; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 14px; cursor: pointer; }
+.pl-opt.on { background: var(--cover); border-color: var(--cover); color: #fff; font-weight: 700; }
+.pl-alert { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; padding: 12px; border-radius: 12px; background: #FBEDEC; color: #8E2F29; font-size: 14px; }
+.pl-date { font-size: 13px; color: var(--sub); margin: 14px 0 4px; }
+.pl-list { list-style: none; }
+.pl-it { display: grid; grid-template-columns: 46px 1fr; position: relative; padding-bottom: 12px; }
+.pl-it::before { content: ""; position: absolute; left: 57px; top: 24px; bottom: -2px; width: 2px; background: var(--line); }
+.pl-it:last-child::before { display: none; }
+.pl-it time { font-size: 14px; font-weight: 800; color: var(--primary); padding-top: 12px; font-variant-numeric: tabular-nums; }
+.pl-dot { position: absolute; left: 51px; top: 14px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 3px solid var(--primary); }
+.pl-box { margin-left: 24px; background: var(--bg); border-radius: 14px; padding: 12px 14px; }
+.pl-yacht .pl-box { background: var(--soft); border: 2px solid var(--primary); }
+.pl-sun .pl-box { background: #FFF3E6; } .pl-sun .pl-dot { border-color: #E39A58; } .pl-sun small { color: #A9622A; }
+.pl-box small { font-size: 12px; color: var(--sub); font-weight: 700; }
+.pl-box h3 { font-size: 16px; font-weight: 800; margin-top: 2px; letter-spacing: -.02em; }
+.pl-box p { font-size: 13px; color: var(--sub); margin-top: 2px; }
+.pl-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+.maplinks { display: flex; gap: 6px; flex-wrap: wrap; }
+.maplinks a, .pl-more { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+.pl-swap { font: inherit; font-size: 12px; font-weight: 700; color: var(--sub); background: none; border: 1px dashed var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.pl-why { margin-top: 6px; font-size: 13px; color: var(--sub); }
+.pl-why summary { cursor: pointer; font-weight: 700; color: var(--primary); }
+.pl-why ul { margin: 6px 0 0 18px; display: grid; gap: 3px; }
+.pl-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.pl-share, .pl-full { font: inherit; display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.pl-share { background: var(--cover); color: #fff; border: 0; }
+.pl-full { border: 1px solid var(--line); color: var(--ink); background: var(--paper); }
+.pl-actions:has(.pl-share:only-child) { grid-template-columns: 1fr; }
+.pl-note { font-size: 12px; color: var(--faint, #8A979E); margin-top: 10px; }
+.pl-more-link { margin-top: 16px; } .pl-more-link a { font-weight: 700; color: var(--primary); }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: #fff; font-size: 14px; padding: 10px 16px; border-radius: 10px; z-index: 80; max-width: calc(100% - 32px); }
+
+/* 안목 주변 */
+.ptabs { display: flex; gap: 6px; margin-bottom: 16px; }
+.ptabs a { height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); display: flex; align-items: center; gap: 4px; font-size: 15px; color: var(--ink); }
+.ptabs a.on { background: var(--cover); border-color: var(--cover); color: #fff; font-weight: 700; }
+.ptabs small { font-size: 12px; opacity: .75; }
+.places { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.place { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+.place-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.place h3 { font-size: 16px; font-weight: 800; }
+.place .walk { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--soft); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.place-menu { font-size: 13px; color: var(--sub); }
+.place-text { font-size: 14px; color: var(--sub); }
+.place-hours { font-size: 13px; color: var(--sub); }
+.place-hours b { margin-right: 6px; font-size: 12px; }
+.place-hours b.open { color: var(--good, #3F8A63); } .place-hours b.closed { color: var(--stop); }
+.place-park { font-size: 12px; color: var(--sub); display: flex; align-items: center; gap: 4px; }
+.place .maplinks { margin-top: 6px; }
+
+/* 아래 탭 (휴대폰·태블릿) */
+.tabbar { display: none; }
+@media (max-width: 900px) {
+  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--paper); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; font-size: 11px; color: var(--faint, #8A979E); }
+  .tabbar a.on { color: var(--primary); font-weight: 700; }
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .ystrip { grid-template-columns: repeat(4, 62%); overflow-x: auto; scroll-snap-type: x mandatory; margin: 14px -28px 0; padding: 0 28px 4px; scroll-padding: 0 28px; scrollbar-width: none; }
+  .ystrip::-webkit-scrollbar { display: none; }
+  .ycard { scroll-snap-align: start; }
+  .places { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .hero, .hero-in { min-height: 540px; }
+  .hero-in { padding-top: 28px; }
+  .hero h1 { font-size: 34px; }
+  .hero-stats b { font-size: 17px; }
+  .hero-boat .icon { width: 46px; height: 46px; }
+  .hblock { margin-top: 30px; }
+  .hhead h2 { font-size: 20px; }
+  .slots { grid-template-columns: repeat(3, 42%); overflow-x: auto; margin: 14px -16px 0; padding: 0 16px 4px; scrollbar-width: none; }
+  .slot b { font-size: 19px; }
+  .ystrip { grid-template-columns: repeat(4, 70%); margin: 14px -16px 0; padding: 0 16px 4px; scroll-padding: 0 16px; }
+  .planner { margin-left: -6px; margin-right: -6px; padding: 14px 12px; }
+  .pl-it { grid-template-columns: 42px 1fr; }
+  .pl-it::before { left: 53px; } .pl-dot { left: 47px; }
+  .pl-box { margin-left: 22px; }
+  .places { grid-template-columns: 1fr; }
+  .ptabs { overflow-x: auto; }
+  .ptabs a { flex: 0 0 auto; }
+}
+
   </style>
 </head>
 <body>
   <header id="site-header"></header>
   <main id="app">
-    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v14)</p></noscript>
+    <noscript><p style="padding:40px;text-align:center">이 사이트는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요. (요트핏 v15)</p></noscript>
   </main>
   <footer id="site-footer"></footer>
 
@@ -877,14 +1022,107 @@ window.SITE_DATA = {
       ] }
   ],
 
-  /* ---------- 8. 마리나 주변 관광 (메인 화면 카드 4개) ----------
-     items 예시) { name: "[장소 이름]", move: "[도보]", time: "[약 ○분]", text: "[설명]" } */
-  tours: [
-    { id: "beach", name: "안목해변 산책", desc: "바다를 따라 걷는 산책 코스", items: [] },
-    { id: "cafe",  name: "카페",          desc: "투어 전후 쉬어 가기 좋은 곳", items: [] },
-    { id: "food",  name: "먹거리",        desc: "마리나 근처 식사 장소",       items: [] },
-    { id: "etc",   name: "그 외 볼거리",   desc: "함께 둘러보면 좋은 곳",       items: [] }
-  ],
+  /* ---------- 8. 안목 주변 장소 (카페 · 식당 · 산책) ----------
+     자료: '안목해변 카페 조사', '안목해변 식당 조사' (전화번호는 넣지 않아요)
+     walk  = 마리나(선착장)에서 걸어서 몇 분 (숫자)
+     hours = 요일별 영업시간. d = 요일 번호(0 일, 1 월 … 6 토), o = 여는 시각, c = 닫는 시각
+             자정 넘어 닫으면 24:00보다 큰 숫자로 적어요 (새벽 1시 = "25:00"), lo = 라스트오더
+     off   = 정기 휴무 요일 번호
+     예시) { name: "[가게 이름]", addr: "[주소]", walk: 5, hours: [ { d: "0123456", o: "09:00", c: "21:00" } ],
+             off: [], hoursText: "[화면에 보일 영업시간]", parking: "[주차]", link: "https://naver.me/..." } */
+  places: {
+    cafe: [
+      { name: "퀸마리나 커피", addr: "강릉시 창해로14번길 51-20, 4층", walk: 0, walkText: "마리나 건물 4층",
+        hours: [ { d: "0123456", o: "09:00", c: "22:00", lo: "21:40" } ], off: [], hoursText: "매일 09:00~22:00 (라스트오더 21:40)",
+        parking: "강릉항 공영주차장", link: "https://naver.me/FcmOBYjN" },
+      { name: "산토리니커피", addr: "강원 강릉시 경강로 2667", walk: 2,
+        hours: [ { d: "12345", o: "10:00", c: "21:00", lo: "20:30" }, { d: "06", o: "09:00", c: "22:00", lo: "21:30" } ], off: [],
+        hoursText: "평일 10:00~21:00, 주말 09:00~22:00", parking: "안목해변 공영주차장", link: "https://naver.me/xcnB0WGd" },
+      { name: "카페베네 안목점", addr: "강원 강릉시 창해로14번길 50", walk: 3,
+        hours: [ { d: "01234", o: "08:00", c: "24:00", lo: "23:50" }, { d: "56", o: "08:00", c: "25:00", lo: "24:50" } ], off: [],
+        hoursText: "일~목 08:00~24:00, 금·토 08:00~새벽 1:00", parking: "강릉항 공영주차장", link: "https://naver.me/GzEcNMVE" },
+      { name: "키크러스 강릉점", addr: "강원 강릉시 창해로14번길 48-1", walk: 3,
+        hours: [ { d: "01234", o: "08:00", c: "24:00" }, { d: "56", o: "08:00", c: "25:00" } ], off: [],
+        hoursText: "일~목 08:00~24:00, 금·토 08:00~새벽 1:00", parking: "안목해변 공영주차장", link: "https://naver.me/G65t7Trv" },
+      { name: "스타벅스 강릉안목해변점", addr: "강원 강릉시 창해로14번길 40", walk: 4,
+        hours: [ { d: "012345", o: "07:00", c: "22:00" }, { d: "6", o: "07:30", c: "22:00" } ], off: [],
+        hoursText: "매일 07:00~22:00 (토 07:30부터)", parking: "안목해변 공영주차장", link: "https://naver.me/xKEkFVjm" },
+      { name: "카페알베로", addr: "강원 강릉시 창해로14번길 36", walk: 5,
+        hours: [ { d: "0123456", o: "09:00", c: "18:30" } ], off: [], hoursText: "매일 09:00~18:30",
+        parking: "주차 불가 (공영주차장 이용)", link: "https://naver.me/FHlz7Z9N" },
+      { name: "할리스 강릉안목해변점", addr: "강원 강릉시 창해로14번길 34-1", walk: 5,
+        hours: [ { d: "01234", o: "09:00", c: "22:00" }, { d: "56", o: "09:00", c: "23:00" } ], off: [],
+        hoursText: "일~목 09:00~22:00, 금·토 09:00~23:00", parking: "주차 불가", link: "https://naver.me/5CWNZphU" },
+      { name: "보사노바 커피로스터스 강릉점", addr: "강원 강릉시 창해로14번길 28", walk: 6,
+        hours: [ { d: "0123456", o: "07:00", c: "22:00" } ], off: [], hoursText: "매일 07:00~22:00",
+        parking: "카페 앞 노상주차장 또는 안목해변 공영주차장", link: "https://naver.me/G1wSNh2o" },
+      { name: "에이엠브레드앤커피", addr: "강원 강릉시 창해로14번길 24", walk: 7,
+        hours: [ { d: "03", o: "08:00", c: "21:30", lo: "21:00" }, { d: "12456", o: "08:00", c: "22:00", lo: "21:30" } ], off: [],
+        hoursText: "08:00~22:00 (일·수 21:30까지)", parking: "주차 가능", link: "https://naver.me/5oE5j4x4" },
+      { name: "카페뤼미에르", addr: "강원 강릉시 창해로14번길 18", walk: 7,
+        hours: [ { d: "123456", o: "08:30", c: "23:00" }, { d: "0", o: "08:30", c: "22:00" } ], off: [],
+        hoursText: "월~토 08:30~23:00, 일 08:30~22:00", parking: "주차 가능", link: "https://naver.me/5FmSYFcl" },
+      { name: "카페뤼미에르 2호점", addr: "강원 강릉시 창해로14번길 20-1", walk: 7,
+        hours: [ { d: "0123456", o: "10:00", c: "18:00" } ], off: [], hoursText: "매일 10:00~18:00",
+        parking: "안목해변 공영주차장", link: "https://naver.me/5UExEKdc" },
+      { name: "커피커퍼 안목점", addr: "강원 강릉시 창해로14번길 20", walk: 7,
+        hours: [ { d: "012345", o: "09:00", c: "21:00" }, { d: "6", o: "09:00", c: "22:00" } ], off: [],
+        hoursText: "09:00~21:00 (토 22:00까지)", parking: "안목해변 공영주차장", link: "https://naver.me/x3jFnE4f" },
+      { name: "하슬라가배", addr: "강원 강릉시 창해로14번길 12, 2층", walk: 8,
+        hours: [ { d: "0123456", o: "09:00", c: "21:00" } ], off: [], hoursText: "매일 09:00~21:00",
+        parking: "안목해변 공영주차장, 카페 뒤 무료 공영주차장", link: "https://naver.me/52R5n94Z" },
+      { name: "커피씨엘", addr: "강원 강릉시 창해로14번길 8", walk: 9,
+        hours: [ { d: "12345", o: "05:00", c: "19:00", lo: "18:30" }, { d: "06", o: "05:00", c: "23:00", lo: "22:30" } ], off: [],
+        hoursText: "평일 05:00~19:00, 주말 05:00~23:00", parking: "안목해변 공영주차장", link: "https://naver.me/GWeyZ2t5" },
+      { name: "안목카페", addr: "강원 강릉시 창해로 7", walk: 10,
+        hours: [ { d: "0123456", o: "08:00", c: "21:00" } ], off: [], hoursText: "매일 08:00~21:00",
+        parking: "안목해변 공영주차장", link: "https://naver.me/GxkFRQoY" }
+    ],
+    food: [
+      { name: "강릉 대게 해송호", menu: "대게", addr: "강원 강릉시 창해로14번길 51-4", walk: 2,
+        hours: [ { d: "023456", o: "10:30", c: "19:40", lo: "19:30" } ], off: [1], hoursText: "10:30~19:40 (월요일 휴무)",
+        parking: "주차 가능", link: "https://naver.me/5FDsqlsH" },
+      { name: "페리페리버거 강릉안목해변점", menu: "버거", addr: "강원 강릉시 창해로2번길 32, 1층", walk: 4,
+        hours: [ { d: "023456", o: "10:30", c: "20:30", lo: "20:00" } ], off: [1], hoursText: "10:30~20:30 (월요일 휴무)",
+        parking: "안목해변 공영주차장", link: "https://naver.me/IGslEZHJ" },
+      { name: "만석닭강정 안목직영점", menu: "닭강정", addr: "강원 강릉시 창해로2번길 32, 2층", walk: 4,
+        hours: [ { d: "1345", o: "10:30", c: "20:00" }, { d: "06", o: "09:30", c: "20:00" } ], off: [2],
+        hoursText: "평일 10:30~20:00, 주말 09:30~20:00 (화요일 휴무)", parking: "안목해변 공영주차장", link: "https://naver.me/FMc2agHc" },
+      { name: "효레의 식당 안목점", addr: "강원 강릉시 창해로2번길 32, 3층", walk: 4,
+        hours: [ { d: "013456", o: "11:00", c: "21:00", lo: "20:00" } ], off: [2], hoursText: "11:00~21:00 (화요일 휴무)",
+        parking: "안목해변 공영주차장", link: "https://naver.me/GL81J5Kb" },
+      { name: "파로돈까스", menu: "돈까스", addr: "강원 강릉시 창해로2번길 32, 5층", walk: 4,
+        hours: [ { d: "013456", o: "10:00", c: "21:00" } ], off: [2], hoursText: "10:00~21:00 (화요일 휴무)",
+        parking: "안목해변 공영주차장", link: "https://naver.me/Gq8S9RNK" },
+      { name: "미역국 전문점 안목애", menu: "미역국", addr: "강원 강릉시 창해로14번길 34", walk: 5,
+        hours: [ { d: "0123456", o: "07:00", c: "20:30" } ], off: [], hoursText: "매일 07:00~20:30",
+        parking: "안목해변 공영주차장", link: "https://naver.me/FEUAA1rm" },
+      { name: "피앤비코", addr: "강원 강릉시 창해로14번길 22-1, 3층", walk: 7,
+        hours: [ { d: "0123456", o: "11:30", c: "16:00" }, { d: "0123456", o: "17:00", c: "21:00", lo: "20:00" } ], off: [],
+        hoursText: "11:30~21:00 (16:00~17:00 쉬는 시간)", parking: "안목해변 공영주차장", link: "https://naver.me/G9rgw23G" },
+      { name: "해송", addr: "강원 강릉시 창해로14번길 16, 2층", walk: 8,
+        hours: [ { d: "0123456", o: "10:00", c: "22:00", lo: "21:00" } ], off: [], hoursText: "매일 10:00~22:00",
+        parking: "안목해변 공영주차장", link: "https://naver.me/IxKQlAmp" },
+      { name: "버거웍스", menu: "버거", addr: "강원 강릉시 창해로14번길 12", walk: 8,
+        hours: [ { d: "0", o: "10:00", c: "22:00" }, { d: "1234", o: "10:00", c: "23:00" }, { d: "56", o: "10:00", c: "25:00" } ], off: [],
+        hoursText: "10:00~23:00 (일 22:00, 금·토 새벽 1:00까지)", parking: "안목해변 공영주차장", link: "https://naver.me/5T4nkUNc" },
+      { name: "머구리횟집", menu: "회", addr: "강원 강릉시 창해로 19", walk: 11,
+        hours: [ { d: "0123456", o: "11:00", c: "22:00" } ], off: [], hoursText: "매일 11:00~22:00",
+        parking: "가게 앞 주차장", link: "https://naver.me/5z5i5Hj3" },
+      { name: "화덕집 강릉본점", addr: "강원 강릉시 창해로 27, 1층", walk: 12,
+        hours: [ { d: "12345", o: "14:00", c: "23:00", lo: "22:00" }, { d: "06", o: "12:00", c: "24:00", lo: "23:00" } ], off: [],
+        hoursText: "평일 14:00~23:00, 주말 12:00~24:00", parking: "주변 공영주차장", link: "https://naver.me/GRo4zS8C" }
+    ],
+    // 산책·야경: 팀 자료가 오면 걸어서 몇 분을 채워 주세요
+    walk: [
+      { name: "안목해변 산책", walk: 0, walkText: "마리나 바로 앞", night: false,
+        hoursText: "언제나", text: "카페거리를 따라 이어지는 해변 산책로예요. 노을 보기 좋아요." },
+      { name: "솔바람다리", walk: 0, walkText: "마리나 바로 옆", night: true,
+        hoursText: "언제나, 밤에는 조명", text: "남항진과 안목을 잇는 걷는 다리예요. 밤에 조명이 켜져요." }
+    ]
+  },
+
+  tours: [],
 
   /* ---------- 9. 안전 가이드 (4단계) ----------
      kind = must(꼭 해요, 파란 동그라미) / no(하지 마요, 빨간 금지 표시) / info(알아두기, 네모)
@@ -953,10 +1191,10 @@ const MENU = [
   { path: "#/marina",    label: "마리나 소개" },
   { path: "#/yacht",     label: "요트·체험" },
   { path: "#/transport", label: "가는 방법" },
-  { path: "#/tour",      label: "주변 관광" },
+  { path: "#/tour",      label: "안목 주변" },
   { path: "#/safety",    label: "안전 가이드" },
   { path: "#/live",      label: "실시간 정보" },
-  { path: "#/ai",        label: "코스 짜기", highlight: true }
+  { path: "#/plan",      label: "안목 코스 짜기", highlight: true }
 ];
 
 /* ---------- 작은 도우미 함수 ---------- */
@@ -970,6 +1208,8 @@ const isEmpty = list => !list || list.length === 0;
 
 // 간단한 아이콘 (선 그림)
 const ICON = {
+  home: '<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/>',
+  sun: '<circle cx="9" cy="9" r="3.5"/><path d="M9 2v1.5M2 9h1.5M4 4l1 1M14 4l-1 1"/><path d="M10 20h9a3 3 0 0 0 0-6 4.5 4.5 0 0 0-8.6 1.2A2.4 2.4 0 0 0 10 20z"/>',
   boat:   '<path d="M3 17l2 3h14l2-3H3z"/><path d="M12 3v11"/><path d="M12 4l6 9h-6"/><path d="M12 6l-5 7h5"/>',
   route:  '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/>',
   shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
@@ -1082,67 +1322,6 @@ function transportSummary() {
       <thead><tr><th>출발지</th><th>자주 오는 버스</th><th>택시</th><th>도보</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
     <p class="tnote">${esc(note)}</p>`;
-}
-
-function pageHome() {
-  const chips = D.categories.map(c =>
-    `<a class="chip chip-lg" href="#/category/${c.id}">${esc(c.name)}</a>`).join("");
-  const quick = [
-    ["#/yacht", "boat", "요트·체험"], ["#/transport", "bus", "가는 방법"], ["#/marina", "building", "시설"],
-    ["#/safety", "buoy", "안전 가이드"], ["#/live", "cam", "실시간 영상"]
-  ].map(([h, i, t]) => `<a href="${h}">${icon(i, 26)}${t}</a>`).join("");
-  const facts = (D.quickFacts || []).map(f => `
-    <div class="fact">${icon(f.icon, 20)}<div><small>${esc(f.label)}</small><b>${esc(f.title)}</b><p>${esc(f.text)}</p></div></div>`).join("");
-  const checks = (D.quickChecks || []).map(c => `<li>${icon("check", 16)}<span>${esc(c)}</span></li>`).join("");
-  const near = D.tours.map(t => {
-    const first = (t.items || [])[0];
-    return `<a href="#/tour"><h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p>
-      <small>${first ? esc(`마리나에서 ${first.move} ${first.time}`) : "이동 시간 확인 중"}</small></a>`;
-  }).join("");
-
-  return `
-    <section class="cover">
-      <div class="container cover-inner">
-        <div>
-          <p class="addr">${esc(D.site.address || "")}</p>
-          <h1>${esc(D.site.title || "강릉항 요트마리나 이용 안내")}</h1>
-          <nav class="quick" aria-label="바로가기">${quick}</nav>
-        </div>
-        ${seaPanel()}
-        ${liveSummary()}
-      </div>
-    </section>
-
-    ${facts ? `<section class="facts"><div class="container facts-inner">${facts}</div></section>` : ""}
-
-    <div class="container">
-      <form class="course-bar" data-ai-form>
-        <label for="ai-input">내 상황에 맞는 코스</label>
-        <input id="ai-input" name="q" placeholder="${esc(D.aiExamples[0])}">
-        <button type="submit" class="btn-orange">코스 짜기</button>
-      </form>
-
-      <div class="two">
-        <section class="panel">
-          <div class="panel-head"><h2>가는 방법</h2><a href="#/transport">자세히 보기</a></div>
-          ${transportSummary()}
-        </section>
-        <section class="panel">
-          <div class="panel-head"><h2>타기 전에 꼭</h2><a href="#/safety">안전 가이드</a></div>
-          <ul class="check">${checks}</ul>
-        </section>
-      </div>
-
-      <section class="block">
-        <h2 class="section-title">조건으로 체험 찾기</h2>
-        <div class="chip-row">${chips}</div>
-      </section>
-
-      <section class="block">
-        <h2 class="section-title">투어 전후로 들르기 좋은 곳</h2>
-        <div class="near">${near}</div>
-      </section>
-    </div>`;
 }
 
 /* ---------- ② AI 코스 추천 결과 ---------- */
@@ -1501,23 +1680,6 @@ function transportCard(t) {
 }
 
 /* ---------- 주변 관광 ---------- */
-function pageTour() {
-  const groups = D.tours.map(g => `
-    <h2 class="section-title ${g === D.tours[0] ? "" : "mt-48"}">${esc(g.name)}</h2>
-    <p class="section-desc">${esc(g.desc)}</p>
-    ${isEmpty(g.items)
-      ? preparing(`${g.name} 정보 준비 중입니다`)
-      : `<div class="grid-3">${g.items.map(i => `
-          <div class="card tour-card">
-            <h3>${esc(i.name)}</h3>
-            <p>${esc(i.text || "")}</p>
-            <div class="move-info">${icon("route", 16)} <span>마리나에서</span> <b>${esc(i.move)} ${esc(i.time)}</b></div>
-          </div>`).join("")}</div>`}`).join("");
-  return `
-    ${pageHead("NEARBY", "마리나 주변 관광", "투어 전후로 함께 둘러보기 좋은 곳을 소개해요.")}
-    <section class="section"><div class="container">${groups}</div></section>`;
-}
-
 /* ---------- 안전 가이드 ---------- */
 // 표지판 그림 (24칸 선 그림). "하지 마요" 그림은 금지 표시 안에 '하면 안 되는 행동'을 그려요.
 const SAFETY_PIC = {
@@ -1793,6 +1955,441 @@ function pageNotFound() {
 }
 
 /* =====================================================================
+   안목 코스 추천 (규칙 방식, 돈 안 드는 추천)
+   요트 출항 시각 → 내리는 시각 → 그 시각에 문 연 가까운 곳을 오늘 바다 상태에 맞춰 이어 줘요.
+   ===================================================================== */
+const hm = s => { const m = String(s || "").match(/(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : NaN; };
+const fmt = min => { const h = Math.floor(min / 60) % 24, m = Math.round(min % 60); return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`; };
+const durMin = s => { const t = String(s || ""); const h = t.match(/(\d+)\s*시간/), m = t.match(/(\d+)\s*분/); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0) || 60; };
+const PLAN_SLOTS = [ { key: "am", label: "오전" }, { key: "pm", label: "오후" }, { key: "sunset", label: "노을" } ];
+const PLAN_PARTY = [ { key: "couple", label: "연인" }, { key: "family", label: "가족·아이" }, { key: "friends", label: "친구" }, { key: "pet", label: "반려동물" } ];
+
+// 가게가 그 요일·시각에 열려 있나 (stay = 머무를 시간, 닫기 전 그만큼 남아야 해요)
+function openAt(p, date, min, stay = 40) {
+  if (!p.hours) return true;
+  const wd = date.getDay();
+  if ((p.off || []).includes(wd)) return false;
+  return p.hours.some(h => {
+    if (!String(h.d).includes(String(wd))) return false;
+    const o = hm(h.o), c = hm(h.lo || h.c);
+    return min >= o && min + Math.min(stay, 30) <= c;
+  });
+}
+function openNowText(p, date = new Date()) {
+  if (!p.hours) return "";
+  const min = date.getHours() * 60 + date.getMinutes();
+  if ((p.off || []).includes(date.getDay())) return "오늘 휴무";
+  return openAt(p, date, min, 0) ? "지금 영업 중" : "지금은 문 닫음";
+}
+function mapLinks(p) {
+  const kakao = "https://map.kakao.com/link/search/" + encodeURIComponent(p.name.replace(/\s*\(.*\)$/, "") + " 강릉");
+  return `<div class="maplinks">${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">네이버 지도</a>` : ""}<a href="${kakao}" target="_blank" rel="noopener">카카오맵</a></div>`;
+}
+
+// 날씨 (오늘 = 지금 값, 내일 = 예보)
+function planWeather(dayOffset) {
+  if (dayOffset === 0) {
+    return { temp: toNum(currentValue("temp")), wind: toNum(currentValue("wind")), wave: toNum(currentValue("wave")),
+             water: toNum(currentValue("water")), alert: currentValue("alert"), st: currentStatus() };
+  }
+  const f = findDay(D.live.week, addDays(new Date(), dayOffset));
+  return { temp: toNum(f.tmax), wind: toNum(f.wind), wave: toNum(f.wave), water: NaN, alert: f.alert || "",
+           st: dayStatus(f.wind, f.wave, f.alert) };
+}
+
+// 노을 코스 출항 시각: 업체 운항표의 '일몰' 칸 → 없으면 해 지는 시각 40분 전
+function sunsetDepart(date) {
+  const m = date.getMonth() + 1;
+  for (const c of D.companies || []) {
+    const s = (c.schedule || []).find(x => (x.months || []).includes(m));
+    const t = s && (s.times || []).find(x => /일몰/.test(x));
+    if (t) return hm(t);
+  }
+  const ss = hm(D.live.sunset);
+  return isNaN(ss) ? 16 * 60 + 30 : Math.floor((ss - 40) / 10) * 10;
+}
+
+// 기본값: 지금 시각으로 고르기 (지났으면 내일)
+function defaultPlan() {
+  const now = new Date(), min = now.getHours() * 60 + now.getMinutes();
+  const sd = sunsetDepart(now);
+  if (min < 9 * 60) return { day: 0, slot: "am" };
+  if (min < 13 * 60) return { day: 0, slot: "pm" };
+  if (min < sd - 60) return { day: 0, slot: "sunset" };
+  return { day: 1, slot: "sunset" };
+}
+
+function yachtCandidates(o) {
+  const all = D.experiences || [];
+  const tag = (e, t) => (e.tags || []).includes(t);
+  let list;
+  if (o.party === "pet") list = all.filter(e => tag(e, "반려동물 동반"));
+  else list = all.filter(e => e.type === "public");
+  if (o.slot === "am") list = list.filter(e => tag(e, "오전")).concat(list.filter(e => !tag(e, "오전") && !tag(e, "노을 시간대")));
+  else if (o.slot === "sunset") list = list.filter(e => tag(e, "노을 시간대"));
+  else list = list.filter(e => !tag(e, "오전") && !tag(e, "노을 시간대"));
+  if (!list.length) list = all.filter(e => e.type !== "special");
+  const price = e => { const m = String(e.price || "").match(/([\d,]+)\s*원/); return m ? Number(m[1].replace(/,/g, "")) : 1e9; };
+  const order = id => (D.companies || []).findIndex(c => c.id === id);
+  list = [...new Set(list)];
+  return list.sort((a, b) => (o.sick ? durMin(a.duration) - durMin(b.duration) : 0) || price(a) - price(b) || order(a.company) - order(b.company));
+}
+
+// 코스 만들기
+function makePlan(o) {
+  const date = addDays(new Date(), o.day);
+  const w = planWeather(o.day);
+  const sunset = hm(D.live.sunset);
+  const why = [];
+  const steps = [];
+  const storm = /풍랑/.test(w.alert) || (w.st && w.st.key === "stop");
+  const cold = (w.temp < 12) || (w.wind >= 8) || (w.water < 15);
+  const P = D.places || { cafe: [], food: [], walk: [] };
+  const used = new Set();
+  const swaps = o.swaps || {};
+
+  if (w.st) why.push(`${o.day ? "내일" : "오늘"} 바다: ${w.st.text}${isNaN(w.wind) ? "" : ` (바람 ${w.wind}m/s${isNaN(w.wave) ? "" : `, 파도 ${w.wave}m`})`}`);
+
+  let t;
+  if (storm) {
+    why.push("풍랑특보나 강한 바람으로 요트 운항이 어려울 수 있어 실내 위주로 바꿨어요. 운항이 취소되면 업체가 연락하고 환불해 줘요.");
+    t = o.slot === "am" ? 10 * 60 : o.slot === "pm" ? 13 * 60 : (isNaN(sunset) ? 16 * 60 : sunset - 60);
+    steps.push({ kind: "arrive", time: t, title: "안목 도착", sub: o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요" });
+  } else {
+    const cands = yachtCandidates(o);
+    const pick = cands[(o.yacht || 0) % Math.max(cands.length, 1)];
+    const comp = pick && (D.companies || []).find(c => c.id === pick.company);
+    const dep = o.slot === "am" ? 10 * 60 : o.slot === "pm" ? 14 * 60 : sunsetDepart(date);
+    const dur = durMin(pick && pick.duration);
+    steps.push({ kind: "arrive", time: dep - 60, title: "강릉항 요트마리나 도착",
+      sub: [o.car ? "강릉항 공영주차장 (24시간 무료)" : "버스는 안목커피거리 정류장에서 내려요",
+            "화장실은 안목 여행자센터에서 미리", o.sick ? "먹는 멀미약은 지금 (탑승 1시간 전)" : ""].filter(Boolean).join(" · ") });
+    steps.push({ kind: "yacht", time: dep, title: pick ? `${comp ? comp.name + " " : ""}${pick.name}` : "요트 투어", exp: pick, comp,
+      sub: pick ? `${pick.duration || ""}${pick.price ? " · " + pick.price : ""}` : "", count: cands.length });
+    if (o.slot === "sunset" && !isNaN(sunset) && sunset > dep && sunset < dep + dur) {
+      steps.push({ kind: "sun", time: sunset, title: "바다 위에서 노을", sub: "요트 위에서 해 지는 걸 봐요. 바람막이를 챙기세요." });
+    }
+    if (o.sick) why.push("멀미 걱정이 있어 짧은 코스를 먼저 골랐어요.");
+    if (o.party === "pet") why.push("반려동물과 탈 수 있는 코스만 골랐어요. 가게는 반려동물 동반이 되는지 미리 확인해 주세요.");
+    t = dep + dur + 10;   // 내려서 정리하는 10분
+  }
+
+  // 다음 장소 고르기 (문 연 곳 중 가까운 순, '바꾸기'로 다음 후보)
+  const choose = (kind, list, stay, reason, idx) => {
+    const ok = list.filter(p => !used.has(p.name) && openAt(p, date, t + (p.walk || 0), stay))
+                   .sort((a, b) => (a.walk || 0) - (b.walk || 0));
+    if (!ok.length) return false;
+    const p = ok[(swaps[idx] || 0) % ok.length];
+    used.add(p.name);
+    t += p.walk || 0;
+    steps.push({ kind, time: t, place: p, title: p.name, sub: reason, alt: ok.length, idx });
+    t += stay;
+    return true;
+  };
+  const mealTime = m => (m >= 11 * 60 && m <= 13 * 60 + 30) || (m >= 17 * 60 && m <= 19 * 60 + 30);
+  let i = 0;
+  const firstCafe = storm || cold || o.sick;
+  if (firstCafe) choose("cafe", P.cafe, 50, storm ? "바깥 대신 실내에서 쉬어 가요" : o.sick ? "가까운 곳에서 먼저 쉬어 가요" : "바닷바람에 식은 몸, 따뜻한 음료로", i++);
+  if (mealTime(t) || (t < 17 * 60 && t + 90 >= 17 * 60 && t >= 16 * 60)) {
+    if (t < 17 * 60 && !mealTime(t)) t = 17 * 60;
+    const fam = o.party === "family";
+    const foods = fam ? P.food.slice().sort((a, b) => (/돈까스|버거|미역국/.test(b.menu || "") - /돈까스|버거|미역국/.test(a.menu || ""))) : P.food;
+    choose("food", foods, 60, t >= 17 * 60 ? "저녁 식사" : "점심 식사", i++);
+  }
+  if (!firstCafe) choose("cafe", P.cafe, 50, "바다 보며 커피 한 잔", i++);
+  // 노을·야경
+  const walks = P.walk || [];
+  if (!storm && w.wind < 14) {
+    if (!isNaN(sunset) && t < sunset && sunset - t < 120 && o.slot !== "sunset") {
+      t = sunset - 15;
+      const beach = walks.find(x => !x.night);
+      if (beach) steps.push({ kind: "walk", time: t, place: beach, title: "안목해변에서 노을 보기", sub: `해 지는 시각 ${D.live.sunset}` });
+      t = sunset + 20;
+    }
+    if (!isNaN(sunset) && t >= sunset) {
+      const bridge = walks.find(x => x.night);
+      if (bridge) steps.push({ kind: "walk", time: t, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸어요" });
+    }
+  }
+  if (cold && !storm) why.push(`바람과 바다가 차가운 편이라 내린 뒤 따뜻한 실내를 먼저 넣었어요.`);
+  why.push("가게는 그 시각에 문을 여는 곳 중 마리나에서 가까운 순으로 골랐어요.");
+  return { o, date, steps, why, storm };
+}
+
+const STEP_LABEL = { arrive: "도착", yacht: "요트", sun: "해 지는 시각", cafe: "카페", food: "식사", walk: "산책" };
+function planStep(s) {
+  const walk = s.place ? (s.place.walkText || (s.place.walk ? `걸어서 ${s.place.walk}분` : "")) : "";
+  const swap = (s.kind === "yacht" && s.count > 1) ? `<button type="button" class="pl-swap" data-swap="yacht">다른 요트</button>`
+             : (s.alt > 1 ? `<button type="button" class="pl-swap" data-swap="${s.idx}">다른 곳</button>` : "");
+  return `
+    <li class="pl-it pl-${s.kind}">
+      <time>${fmt(s.kind === "yacht" || s.kind === "sun" ? s.time : Math.round(s.time / 5) * 5)}</time><i class="pl-dot"></i>
+      <div class="pl-box">
+        <small>${STEP_LABEL[s.kind]}${walk ? ` · ${esc(walk)}` : ""}${s.place && s.place.menu ? ` · ${esc(s.place.menu)}` : ""}</small>
+        <h3>${esc(s.title)}</h3>
+        ${s.sub ? `<p>${esc(s.sub)}</p>` : ""}
+        ${(s.place && s.place.link) || s.kind === "yacht" || swap ? `<div class="pl-row">${s.place && s.place.link ? mapLinks(s.place) : s.kind === "yacht" ? `<a class="pl-more" href="#/yacht" data-company="${esc(s.comp ? s.comp.id : "")}">코스·예약 보기</a>` : "<span></span>"}${swap}</div>` : ""}
+      </div>
+    </li>`;
+}
+
+function plannerHTML(full) {
+  const o = window.__plan || (window.__plan = Object.assign({ party: "couple", car: false, sick: false, yacht: 0, swaps: {} }, defaultPlan()));
+  const plan = makePlan(o);
+  const seg = (name, list, cur) => list.map(x => `<button type="button" class="pl-opt ${cur === x.key ? "on" : ""}" data-pl="${name}" data-val="${x.key}" aria-pressed="${cur === x.key}">${x.label}</button>`).join("");
+  const tog = (name, label) => `<button type="button" class="pl-opt ${o[name] ? "on" : ""}" data-pl="${name}" data-val="toggle" aria-pressed="${!!o[name]}">${label}</button>`;
+  const d = plan.date;
+  return `
+    <div class="planner" id="planner">
+      <div class="pl-controls">
+        <div class="pl-seg">${seg("day", [{ key: 0, label: "오늘" }, { key: 1, label: "내일" }], o.day)}<span class="pl-gap"></span>${seg("slot", PLAN_SLOTS, o.slot)}</div>
+        <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("car", "차로 와요")}${tog("sick", "멀미 걱정")}</div>
+      </div>
+      ${plan.storm ? `<div class="pl-alert">${icon("alert", 18)}<span>요트 운항이 어려울 수 있는 날이에요. 실내 위주 코스로 바꿨어요.</span></div>` : ""}
+      <p class="pl-date">${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAY[d.getDay()]})</p>
+      <ol class="pl-list">${plan.steps.map(planStep).join("")}</ol>
+      <details class="pl-why"><summary>이렇게 짠 이유</summary><ul>${plan.why.map(x => `<li>${esc(x)}</li>`).join("")}</ul></details>
+      <div class="pl-actions">
+        <button type="button" class="pl-share" data-share>일행에게 공유</button>
+        ${full ? "" : `<a class="pl-full" href="#/plan">안목 코스 크게 보기</a>`}
+      </div>
+      <p class="pl-note">출항 시각과 영업시간은 자료 기준이에요. 예약할 때 업체에, 가게는 방문 전에 확인해 주세요.</p>
+    </div>`;
+}
+function rerenderPlanner() {
+  const box = document.getElementById("planner");
+  if (box) box.outerHTML = plannerHTML(location.hash.startsWith("#/plan"));
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], .pl-more");
+  if (!b) return;
+  const o = window.__plan;
+  if (b.matches(".pl-more")) { if (b.dataset.company) window.__expCompany = b.dataset.company; return; }
+  if (b.matches("[data-share]")) { sharePlan(); return; }
+  if (b.matches(".pl-swap")) {
+    if (b.dataset.swap === "yacht") o.yacht = (o.yacht || 0) + 1;
+    else o.swaps[b.dataset.swap] = (o.swaps[b.dataset.swap] || 0) + 1;
+  } else {
+    const k = b.dataset.pl, v = b.dataset.val;
+    if (v === "toggle") o[k] = !o[k];
+    else o[k] = k === "day" ? Number(v) : v;
+    o.yacht = 0; o.swaps = {};
+  }
+  rerenderPlanner();
+});
+async function sharePlan() {
+  const plan = makePlan(window.__plan);
+  const text = plan.steps.map(s => `${fmt(s.kind === "yacht" || s.kind === "sun" ? s.time : Math.round(s.time / 5) * 5)} ${s.title}`).join("\n");
+  const url = location.origin + location.pathname + "#/plan";
+  const data = { title: "요트핏 안목 코스", text: `${plan.date.getMonth() + 1}월 ${plan.date.getDate()}일 안목 코스\n${text}`, url };
+  try {
+    if (navigator.share) { await navigator.share(data); return; }
+    await navigator.clipboard.writeText(data.text + "\n" + url);
+    toast("코스를 복사했어요. 메신저에 붙여 넣으세요.");
+  } catch (err) { /* 공유 취소 */ }
+}
+function toast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+/* ---------- ① 메인 (휴대폰 먼저) ---------- */
+// 시간대에 따라 하늘색이 바뀌는 첫 화면
+function skyClass(now = new Date()) {
+  const m = now.getHours() * 60 + now.getMinutes(), ss = hm(D.live.sunset);
+  if (m < 6 * 60 || (!isNaN(ss) && m > ss + 40)) return "sky-night";
+  if (!isNaN(ss) && m >= ss - 90) return "sky-sunset";
+  if (m < 8 * 60) return "sky-dawn";
+  return "sky-day";
+}
+const HERO_TITLE = { good: "요트 타기\n좋은 날이에요", mild: "배가 조금\n흔들리는 날이에요", rough: "배가 많이\n흔들리는 날이에요", stop: "오늘은 요트 운항이\n어려울 수 있어요" };
+function heroSea() {
+  const st = currentStatus();
+  const wave = toNum(currentValue("wave"));
+  const amp = isNaN(wave) ? 6 : Math.max(3, Math.min(16, 4 + wave * 8));   // 파도가 높을수록 물결도 커요
+  const path = `M0 ${20} ` + Array.from({ length: 7 }, (_, i) => `q 32 ${i % 2 ? amp : -amp} 64 0`).join(" ") + " V60 H0 Z";
+  const stat = (label, id, unit) => {
+    const v = currentValue(id), e = easyText(id, v);
+    return `<div><span>${label}</span><b>${show(v, unit)}</b><em>${esc(e || "확인 중")}</em></div>`;
+  };
+  const now = new Date();
+  const title = st ? HERO_TITLE[st.key] : "오늘 강릉 바다를\n확인하고 있어요";
+  return `
+    <section class="hero ${skyClass(now)}">
+      <div class="hero-sky"><i class="hero-sun"></i></div>
+      <div class="hero-boat">${icon("boat", 56)}</div>
+      <svg class="hero-wave" viewBox="0 0 448 60" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>
+      <div class="hero-sea"></div>
+      <div class="container hero-in">
+        <p class="hero-kicker">강릉항 요트마리나 · 오늘 바다 ${esc(D.live.updated ? D.live.updated + " 기준" : "")}</p>
+        <h1>${esc(title).replace(/\n/g, "<br>")}</h1>
+        <div class="hero-stats">
+          ${stat("바람", "wind", "m/s")}${stat("파도", "wave", "m")}${stat("기온", "temp", "°")}
+          <div><span>해 지는 시각</span><b>${esc(D.live.sunset || "--:--")}</b><em>노을 코스</em></div>
+        </div>
+        <div class="hero-btns">
+          <a class="hero-btn main" href="#/yacht">오늘 탈 요트 보기</a>
+          <a class="hero-btn" href="#/plan">안목 코스 짜기</a>
+        </div>
+      </div>
+    </section>`;
+}
+
+// 오늘 좋은 출항 시간 (오전 / 오후 / 노을)
+function goodSlots() {
+  const all = D.experiences || [];
+  const pub = all.filter(e => e.type === "public");
+  const tag = (e, t) => (e.tags || []).includes(t);
+  const sd = sunsetDepart(new Date());
+  const now = new Date(), nm = now.getHours() * 60 + now.getMinutes();
+  const slots = [
+    { key: "am", label: "오전", time: 10 * 60, list: pub.filter(e => tag(e, "오전")), note: "바람이 약한 아침" },
+    { key: "pm", label: "오후", time: 14 * 60, list: pub.filter(e => !tag(e, "오전") && !tag(e, "노을 시간대")), note: "햇살 좋은 낮" },
+    { key: "sunset", label: "노을", time: sd, list: pub.filter(e => tag(e, "노을 시간대")), note: `해 지는 시각 ${D.live.sunset || "--:--"}` }
+  ];
+  return `<div class="slots">${slots.map(s => {
+    const past = nm > s.time - 30;
+    return `<button type="button" class="slot ${s.key === "sunset" ? "best" : ""}" data-slot="${s.key}">
+      <small>${s.key === "sunset" ? "노을 추천" : s.label}${past ? " · 오늘은 지났어요" : ""}</small>
+      <b>${fmt(s.time)}</b>
+      <span>${esc(s.note)}</span>
+      <span>${esc(minPrice(s.list) || "업체 문의")}</span>
+    </button>`;
+  }).join("")}</div>`;
+}
+
+// 요트 업체 카드 (가로로 넘기기)
+function yachtStrip() {
+  const groups = expGroups([]);
+  return `<div class="ystrip">${groups.map(g => {
+    const c = g.c || {};
+    const pub = minPrice(g.items.filter(e => e.type === "public"));
+    const feats = companyFeatures(g.items).slice(0, 3).map(f => `<span>${esc(f)}</span>`).join("");
+    return `<a class="ycard" href="#/yacht" data-company="${esc(g.id)}">
+      <div class="ycard-photo" style="--hue:${(g.id.length * 37) % 40}">${c.photo ? `<img src="${esc(c.photo)}" alt="${esc(c.name)} 요트" loading="lazy">` : `${icon("boat", 34)}`}</div>
+      <h3>${esc(c.name || g.id)}</h3>
+      <p>${pub ? `퍼블릭 <b>${esc(pub)}</b>` : `코스 ${g.items.length}개`}</p>
+      <div class="ycard-tags">${feats}</div>
+    </a>`;
+  }).join("")}</div>`;
+}
+
+function pageHome() {
+  const checks = (D.quickChecks || []).map(c => `<li>${icon("check", 16)}<span>${esc(c)}</span></li>`).join("");
+  const chips = D.categories.map(c => `<a class="chip chip-lg" href="#/category/${c.id}">${esc(c.name)}</a>`).join("");
+  return `
+    ${heroSea()}
+    <div class="container home">
+      <section class="hblock">
+        <div class="hhead"><h2>오늘은 이 시간이 좋아요</h2><a href="#/live">이번 주 날씨</a></div>
+        <p class="hlead">날씨와 해 지는 시각으로 골랐어요. 누르면 그 시간으로 코스를 짜요.</p>
+        ${goodSlots()}
+      </section>
+
+      <section class="hblock">
+        <div class="hhead"><h2>요트 고르기</h2><a href="#/yacht">전체 코스</a></div>
+        <p class="hlead">강릉항에서 출발하는 요트 ${(D.companies || []).length}곳</p>
+        ${yachtStrip()}
+      </section>
+
+      <section class="hblock">
+        <div class="hhead"><h2>요트에서 내리면, 안목에서</h2></div>
+        <p class="hlead">요트 내리는 시각과 오늘 바다에 맞춰 다음 갈 곳을 이어 드려요.</p>
+        ${plannerHTML(false)}
+      </section>
+
+      <div class="two">
+        <section class="panel">
+          <div class="panel-head"><h2>가는 방법</h2><a href="#/transport">자세히 보기</a></div>
+          ${transportSummary()}
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>타기 전에 꼭</h2><a href="#/safety">안전 가이드</a></div>
+          <ul class="check">${checks}</ul>
+        </section>
+      </div>
+
+      <section class="block">
+        <h2 class="section-title">조건으로 체험 찾기</h2>
+        <div class="chip-row">${chips}</div>
+      </section>
+    </div>`;
+}
+
+// 안목 코스 페이지 (아래 탭 '안목 코스')
+function pagePlan() {
+  return `
+    ${pageHead("", "안목 코스 짜기", "요트 타는 시간과 오늘 바다에 맞춰, 내린 뒤 갈 곳까지 이어 드려요.")}
+    <section class="section"><div class="container narrow">${plannerHTML(true)}
+      <p class="pl-more-link"><a href="#/tour">안목 카페·식당 전체 보기</a></p>
+    </div></section>`;
+}
+
+// 주변 관광: 카페 · 식당 · 산책 (영업 중 표시, 걸어서 몇 분)
+function placeCard(p) {
+  const st = openNowText(p);
+  return `
+    <div class="place">
+      <div class="place-top">
+        <h3>${esc(p.name)}</h3>
+        <span class="walk">${esc(p.walkText || (p.walk != null ? `걸어서 ${p.walk}분` : ""))}</span>
+      </div>
+      ${p.menu ? `<p class="place-menu">${esc(p.menu)}</p>` : ""}
+      ${p.text ? `<p class="place-text">${esc(p.text)}</p>` : ""}
+      <p class="place-hours">${st ? `<b class="${/영업 중/.test(st) ? "open" : "closed"}">${st}</b>` : ""}${esc(p.hoursText || "")}</p>
+      ${p.parking ? `<p class="place-park">${icon("parking", 14)} ${esc(p.parking)}</p>` : ""}
+      ${p.link ? mapLinks(p) : ""}
+    </div>`;
+}
+function pageTour(kind) {
+  const P = D.places || {};
+  const tabs = [ { key: "cafe", label: "카페" }, { key: "food", label: "식당" }, { key: "walk", label: "산책·야경" } ];
+  const cur = tabs.find(t => t.key === kind) ? kind : "cafe";
+  const list = (P[cur] || []).slice().sort((a, b) => (a.walk ?? 99) - (b.walk ?? 99));
+  return `
+    ${pageHead("", "안목 주변", "요트 타기 전후로 걸어서 갈 수 있는 곳이에요. 마리나에서 가까운 순이에요.")}
+    <section class="section"><div class="container">
+      <div class="ptabs" role="tablist">${tabs.map(t => `<a role="tab" aria-selected="${t.key === cur}" class="${t.key === cur ? "on" : ""}" href="#/tour/${t.key}">${t.label} <small>${(P[t.key] || []).length}</small></a>`).join("")}</div>
+      ${list.length ? `<div class="places">${list.map(placeCard).join("")}</div>` : preparing("정보 준비 중입니다")}
+      <p class="pl-note">영업시간은 자료 기준이에요. 방문 전에 지도 앱에서 한 번 더 확인해 주세요.</p>
+    </div></section>`;
+}
+
+// 휴대폰 아래 탭
+const TABS = [
+  { path: "#/", label: "홈", icon: "home" },
+  { path: "#/yacht", label: "요트", icon: "boat" },
+  { path: "#/plan", label: "안목 코스", icon: "route" },
+  { path: "#/safety", label: "안전", icon: "buoy" },
+  { path: "#/live", label: "바다 날씨", icon: "sun" }
+];
+function renderTabbar() {
+  let bar = document.getElementById("tabbar");
+  if (!bar) { bar = document.createElement("nav"); bar.id = "tabbar"; bar.className = "tabbar"; bar.setAttribute("aria-label", "주요 메뉴"); document.body.appendChild(bar); }
+  const h = location.hash || "#/";
+  bar.innerHTML = TABS.map(t => {
+    const on = t.path === "#/" ? (h === "#/" || h === "#") : h.startsWith(t.path) || (t.path === "#/plan" && h.startsWith("#/tour"));
+    return `<a href="${t.path}" class="${on ? "on" : ""}" ${on ? 'aria-current="page"' : ""}>${icon(t.icon, 22)}<span>${t.label}</span></a>`;
+  }).join("");
+}
+document.addEventListener("click", e => {
+  const y = e.target.closest && e.target.closest(".ycard[data-company]");
+  if (y) { window.__expCompany = y.dataset.company; return; }
+  const s = e.target.closest && e.target.closest(".slot[data-slot]");
+  if (s) {
+    const o = window.__plan;
+    o.slot = s.dataset.slot; o.yacht = 0; o.swaps = {};
+    const nm = new Date().getHours() * 60 + new Date().getMinutes();
+    const t = s.dataset.slot === "am" ? 600 : s.dataset.slot === "pm" ? 840 : sunsetDepart(new Date());
+    o.day = nm > t - 60 ? 1 : 0;
+    rerenderPlanner();
+    document.getElementById("planner")?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }
+});
+
+/* =====================================================================
    공통 상단/하단
    ===================================================================== */
 function renderHeader() {
@@ -1846,14 +2443,15 @@ function routerInner() {
   let html;
   switch (parts[0]) {
     case undefined:   html = pageHome(); break;
-    case "result":    html = pageResult(params); break;
-    case "ai":        html = pageAI(); break;
+    case "result":    html = pagePlan(); break;
+    case "ai":        html = pagePlan(); break;
+    case "plan":      html = pagePlan(); break;
     case "category":  html = pageCategory(parts[1]); break;
     case "marina":    html = pageMarina(); break;
     case "yacht":     html = pageYacht(); break;
     case "booking":   html = pageBooking(); break;
     case "transport": html = pageTransport(); break;
-    case "tour":      html = pageTour(); break;
+    case "tour":      html = pageTour(parts[1]); break;
     case "safety":    html = pageSafety(parts[1]); break;
     case "live":      html = pageLive(); break;
     default:          html = pageNotFound();
@@ -1864,6 +2462,7 @@ function routerInner() {
   document.querySelectorAll("[data-nav]").forEach(a =>
     a.classList.toggle("current", hash.startsWith(a.dataset.nav)));
   document.querySelector(".nav")?.classList.remove("open");
+  renderTabbar();
 
   // 안전 가이드 특정 항목으로 왔으면 그 위치로, 아니면 맨 위로
   const focus = parts[0] === "safety" && parts[1] && document.getElementById("safety-tiles");
@@ -1945,7 +2544,7 @@ function applyWeather(w) {
   L.source = w.source || "기상청";
   // 날씨가 보이는 화면이면 다시 그리기 (스크롤 위치는 그대로)
   const h = location.hash || "#/";
-  if (h === "#/" || h === "#" || h.startsWith("#/live")) {
+  if (h === "#/" || h === "#" || h.startsWith("#/live") || h.startsWith("#/plan")) {
     window.__keepScroll = true;   // 날씨만 바뀐 거라 스크롤은 그대로
     router();
     window.__keepScroll = false;
