@@ -1255,9 +1255,9 @@ window.SITE_DATA = {
 
   </script>
 
-  <script src="course-dict.js"></script>
-  <script src="course-engine.js"></script>
-  <script src="course-cases.js"></script>
+  <script src="course-dict.js?v=18.2"></script>
+  <script src="course-engine.js?v=18.2"></script>
+  <script src="course-cases.js?v=18.2"></script>
   <script>
 /* =====================================================================
    요트핏 동작 파일 (app.js)
@@ -2229,7 +2229,7 @@ function makePlan(o) {
   if (after.fromTable) why.push("카페·식당은 미리 계산해 둔 경우의 수 표에서 골랐어요.");
   // 노을·야경 (밤 9시 30분 전까지만)
   const walks = P.walk || [];
-  const endLimit = o.endBy != null ? o.endBy - YF.endBuffer(o) : 22 * 60;
+  const endLimit = o.endBy != null ? o.endBy - (YF.endBuffer ? YF.endBuffer(o) : 20) : 22 * 60;
   if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30 && t + 32 <= endLimit && !o.noAfter) {
     const bridge = walks.find(x => x.night);
     if (bridge) { steps.push({ kind: "move", text: `걸어서 약 ${Math.max(2, at)}분` }); t = r10(t + Math.max(2, at)); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
