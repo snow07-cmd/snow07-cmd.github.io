@@ -1,15 +1,17 @@
 # 요트핏 날씨 자동 업데이트
-# 30분마다 기상청 API를 불러 weather.json을 새로 저장합니다.
+# 날씨를 받은 뒤 30분 기다렸다가, 다음 실행을 스스로 시작해요 (줄줄이 이어서 실행).
+# 예약(cron)은 줄이 끊겼을 때 다시 잇는 예비용이에요.
 # 인증키: 저장소 Settings → Secrets and variables → Actions → KMA_KEY
 name: 날씨 업데이트
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # 30분마다 (매시 7분, 37분). 저장소 주인 계정으로 저장해야 자동 실행돼요 — 저장소 주인 계정으로 저장해야 자동 실행돼요
-  workflow_dispatch:          # Actions 화면에서 'Run workflow'로 바로 실행
+    - cron: "7,37 * * * *"   # 예비용. 저장소 주인 계정으로 저장해야 자동 실행돼요
+  workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write            # 다음 실행을 스스로 시작하려면 필요해요
 
 concurrency:
   group: weather
@@ -18,7 +20,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +40,23 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add weather.json
             git commit -m "날씨 자동 업데이트"
+            git pull --rebase -q
             git push
           else
             echo "바뀐 내용이 없어요."
+          fi
+
+      - name: 30분 뒤 다음 실행 시작
+        if: always()              # 날씨 받기가 실패해도 줄은 이어가요
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 1740
+          waiting=$(gh run list -R "$GITHUB_REPOSITORY" -w weather.yml --json status \
+                    -q '[.[] | select(.status=="queued" or .status=="pending" or .status=="waiting")] | length')
+          if [ "$waiting" = "0" ]; then
+            gh workflow run weather.yml -R "$GITHUB_REPOSITORY" --ref main
+            echo "다음 실행을 시작했어요."
+          else
+            echo "이미 기다리는 실행이 있어서 새로 시작하지 않아요."
           fi
