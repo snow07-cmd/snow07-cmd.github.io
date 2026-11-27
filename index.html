@@ -707,6 +707,11 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
 .maplinks a, .pl-more { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
 .pl-swap { font: inherit; font-size: 12px; font-weight: 700; color: var(--sub); background: none; border: 1px dashed var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
 .pl-why { margin-top: 6px; font-size: 13px; color: var(--sub); }
+.pl-faq { margin: 10px 0 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); font-size: 14px; }
+.pl-faq > b { display: block; color: var(--primary); margin-bottom: 6px; }
+.pl-faq dl { margin: 0; display: grid; gap: 8px; }
+.pl-faq dt { font-weight: 700; } .pl-faq dd { margin: 2px 0 0; color: var(--sub); line-height: 1.5; }
+.pl-faq a { color: var(--primary); font-weight: 700; }
 .pl-why summary { cursor: pointer; font-weight: 700; color: var(--primary); }
 .pl-why ul { margin: 6px 0 0 18px; display: grid; gap: 3px; }
 .pl-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
@@ -1255,9 +1260,9 @@ window.SITE_DATA = {
 
   </script>
 
-  <script src="course-dict.js?v=18.3"></script>
-  <script src="course-engine.js?v=18.3"></script>
-  <script src="course-cases.js?v=18.3"></script>
+  <script src="course-dict.js?v=18.4"></script>
+  <script src="course-engine.js?v=18.4"></script>
+  <script src="course-cases.js?v=18.4"></script>
   <script>
 /* =====================================================================
    요트핏 동작 파일 (app.js)
@@ -2054,7 +2059,9 @@ const PLAN_EXAMPLES = [
   "아이 둘이랑 오전에 타요. 멀미가 조금 걱정돼요",
   "강아지랑 같이 탈 수 있는 요트 찾아요. 차로 가요",
   "부모님 모시고 토요일 오후에 타고 7시 기차 타야 해요",
-  "친구 4명이랑 노을 보고 피맥, 버스로 가요"
+  "친구 4명이랑 노을 보고 피맥, 버스로 가요",
+  "밥은 먹고 와요 타고 나서 카페 두 군데",
+  "비 오면 취소돼요? 주차는 어디에 해요?"
 ];
 
 function openAt(p, date, min, stay = 40) {
@@ -2221,7 +2228,9 @@ function makePlan(o) {
   }
   // 내린 뒤 카페·식당: 경우의 수 표(course-cases.js)에서 바로 꺼내고, 특별한 요청이 있으면 엔진이 그 자리에서 계산
   const wx = { cold, rain: !!w.rain, storm };
-  const actx = { o, wd: date.getDay(), t, w: wx, P, used, at: 0, swaps };
+  // "내린 뒤 2시간만" → 그 안에 끝나게 (끝나는 시각으로 바꿔서 엔진에 넘겨요)
+  const oA = (o.afterBudget && o.endBy == null) ? Object.assign({}, o, { endBy: t + o.afterBudget + 20 }) : o;
+  const actx = { o: oA, wd: date.getDay(), t, w: wx, P, used, at: 0, swaps };
   const after = (!storm && YF.planAfterFast(actx)) || YF.planAfter(Object.assign(actx, { used }));
   steps.push(...after.steps);
   t = after.t; let at = after.at;
@@ -2229,7 +2238,7 @@ function makePlan(o) {
   if (after.fromTable) why.push("카페·식당은 미리 계산해 둔 경우의 수 표에서 골랐어요.");
   // 노을·야경 (밤 9시 30분 전까지만)
   const walks = P.walk || [];
-  const endLimit = o.endBy != null ? o.endBy - (YF.endBuffer ? YF.endBuffer(o) : 20) : 22 * 60;
+  const endLimit = oA.endBy != null ? oA.endBy - (YF.endBuffer ? YF.endBuffer(oA) : 20) : 22 * 60;
   if (!storm && !(w.wind >= 14) && !isNaN(sunset) && t >= sunset && t < 21 * 60 + 30 && t + 32 <= endLimit && !o.noAfter) {
     const bridge = walks.find(x => x.night);
     if (bridge) { steps.push({ kind: "move", text: `걸어서 약 ${Math.max(2, at)}분` }); t = r10(t + Math.max(2, at)); steps.push({ kind: "walk", time: t, end: t + STAY.walk, place: bridge, title: "솔바람다리 야경", sub: w.wind >= 8 ? "바람이 강하니 짧게 걸어요" : "조명이 켜진 다리를 걸으며 마무리" }); }
@@ -2297,6 +2306,63 @@ function askBox(q = "") {
     </details>`;
 }
 
+// 문장 속 질문에 답하기 (사이트 자료로만, 전화번호 없이)
+const FAQ_LABEL = { parking: "주차", toilet: "화장실", waiting: "기다릴 곳", arrive: "언제 도착해요?", pill: "멀미약", clothes: "옷차림·신발", vest: "구명조끼",
+  alcohol: "술·음식", refund: "취소·환불", rain: "비·눈 오는 날", wind: "오늘 바다·운항", sunset: "해 지는 시각", weather: "날씨", pet: "반려동물 탑승",
+  wheelchair: "휠체어", kids: "아이·임산부·어르신", capacity: "인원", price: "요금", book: "예약", duration: "타는 시간", courses: "코스·업체",
+  wine: "와인 코스", swim: "요트 수영", bus: "가는 방법", cafes: "카페", foods: "식당", hours: "영업시간", night: "야경", photo: "사진 찍기 좋은 곳", live: "실시간 바다" };
+function faqAnswer(k, o) {
+  const fac = n => (D.facilities || []).find(f => f.name.startsWith(n)) || {};
+  const saf = t => { for (const st of D.safety || []) for (const it of st.items) if (it.title.includes(t)) return it.text; return ""; };
+  const exps = (D.experiences || []).filter(e => e.type !== "special");
+  const won = e => { const m = String(e.price || "").match(/([\d,]+)\s*원/); return m ? Number(m[1].replace(/,/g, "")) : 1e9; };
+  const cname = id => ((D.companies || []).find(c => c.id === id) || {}).name || "";
+  const list = es => es.map(e => `${cname(e.company)} ${e.name}(${[e.duration, e.price].filter(Boolean).join(", ")})`).join(" · ");
+  const A = {
+    parking: () => `${fac("주차장").text || ""} ${[fac("주차장").hours, fac("주차장").fee].filter(Boolean).join(" · ")} (${fac("주차장").place || ""})`,
+    toilet: () => `${fac("화장실").text || ""} (${fac("화장실").hours || ""})`,
+    waiting: () => fac("대기실").text || "",
+    arrive: () => `${saf("출항 1시간 전까지")} 화장실은 안목 여행자센터에서 미리 다녀오세요.`,
+    pill: () => `${saf("붙이는 멀미약")} ${saf("먹는 멀미약")} ${saf("멀미약 부작용")}`,
+    clothes: () => `${saf("겹쳐 입고")} ${saf("요트화")}`,
+    vest: () => `${saf("구명조끼·슬리퍼")} ${saf("구명조끼 꼭")}`,
+    alcohol: () => `${saf("술 마시기")} 음식·음료를 가져가도 되는지는 업체에 확인해 주세요.`,
+    refund: () => `${saf("풍랑주의보면 운항")} ` + (D.companies || []).map(c => `${c.name}: ${c.refund}`).join(" / "),
+    rain: () => `비나 눈만으로 운항이 취소되지는 않아요. 풍랑주의보나 강한 바람이면 업체가 연락하고 환불해 줘요. ${/비|눈/.test(String(D.live.pty || "")) ? "지금 비·눈이 와요. " : ""}운항은 업체에 꼭 확인해 주세요.`,
+    wind: () => { const st = currentStatus(); const v = id => currentValue(id); return `오늘 바다: ${st ? st.text : "확인 중"}${v("wind") ? ` (바람 ${v("wind")}m/s${v("wave") ? `, 파도 ${v("wave")}m` : ""})` : ""}${v("alert") ? ` · 특보: ${v("alert")}` : ""}. 운항 여부는 업체가 정해요. 예약한 업체에 확인해 주세요.`; },
+    sunset: () => { const ss = D.live.sunset || fmt(Math.round(sunTimes(addDays(new Date(), o.day || 0)).set)); return `${o.day ? "그날" : "오늘"} 해 지는 시각은 약 ${ss}이에요. 일몰 코스는 이 시각에 맞춰 출항해요.`; },
+    weather: () => { const v = id => currentValue(id); return `지금 기온 ${v("temp") || "--"}℃, 바람 ${v("wind") || "--"}m/s, 파도 ${v("wave") || "--"}m, 수온 ${v("water") || "--"}℃예요. 바다 날씨 화면에서 며칠 앞 예보도 볼 수 있어요.`; },
+    pet: () => { const ps = exps.filter(e => (e.tags || []).includes("반려동물 동반")); return ps.length ? `반려동물과 탈 수 있는 코스: ${list(ps)}. 가게 동반 여부는 가게에 미리 확인해 주세요.` : "반려동물 탑승은 업체에 문의해 주세요."; },
+    wheelchair: () => `${fac("휠체어").text || ""} ${saf("누구나 탈 수 있어요")}`,
+    kids: () => `${saf("누구나 탈 수 있어요")} 구명조끼를 입고, 아이는 보호자가 가까이에서 지켜봐 주세요.`,
+    capacity: () => (D.companies || []).map(c => `${c.name}: ${c.capacity}`).join(" / "),
+    price: () => { const pub = exps.filter(e => e.type === "public").sort((a, b) => won(a) - won(b)), pri = exps.filter(e => e.type === "private").sort((a, b) => won(a) - won(b));
+      return `합승(1인)은 ${pub[0] ? pub[0].price.replace("1인 ", "") : ""}부터, 전세(일행 전체)는 ${pri[0] ? pri[0].price : ""}부터예요. 가장 싼 합승: ${list(pub.slice(0, 2))}${o.people ? `. ${o.people}명이면 합승 ${(won(pub[0]) * o.people).toLocaleString("ko-KR")}원부터` : ""}.`; },
+    book: () => (D.companies || []).map(c => `${c.name}: ${(c.links || []).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(", ")}`).join(" / "),
+    duration: () => `코스마다 1시간, 1시간 30분, 2시간이 많고, 전세는 5시간 코스도 있어요. 일몰 코스는 1시간 30분이에요.`,
+    courses: () => (D.companies || []).map(c => `${c.name} ${exps.filter(e => e.company === c.id).length}개`).join(" · ") + ` 코스가 있어요. 위 일정의 '다른 요트'나 '요트·체험' 화면에서 비교해 보세요.`,
+    wine: () => { const ws = exps.filter(e => /와인/.test(e.name)); return ws.length ? `와인 코스: ${list(ws)}` : "와인 코스는 업체에 문의해 주세요."; },
+    swim: () => { const ws = exps.filter(e => /수영/.test(e.name)); return ws.length ? `요트 수영 코스: ${list(ws)}. 수영 가능 시기는 업체에 확인해 주세요.` : "요트 수영은 업체에 문의해 주세요."; },
+    bus: () => busLine(o.from || "station") + ". 다른 출발지는 '가는 방법' 화면에서 볼 수 있어요." + ((D.transport || [])[0] ? ` 택시는 강릉역에서 ${((D.transport[0].options || []).find(x => x.type === "taxi") || {}).time || ""} 걸려요.` : ""),
+    cafes: () => `안목 카페 ${(D.places.cafe || []).length}곳 중에서 그날 상황에 맞춰 골라요. 후기가 많은 곳: ` + Object.entries(COURSE_DICT.places).filter(([n, p]) => p.review === "많음" && (D.places.cafe || []).some(c => c.name === n)).map(([n, p]) => `${n}(${p.note.split(".")[0]})`).join(" · "),
+    foods: () => `안목 식당 ${(D.places.food || []).length}곳: ` + (D.places.food || []).map(f => `${f.name}${(COURSE_DICT.places[f.name] || {}).menu2 ? `(${COURSE_DICT.places[f.name].menu2.join("·")})` : ""}`).join(" · "),
+    hours: () => { const ns = o.must || []; const all = [...(D.places.cafe || []), ...(D.places.food || [])];
+      return ns.length ? ns.map(n => { const p = all.find(x => x.name === n); return p ? `${n}: ${p.hoursText || ""}` : ""; }).filter(Boolean).join(" / ") : "일정에는 그 시각에 문 연 가게만 넣어요. 가게별 영업시간은 '안목 카페·식당' 화면에서 볼 수 있어요."; },
+    night: () => { const b = ((D.places || {}).walk || []).find(x => x.night); return b ? `${b.name}: ${b.text} 해가 진 뒤 일정이면 마지막에 넣어 드려요.` : ""; },
+    photo: () => `사진 후기가 좋은 곳: ` + Object.entries(COURSE_DICT.places).filter(([, p]) => (p.tags || []).includes("photo")).map(([n]) => n).join(" · ") + `. 노을 시각에는 바다 위나 안목해변이 가장 예뻐요.`,
+    live: () => `실시간 바다 모습과 날씨는 <a href="#/live">실시간 정보</a> 화면에서 볼 수 있어요.`
+  };
+  const f = A[k];
+  if (!f) return "";
+  const text = f();
+  return k === "book" || k === "live" ? text : esc(text.replace(/\s+/g, " ").trim());
+}
+function faqBox(o) {
+  const ks = (o.ask || []).filter(k => FAQ_LABEL[k]).slice(0, 6);
+  if (!ks.length) return "";
+  return `<div class="pl-faq"><b>물어보신 것</b><dl>${ks.map(k => `<dt>${FAQ_LABEL[k]}</dt><dd>${faqAnswer(k, o)}</dd>`).join("")}</dl></div>`;
+}
+
 // 결과 (읽은 조건 칩 + 추천 요트 + 시간표)
 function planResultHTML() {
   const o = window.__plan;
@@ -2313,8 +2379,9 @@ function planResultHTML() {
   }).join("")}</div>` : "";
   return `
     <div class="planner" id="planner">
-      ${o.booked ? `<p class="pl-read">예약한 요트 기준으로 짰어요.</p>` : `
+      ${o.booked ? `<p class="pl-read">예약한 요트 기준으로 짰어요.</p>${faqBox(o)}` : `
       <div class="pl-read"><b>읽은 조건</b>${o.found.length ? o.found.map(f => `<span>${esc(f)}</span>`).join("") : "<em>특별한 조건이 없어 기본값으로 짰어요</em>"}</div>
+      ${faqBox(o)}
       <div class="pl-controls">
         <div class="pl-seg">${seg("day", [{ key: 0, label: "오늘" }, { key: 1, label: "내일" }], o.day)}<span class="pl-gap"></span>${seg("slot", PLAN_SLOTS, o.slot)}</div>
         <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("pet", "반려동물")}${tog("car", "차로 와요")}${tog("sick", "멀미 걱정")}</div>

@@ -34,12 +34,18 @@
   function packed(raw) {
     const str = String(raw || ""); let s = ""; const pos = [];
     for (let i = 0; i < str.length; i++) if (!/\s/.test(str[i])) { s += str[i]; pos.push(i); }
-    return { s, pos };
+    return { s, pos, raw: str };
   }
   // 띄어쓰기를 건너 이어 붙은 표현은 앞부분이 두 글자 이상일 때만 인정 ("여자 친구" O, "체력이약 혼자" → '약혼자' X)
-  function crossOK(pk, i, len) {
+  // strict: 지우는 말(except)용. 아니면 한 글자라도 앞이 띄어쓰기·문장 처음이면 한 낱말로 봐요 ("비 오면", "밥 안 먹고")
+  function crossOK(pk, i, len, strict) {
     if (!pk.pos) return true;
-    for (let k = 1; k < len; k++) if (pk.pos[i + k] - pk.pos[i + k - 1] > 1) return k >= 2;
+    for (let k = 1; k < len; k++) if (pk.pos[i + k] - pk.pos[i + k - 1] > 1) {
+      if (k >= 2) return true;
+      if (strict) return false;
+      const before = pk.raw ? pk.raw[pk.pos[i] - 1] : undefined;
+      return before === undefined || /[\s,.!?~"'()]/.test(before);
+    }
     return true;
   }
   function lexList(cat) {
@@ -54,7 +60,7 @@
   function maskAll(t, w, pk) {
     let from = 0, i;
     while ((i = t.indexOf(w, from)) >= 0) {
-      if (crossOK(pk, i, w.length)) t = t.slice(0, i) + BLANK.repeat(w.length) + t.slice(i + w.length);
+      if (crossOK(pk, i, w.length, true)) t = t.slice(0, i) + BLANK.repeat(w.length) + t.slice(i + w.length);
       from = i + 1;
     }
     return t;
@@ -111,7 +117,7 @@
       let d = new Date(now.getFullYear(), 11, 25); if (diffTo(d) < 0) d = new Date(now.getFullYear() + 1, 11, 25);
       hit("day", diffTo(d), "크리스마스");
     } else {
-      const re = /(\d{1,2})\s*일(?!\s*(뒤|후|이나|정도|간|동안|째|치|에\s*한))/g; let dm;
+      const re = /(\d{1,2})\s*일(?!\s*(뒤|후|이나|정도|간|동안|째|치|에\s*한)|요|욜)/g; let dm;
       while ((dm = re.exec(raw))) {
         const before = raw.slice(Math.max(0, dm.index - 3), dm.index);
         if (/박\s*$|월\s*$|\d$/.test(before)) continue;
@@ -160,6 +166,10 @@
     // 함께 가는 사람
     const ph = findAll("party", s);
     const kinds = new Set(ph.map(h => h.v));
+    // '가족·식구'처럼 아이를 뜻하지 않는 말만 있으면, 다른 동행(연인·친구 등)이 있을 때 그쪽을 따라요
+    const WEAK_FAMILY = /^(가족|가족여행|가족끼리|식구|온가족|우리가족|가족나들이|패밀리|가족모두|가족들|가족단위|가족나들이로|가족여행으로|온가족이|가족끼리여행)$/;
+    const strongKid = ph.some(h => h.v === "family" && !WEAK_FAMILY.test(h.w));
+    if (kinds.has("family") && !strongKid && [...kinds].some(k => k !== "family")) { for (let i = ph.length - 1; i >= 0; i--) if (ph[i].v === "family") ph.splice(i, 1); kinds.delete("family"); }
     if (kinds.has("senior")) o.senior = true;
     if (kinds.has("family")) o.kid = true;
     if (findAll("pet", s).length) { o.pet = true; o.found.push("반려동물"); }
@@ -175,7 +185,7 @@
 
     // 인원
     let ppl = null;
-    if ((m = raw.match(/(\d{1,2})\s*(명|인)(?!\s*당)/))) ppl = Number(m[1]);
+    if ((m = raw.match(/(\d{1,2})\s*(명|인)(?!당)/))) ppl = Number(m[1]);
     else { const pp = best(findAll("people", s)); if (pp) ppl = Number(pp.v); }
     const kc = raw.match(/(아이|애|아들|딸|조카|아기|애기)\s*(하나|한\s*명|둘|두\s*명|셋|세\s*명|넷|네\s*명)/);
     if (kc) { const n = /하나|한/.test(kc[2]) ? 1 : /둘|두/.test(kc[2]) ? 2 : /셋|세/.test(kc[2]) ? 3 : 4; o.kids = n; o.found.push(`아이 ${n}명`);
@@ -221,15 +231,40 @@
 
     // 순서
     const od = findAll("order", s).map(h => h.v);
+    // "밥 안 먹고", "식사는 됐어요", "점심은 먹고 왔어요" 처럼 띄어 쓴 말도 읽기
+    if (/(밥|식사|점심|저녁|끼니)\s*(은|는|도)?\s*(안\s*먹|안\s*할|말고|빼고|생략|패스|됐|괜찮|먹었|먹고\s*(와|올|왔|갈게|가요)|하고\s*(와|올|왔))/.test(raw)
+        || /(카페|커피)(로|만|부터)?\s*바로/.test(raw)) od.push("cafeOnly");
+    if (/카페\s*(두|2|여러|몇)\s*(군데|곳|개|집)/.test(raw)) od.push("cafeHop");
+    if (/(밥|식사)\s*(부터|먼저)/.test(raw)) od.push("foodFirst");
+    if (/(카페|커피)\s*(부터|먼저)/.test(raw)) od.push("cafeFirst");
+    if (od.includes("cafeHop")) { hit("cafeHop", true, "카페 2곳"); }
+    if (od.includes("foodFirst") && !od.includes("cafeOnly")) hit("foodFirst", true, "밥 먼저");
+    if (od.includes("cafeFirst") && !od.includes("cafeOnly")) hit("cafeFirst", true, "카페 먼저");
+    if (od.includes("lateNight")) { o.nightWalk = true; hit("lateNight", true, "늦게까지"); }
     if (od.includes("noAfter")) hit("noAfter", true, "탄 뒤 바로 출발");
-    if (od.includes("cafeOnly")) { hit("cafeOnly", true, "식사는 빼고"); o.meal = false; o.food = o.food || null; }
-    if (!o.cafeOnly && /(점심|아침|밥|식사|브런치|대게|회|버거|돈까스|돈가스|닭강정|미역국|피자|꼬치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(raw)
+    if (od.includes("cafeOnly") && !o.cafeHop) { hit("cafeOnly", true, "식사 없이 카페로"); o.meal = false; o.food = null; o.found = o.found.filter(f => f !== "식사" && f !== fh?.v); }
+    if (o.cafeHop && od.includes("cafeOnly")) { o.meal = false; o.food = null; o.found = o.found.filter(f => f !== "식사"); }
+    if (!o.cafeOnly && !o.cafeHop && !(o.foodFirst && /카페|커피/.test(raw)) && /(점심|아침|밥|식사|브런치|대게|회|버거|돈까스|돈가스|닭강정|미역국|피자|꼬치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(raw)
         && !/(타고|탄\s*(뒤|후|다음)|내려서|내리고|끝나고)[^.]{0,10}(점심|저녁|밥|식사|먹)/.test(raw)) hit("preMeal", true, "타기 전 식사");
+
+    // 내린 뒤 쓸 수 있는 시간 ("2시간만 있어요", "세 시간 정도 여유")
+    const bm = raw.match(/(\d{1,2}|한|두|세|네|다섯)\s*시간\s*(반)?\s*(만|정도|쯤|밖에|가량)?\s*(있|머물|놀|여유|시간|남|돌아|뿐|가능|비어|빈다|비는)/);
+    if (bm && !o.endBy) {
+      const n = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5 }[bm[1]] || Number(bm[1]);
+      if (n >= 1 && n <= 10) { o.afterBudget = n * 60 + (bm[2] ? 30 : 0); o.found.push(`내린 뒤 ${n}${bm[2] ? "시간 반" : "시간"}`); delete o.wants.longRide; o.found = o.found.filter(f => f !== "오래 타기"); }
+    }
+    // 시간대를 말하지 않고 "저녁은 ○○"처럼 저녁 식사를 말하면 노을 코스 뒤 저녁으로
+    if (!o.slot && o.time == null && /저녁/.test(raw) && (o.food || o.meal) && !o.cafeOnly) hit("slot", "sunset", "노을");
+    // 손님이 말한 가게
+    o.must = [...new Set(findAll("place", s).map(h => h.v))];
+    if (o.must.length) o.found.push(...o.must.map(n => n.replace(/ (강릉|안목).*$/, "")));
+    // 궁금한 것 (질문)
+    o.ask = [...new Set(findAll("ask", s).map(h => h.v))];
 
     // 예약·업체
     const co = best(findAll("company", s));
     if (co) { o.company = co.v; o.found.push({ clubyacht: "클럽요트마스터", lunarossa: "루나로사", yachtgallery: "요트갤러리", marinaho: "강릉마리나호" }[co.v]); }
-    if (findAll("booked", s).length) { o.bookedText = true; o.found.push("이미 예약"); }
+    if (findAll("booked", s).length) { o.bookedText = true; o.found.push("이미 예약"); o.ask = o.ask.filter(a => a !== "book"); }
     return o;
   }
 
@@ -324,8 +359,10 @@
       // 끝나는 시각(기차 등) 때문에 식사가 안 들어가면 식사만 1시간으로 줄여서 넣어요
       if (!ok.length && kind === "food" && o.endBy != null) { stay = 60; ok = pool(stay); if (ok.length) notes.push("떠나는 시각에 맞춰 식사는 1시간으로 잡았어요."); }
       if (!ok.length) return false;
+      const must = (o.must || []).filter(n => ok.some(x => x.p.name === n));
       cands.push({ kind, names: ok.slice().sort((a, b) => b.sc - a.sc || a.mv - b.mv).slice(0, kind === "cafe" ? 15 : 8).map(x => x.p.name) });
       ok = order(ok, kind, o, `${kind}${idx}${t}`);
+      if (must.length) ok = [...ok.filter(x => x.p.name === must[0]), ...ok.filter(x => x.p.name !== must[0])];   // 손님이 말한 가게 먼저
       const x = ok[(swaps[idx] || 0) % ok.length];
       used.add(x.p.name);
       steps.push({ kind: "move", text: `걸어서 약 ${x.mv}분` });
@@ -344,16 +381,38 @@
     let ateMeal = false, waited = false;
     if (o.noAfter) return { steps, t, at, ateMeal, notes, cands, waited };
     const foodBase = () => `${mealLabel(r10(t))}${o.food ? ` · ${o.food}` : ""}`;
-    if (!o.cafeOnly && isMeal(r10(t)) && !(o.preMeal && r10(t) < 15 * 60)) {
+    const cafeBase = () => cold ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔";
+    if (o.cafeHop) {                      // 카페 두 곳 (밥은 말했을 때만 사이에)
+      choose("cafe", P.cafe, cafeBase(), 0);
+      if (wantMeal) {                      // 카페 → (저녁 시간까지 기다렸다가) 식사 → 카페
+        if (!isMeal(r10(t)) && t < 17 * 60) { t = 17 * 60; waited = true; cands.push({ kind: "wait", names: [] }); }
+        if (t < 20 * 60) ateMeal = choose("food", P.food, foodBase(), 1);
+        choose("cafe", P.cafe, "두 번째 카페 · 분위기를 바꿔 한 곳 더", 2);
+      } else choose("cafe", P.cafe, "두 번째 카페 · 분위기를 바꿔 한 곳 더", 1);
+    } else if (o.cafeOnly) {
+      choose("cafe", P.cafe, "식사 없이 바로 카페로 · " + (cold ? "따뜻한 음료로" : "바다 보며 커피 한 잔"), 0);
+    } else if (o.foodFirst && (wantMeal || isMeal(r10(t)))) {
+      ateMeal = choose("food", P.food, foodBase().replace(/^(점심|저녁) 식사|^식사/, "식사 먼저"), 0);
+      choose("cafe", P.cafe, "식사 뒤 바다 보며 커피 한 잔", 1);
+    } else if (o.cafeFirst) {
+      choose("cafe", P.cafe, "카페 먼저 · " + cafeBase(), 0);
+      if (wantMeal || isMeal(r10(t))) {
+        if (!isMeal(r10(t)) && t < 17 * 60 && wantMeal) { t = 17 * 60; waited = true; cands.push({ kind: "wait", names: [] }); }
+        if (t < 20 * 60) ateMeal = choose("food", P.food, foodBase(), 1);
+      }
+    } else if (isMeal(r10(t)) && !(o.preMeal && r10(t) < 15 * 60)) {
       ateMeal = choose("food", P.food, foodBase(), 0);
       choose("cafe", P.cafe, "식사 뒤 바다 보며 커피 한 잔", 1);
     } else {
-      choose("cafe", P.cafe, cold ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔", 0);
+      choose("cafe", P.cafe, cafeBase(), 0);
       if (!o.cafeOnly && (isMeal(r10(t)) || (!o.preMeal && wantMeal && t < 20 * 60))) {
         if (!isMeal(r10(t)) && t < 17 * 60) { t = 17 * 60; waited = true; cands.push({ kind: "wait", names: [] }); }
         ateMeal = choose("food", P.food, foodBase(), 1);
       }
     }
+    if (o.cafeOnly) notes.push("말씀대로 식사는 빼고 카페로 바로 이어 드렸어요.");
+    if (o.cafeHop) notes.push("카페 두 곳을 이어서 넣었어요. 서로 다른 분위기의 곳으로 골랐어요.");
+    if (o.afterBudget) notes.push(`내린 뒤 ${Math.round(o.afterBudget / 60 * 10) / 10}시간 안에 끝나게 짰어요.`);
     if (wantMeal && !ateMeal && !o.preMeal) notes.push(o.endBy != null ? "끝나는 시각 안에 식사를 넣을 시간이 모자라요." : "말씀하신 식사는 이 시간대에 문 연 가게가 없어 넣지 못했어요. 시간대를 바꿔 보세요.");
     if (o.endBy != null) notes.push(o.endTravel ? `${fmt(o.endBy)} ${o.car ? "출발" : "기차·버스"}에 맞춰 ${o.car ? "" : "강릉역·터미널까지 버스 시간(약 35분)과 "}여유를 두고 ${fmt(o.endBy - endBuffer(o))}까지 끝냈어요.` : `${fmt(o.endBy)}까지 떠날 수 있게 20분 여유를 두고 끝냈어요.`);
     return { steps, t, at, ateMeal, notes, cands, waited };
@@ -379,7 +438,7 @@
   /* ---------- 미리 계산 표 ---------- */
   const DIM = {
     party: ["couple", "family", "senior", "friends", "group", "solo", "pet"],
-    food: ["", "meal", "대게", "회", "버거", "돈까스", "닭강정", "미역국", "피자", "꼬치", "빵"],
+    food: ["", "meal", "대게", "회", "버거", "돈까스", "닭강정", "미역국", "피자", "꼬치", "빵", "cafeOnly", "cafeHop"],
     weather: ["normal", "cold", "rain"],
     after: { from: 600, step: 30, n: 24 },     // 10:00 ~ 21:30
     before: { from: 600, step: 30, n: 19 }     // 10:00 ~ 19:00 출항
@@ -387,10 +446,11 @@
   // 표로 바로 낼 수 있는 단순한 조건인지 (특별 요청이 있으면 그 자리에서 계산)
   function simple(o) {
     const extra = Object.keys(o.wants || {}).filter(k => o.wants[k] && !["wine", "swim", "private", "cheap", "longRide", "shortRide", "bakery"].includes(k));
-    return !extra.length && !Object.keys(o.body || {}).some(k => o.body[k] && k !== "sick") && o.endBy == null && !o.cafeOnly && !o.noAfter
+    return !extra.length && !Object.keys(o.body || {}).some(k => o.body[k] && k !== "sick") && o.endBy == null && !o.noAfter
+      && !(o.must && o.must.length) && !o.foodFirst && !o.cafeFirst && !o.afterBudget && !(o.cafeOnly && (o.food || o.meal)) && !(o.cafeHop && (o.food || o.meal))
       && !(o.kid && o.party !== "family") && !(o.senior && o.party !== "senior");
   }
-  const foodDim = o => o.food ? o.food : o.bakery ? "빵" : o.meal ? "meal" : "";
+  const foodDim = o => o.cafeHop && !o.food && !o.meal ? "cafeHop" : o.cafeOnly ? "cafeOnly" : o.food ? o.food : o.bakery ? "빵" : o.meal ? "meal" : "";
   const partyDim = o => o.pet ? "pet" : (o.party || "couple");
   function keyAfter(o, wd, t, w) {
     const b = Math.floor((t - DIM.after.from) / DIM.after.step);
@@ -402,7 +462,7 @@
   function keyBefore(o, wd, dep) {
     const b = Math.floor((dep - DIM.before.from) / DIM.before.step);
     if (b < 0 || b >= DIM.before.n) return -1;
-    const FB = DIM.food.slice(1), pi = DIM.party.indexOf(partyDim(o)), fi = FB.indexOf(foodDim(o) || "meal");
+    const FB = DIM.food.slice(1, 11), pi = DIM.party.indexOf(partyDim(o)), fi = FB.indexOf(foodDim(o) || "meal");
     if (pi < 0 || fi < 0) return -1;
     return (((wd * DIM.before.n + b) * DIM.party.length + pi) * FB.length + fi);
   }
@@ -436,7 +496,8 @@
     const cold = w.cold || w.rain || w.storm;
     for (const r of rows) {
       if (r.kind === "wait") { if (t < 17 * 60) { t = 17 * 60; waited = true; } continue; }
-      const list = r.names.map(n => all.find(p => p.name === n)).filter(Boolean).filter(p => !used.has(p.name));
+      // 카페는 15곳뿐이라 표의 후보 대신 전체에서 다시 골라요 (첫 카페가 무작위로 바뀌면 두 번째 후보도 달라지니까)
+      const list = (r.kind === "cafe" ? (ctx.P.cafe || []) : r.names.map(n => all.find(p => p.name === n)).filter(Boolean)).filter(p => !used.has(p.name));
       let ok = list.map(p => ({ p, mv: Math.max(2, Math.abs((p.walk || 0) - at)) })).map(x => Object.assign(x, { st: r10(t + x.mv), sc: fitScore(x.p, r.kind, o, w, at) }))
         .filter(x => openAt(x.p, wd, x.st, STAY[r.kind]) && x.st + STAY[r.kind] <= DAY_END);
       if (!ok.length) return null;            // 표와 실제 시각이 어긋나면 그 자리에서 계산
@@ -446,14 +507,22 @@
       steps.push({ kind: "move", text: `걸어서 약 ${x.mv}분` });
       t = x.st;
       const miss = r.kind === "food" && o.food && !profile(x.p).menus.includes(o.food);
-      const base = r.kind === "food" ? `${mealLabel(t)}${o.food ? (miss ? ` · ${o.food} 가게가 이 시각엔 쉬어서 대신` : ` · ${o.food}`) : ""}` : i === 0 ? (cold ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔") : "식사 뒤 바다 보며 커피 한 잔";
+      const base = r.kind === "food" ? `${mealLabel(t)}${o.food ? (miss ? ` · ${o.food} 가게가 이 시각엔 쉬어서 대신` : ` · ${o.food}`) : ""}`
+        : o.cafeHop && i > 0 ? "두 번째 카페 · 분위기를 바꿔 한 곳 더"
+        : o.cafeOnly ? "식사 없이 바로 카페로 · " + (cold ? "따뜻한 음료로" : "바다 보며 커피 한 잔")
+        : i === 0 ? (cold ? "바닷바람에 식은 몸, 따뜻한 음료로" : "바다 보며 커피 한 잔") : "식사 뒤 바다 보며 커피 한 잔";
       steps.push({ kind: r.kind, time: t, end: t + STAY[r.kind], place: x.p, title: x.p.name, sub: reasonOf(x.p, r.kind, o, w, base), alt: ok.length, idx: i });
       t += STAY[r.kind]; at = x.p.walk || 0;
       if (r.kind === "food") ateMeal = true;
       i++;
     }
+    // 표를 만든 시각과 실제 시각 차이로, 카페 뒤 식사 시간에 걸치게 되면 그 자리에서 계산
+    if (!o.cafeOnly && !o.cafeHop && !ateMeal && isMeal(r10(t)) && t < 20 * 60) return null;
     if (ctx.used) for (const n of used) ctx.used.add(n);
-    return { steps, t, at, ateMeal, notes: [], cands: rows, waited, fromTable: true };
+    const notes = [];
+    if (o.cafeOnly) notes.push("말씀대로 식사는 빼고 카페로 바로 이어 드렸어요.");
+    if (o.cafeHop) notes.push("카페 두 곳을 이어서 넣었어요. 서로 다른 분위기의 곳으로 골랐어요.");
+    return { steps, t, at, ateMeal, notes, cands: rows, waited, fromTable: true };
   }
 
   function planBeforeFast(ctx) {
