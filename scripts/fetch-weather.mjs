@@ -142,25 +142,35 @@ async function getShort(grid, now) {
 
 /* ---------- 3. 중기예보: 3~10일 ---------- */
 async function getMid(now) {
+  // 발표 시각 후보: 가장 최근 발표부터 거꾸로 4개 (06시·18시 발표, 발표 30분 뒤부터 조회)
+  // 최근 발표가 아직 없거나 NO_DATA면 그 전 발표로 넘어가요.
   const hm = now.getUTCHours() * 60 + now.getUTCMinutes();
-  let base = now, tm = "0600";
-  if (hm < 6 * 60 + 30) { base = addDays(now, -1); tm = "1800"; }
-  else if (hm >= 18 * 60 + 30) tm = "1800";
-  const tmFc = ymd(base) + tm;
-  const [land, ta, sea] = await Promise.all([
-    call("MidFcstInfoService/getMidLandFcst", { regId: CONFIG.midLandReg, tmFc }).catch(e => (console.warn("중기육상:", e.message), [])),
-    call("MidFcstInfoService/getMidTa", { regId: CONFIG.midTaReg, tmFc }).catch(e => (console.warn("중기기온:", e.message), [])),
-    call("MidFcstInfoService/getMidSeaFcst", { regId: CONFIG.midSeaReg, tmFc }).catch(e => (console.warn("중기해상:", e.message), []))
-  ]);
-  const L = land[0] || {}, T = ta[0] || {}, S = sea[0] || {};
-  const out = [];
-  for (let n = 3; n <= 10; n++) {
-    const sky = L[`wf${n}Pm`] || L[`wf${n}`] || L[`wf${n}Am`] || "";
-    const waves = [S[`wh${n}BAm`], S[`wh${n}BPm`], S[`wh${n}B`], S[`wh${n}AAm`], S[`wh${n}APm`], S[`wh${n}A`]].map(num).filter(v => v != null);
-    const row = { date: isoDate(addDays(base, n)), sky, tmax: num(T[`taMax${n}`]), tmin: num(T[`taMin${n}`]), wind: null, wave: waves.length ? Math.max(...waves) : null };
-    if (row.sky || row.tmax != null || row.wave != null) out.push(row);
+  const tries = [];
+  let base = now, tm = hm >= 18 * 60 + 30 ? "1800" : hm >= 6 * 60 + 30 ? "0600" : null;
+  if (!tm) { base = addDays(now, -1); tm = "1800"; }
+  for (let k = 0; k < 4; k++) {
+    tries.push({ base, tmFc: ymd(base) + tm });
+    if (tm === "1800") tm = "0600"; else { base = addDays(base, -1); tm = "1800"; }
   }
-  return out;
+  for (const t of tries) {
+    const [land, ta, sea] = await Promise.all([
+      call("MidFcstInfoService/getMidLandFcst", { regId: CONFIG.midLandReg, tmFc: t.tmFc }).catch(e => (console.warn(`중기육상(${t.tmFc}):`, e.message), [])),
+      call("MidFcstInfoService/getMidTa", { regId: CONFIG.midTaReg, tmFc: t.tmFc }).catch(e => (console.warn(`중기기온(${t.tmFc}):`, e.message), [])),
+      call("MidFcstInfoService/getMidSeaFcst", { regId: CONFIG.midSeaReg, tmFc: t.tmFc }).catch(e => (console.warn(`중기해상(${t.tmFc}):`, e.message), []))
+    ]);
+    if (!land.length && !ta.length && !sea.length) continue;   // 이 발표는 없음 → 그 전 발표
+    const L = land[0] || {}, T = ta[0] || {}, S = sea[0] || {};
+    const out = [];
+    for (let n = 3; n <= 10; n++) {
+      const sky = L[`wf${n}Pm`] || L[`wf${n}`] || L[`wf${n}Am`] || "";
+      const waves = [S[`wh${n}BAm`], S[`wh${n}BPm`], S[`wh${n}B`], S[`wh${n}AAm`], S[`wh${n}APm`], S[`wh${n}A`]].map(num).filter(v => v != null);
+      const row = { date: isoDate(addDays(t.base, n)), sky, tmax: num(T[`taMax${n}`]), tmin: num(T[`taMin${n}`]), wind: null, wave: waves.length ? Math.max(...waves) : null };
+      if (row.sky || row.tmax != null || row.wave != null) out.push(row);
+    }
+    console.log(`중기예보: ${t.tmFc} 발표 사용 (${out.length}일)`);
+    return out;
+  }
+  return [];
 }
 
 /* ---------- 4. 기상특보: 풍랑주의보·경보 ---------- */
@@ -220,7 +230,8 @@ async function main() {
   for (const d of mid) byDate[d.date] = d;
   for (const d of short.days) byDate[d.date] = { ...(byDate[d.date] || {}), ...Object.fromEntries(Object.entries(d).filter(([, v]) => v != null && v !== "")) };
   const today = isoDate(now);
-  const days = Object.values(byDate).filter(d => d.date >= today).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 10);
+  const hasData = d => d.sky || d.tmax != null || d.wind != null || d.wave != null;   // 값이 하나도 없는 날은 빼기
+  const days = Object.values(byDate).filter(d => d.date >= today && hasData(d)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 10);
   if (days[0] && days[0].date === today && alert && alert !== "없음") days[0].alert = alert;
 
   const pickNum = (...v) => { for (const x of v) if (x != null) return x; return null; };
