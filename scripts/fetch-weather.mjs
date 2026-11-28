@@ -163,8 +163,14 @@ async function getMid(now) {
     const out = [];
     for (let n = 3; n <= 10; n++) {
       const sky = L[`wf${n}Pm`] || L[`wf${n}`] || L[`wf${n}Am`] || "";
-      const waves = [S[`wh${n}BAm`], S[`wh${n}BPm`], S[`wh${n}B`], S[`wh${n}AAm`], S[`wh${n}APm`], S[`wh${n}A`]].map(num).filter(v => v != null);
-      const row = { date: isoDate(addDays(t.base, n)), sky, tmax: num(T[`taMax${n}`]), tmin: num(T[`taMin${n}`]), wind: null, wave: waves.length ? Math.max(...waves) : null };
+      // 파도는 "1~2m"처럼 범위로 와요 → 중간값으로 판단하고, 범위는 그대로 보여 줘요
+      const lows = [S[`wh${n}AAm`], S[`wh${n}APm`], S[`wh${n}A`]].map(num).filter(v => v != null);
+      const highs = [S[`wh${n}BAm`], S[`wh${n}BPm`], S[`wh${n}B`]].map(num).filter(v => v != null);
+      const lo = lows.length ? Math.min(...lows) : (highs.length ? Math.min(...highs) : null);
+      const hi = highs.length ? Math.max(...highs) : lo;
+      const wave = lo == null ? null : Math.round((lo + hi) / 2 * 10) / 10;
+      const row = { date: isoDate(addDays(t.base, n)), sky, tmax: num(T[`taMax${n}`]), tmin: num(T[`taMin${n}`]), wind: null, wave,
+                    waveRange: lo != null && hi !== lo ? `${lo}~${hi}` : null };
       if (row.sky || row.tmax != null || row.wave != null) out.push(row);
     }
     console.log(`중기예보: ${t.tmFc} 발표 사용 (${out.length}일)`);

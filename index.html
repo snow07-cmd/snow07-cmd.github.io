@@ -7,10 +7,27 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://raw.githubusercontent.com; frame-src https:; media-src https:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v19">
+  <meta name="site-version" content="v20">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
-  <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
+  <meta name="description" content="강릉항 요트마리나 요트 투어와 오늘 바다 날씨, 요트에서 내린 뒤 안목 카페·식당까지 문장 하나로 코스를 짜 드려요.">
+  <!-- 공유 미리보기 (카카오톡·문자·SNS) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="요트핏">
+  <meta property="og:title" content="요트핏 | 강릉항 요트마리나 안내">
+  <meta property="og:description" content="오늘 바다 날씨와 요트 코스, 내린 뒤 안목 카페·식당까지 한 번에 짜 드려요.">
+  <meta property="og:image" content="https://snow07-cmd.github.io/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://snow07-cmd.github.io/">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- 아이콘 · 홈 화면에 추가 -->
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#2C4653">
+  <meta name="apple-mobile-web-app-title" content="요트핏">
   <!--
     ★ 요트핏 웹사이트 — 이 파일 하나만 있으면 사이트가 작동합니다.
     ★ 내용(요금, 업체, 장소 등)을 고칠 때는 아래 "정보 영역" (window.SITE_DATA) 부분만 고치세요.
@@ -455,6 +472,7 @@ a.chip:hover, button.chip:hover { border-color: var(--primary); color: var(--pri
 .wk-day { display: flex; align-items: baseline; gap: 6px; }
 .wk-day span { font-size: 12px; color: var(--sub); }
 .wk-sky, .wk-temp { font-size: 14px; color: var(--sub); }
+.wk-temp small { font-size: 11px; color: var(--sub); font-weight: 400; display: block; }
 .wk-temp b { font-size: 17px; color: var(--ink); }
 .wk-info { list-style: none; font-size: 13px; color: var(--sub); display: flex; flex-direction: column; gap: 2px; }
 .wk-info li { display: flex; align-items: center; gap: 5px; }
@@ -887,7 +905,8 @@ window.SITE_DATA = {
   site: {
     name: "요트핏",
     subtitle: "강릉 마리나 안내",
-    contact: "[연락처 입력]",
+    contact: "qkrwornr5833@naver.com",   // 사이트 문의 메일
+    yachtContact: "요트 예약·문의는 각 요트 업체 예약 페이지에서 해 주세요.",
     notice: "요금과 운영 시간은 업체 사정에 따라 달라질 수 있어요.",
     address: "강원특별자치도 강릉시 창해로14번길 51-20",
     title: "강릉항 요트마리나\n이용 안내"
@@ -956,14 +975,14 @@ window.SITE_DATA = {
   easy: {
     temp:  [ { under: 10, text: "추워요" }, { under: 17, text: "쌀쌀해요" }, { under: 26, text: "활동하기 좋아요" }, { text: "더워요" } ],
     water: [ { under: 15, text: "차가워요" }, { under: 22, text: "시원해요" }, { text: "따뜻해요" } ],
-    wind:  [ { under: 4, text: "약해요" }, { under: 8, text: "조금 불어요" }, { under: 14, text: "강해요" }, { text: "매우 강해요" } ],
-    wave:  [ { under: 0.5, text: "잔잔해요" }, { under: 1, text: "조금 출렁여요" }, { under: 3, text: "많이 출렁여요" }, { text: "매우 높아요" } ],
+    wind:  [ { under: 4, text: "약해요" }, { under: 8, text: "산들 불어요" }, { under: 14, text: "시원하게 불어요" }, { text: "매우 강해요" } ],
+    wave:  [ { under: 0.5, text: "잔잔해요" }, { under: 1, text: "살랑여요" }, { under: 3, text: "출렁여요" }, { text: "매우 높아요" } ],
     // 오늘 상태 배지: 위에서부터 차례로 검사해서 처음 맞는 것을 보여줘요
     day: [
-      { key: "stop",  text: "운항이 어려운 날",       short: "운항 어려움", rule: "풍랑주의보·경보, 또는 바람 14m/s 이상, 또는 파고 3m 이상", wind: 14, wave: 3 },
-      { key: "rough", text: "배가 많이 흔들리는 날",  short: "많이 흔들림", rule: "바람 8m/s 이상, 또는 파고 1m 이상", wind: 8, wave: 1 },
-      { key: "mild",  text: "배가 약간 흔들리는 날",  short: "약간 흔들림", rule: "바람 4m/s 이상, 또는 파고 0.5m 이상", wind: 4, wave: 0.5 },
-      { key: "good",  text: "요트 타기 좋은 날",      short: "타기 좋음",   rule: "바람 4m/s 미만, 그리고 파고 0.5m 미만" }
+      { key: "stop",  text: "요트가 쉬어 가는 날",    short: "운항 쉼", rule: "풍랑주의보·경보, 또는 바람 14m/s 이상, 또는 파고 3m 이상", wind: 14, wave: 3 },
+      { key: "rough", text: "출렁출렁 파도 타는 날", short: "출렁출렁", rule: "바람 8m/s 이상, 또는 파고 1m 이상", wind: 8, wave: 1 },
+      { key: "mild",  text: "살랑살랑 타기 좋은 날", short: "살랑살랑", rule: "바람 4m/s 이상, 또는 파고 0.5m 이상", wind: 4, wave: 0.5 },
+      { key: "good",  text: "잔잔해서 타기 좋은 날", short: "잔잔해요",   rule: "바람 4m/s 미만, 그리고 파고 0.5m 미만" }
     ]
   },
 
@@ -1068,7 +1087,7 @@ window.SITE_DATA = {
     { company: "clubyacht", type: "private", name: "일몰 코스 (10명)",            duration: "1시간 30분", price: "400,000원",   tags: ["노을 시간대", "노을 감상", "프라이빗(단독)"] },
     { company: "clubyacht", type: "private", name: "요트 수영 코스 (10명)",       duration: "2시간",     price: "500,000원",   tags: ["프라이빗(단독)"] },
     { company: "clubyacht", type: "private", name: "5시간 전세 (8명)",            duration: "5시간",     price: "1,000,000원", tags: ["프라이빗(단독)"] },
-    { company: "clubyacht", type: "special", name: "새해 해돋이 항해 (1월 1일)",  duration: "",          price: "1인 60,000원", note: "자료 기준 2026년 1월 1일 상품이에요." },
+    { company: "clubyacht", type: "special", name: "새해 해돋이 항해 (1월 1일)",  duration: "",          price: "1인 60,000원", note: "2027년 일정은 업체에 확인해 주세요." },
     { company: "clubyacht", type: "special", name: "울릉도 1박 2일 올빼미 항해",   duration: "1박 2일",   price: "1인 600,000원" },
 
     // 루나로사 요트클럽
@@ -1345,9 +1364,6 @@ window.SITE_DATA = {
 
   </script>
 
-  <script src="course-dict.js?v=18.4"></script>
-  <script src="course-engine.js?v=18.4"></script>
-  <script src="course-cases.js?v=18.4"></script>
   <script>
 /* =====================================================================
    요트핏 동작 파일 (app.js)
@@ -1876,7 +1892,7 @@ function pageBooking() {
   return `
     ${pageHead("BOOKING", "예약하기", "앱에서 바로 예약하는 기능을 준비하고 있어요.")}
     <section class="section"><div class="container narrow">
-      ${preparing("예약 기능 준비 중입니다", "지금은 요트·체험 페이지의 업체 전화번호나 홈페이지로 문의해 주세요.")}
+      ${preparing("예약 기능 준비 중입니다", "지금은 요트·체험 페이지에서 각 업체 예약 페이지로 문의해 주세요.")}
       <p class="center mt-24"><a class="btn-line" href="#/yacht">요트·체험 보러 가기</a></p>
     </div></section>`;
 }
@@ -2091,14 +2107,29 @@ function weekView() {
   const cards = Array.from({ length: n }, (_, i) => i).map(i => {
     const d = addDays(today, i), f = findDay(D.live.week, d);
     const label = i === 0 ? "오늘" : i === 1 ? "내일" : WEEKDAY[d.getDay()] + "요일";
+    if (i === 0) {   // 오늘은 지금 날씨 (30분마다 새로 받아요)
+      const t = currentValue("temp"), hi = toNum(f.tmax), lo = toNum(f.tmin);
+      const range = [isNaN(hi) ? "" : `최고 ${hi}°`, isNaN(lo) ? "" : `최저 ${lo}°`].filter(Boolean).join(" · ");
+      return `
+      <div class="week-card today">
+        <div class="wk-day"><b>오늘</b><span>지금 ${esc(D.live.updated || "")}</span></div>
+        <div class="wk-sky">${esc(D.live.pty || f.sky || "--")}</div>
+        <div class="wk-temp"><b>${show(t, "°")}</b>${range ? ` <small>${esc(range)}</small>` : ""}</div>
+        <ul class="wk-info">
+          <li>${icon("wind", 14)} ${show(currentValue("wind"), "m/s")}</li>
+          <li>${icon("wave", 14)} ${show(currentValue("wave"), "m")}</li>
+        </ul>
+        ${dayBadge(currentStatus(), true)}
+      </div>`;
+    }
     return `
-      <div class="week-card ${i === 0 ? "today" : ""}">
+      <div class="week-card">
         <div class="wk-day"><b>${label}</b><span>${d.getMonth() + 1}/${d.getDate()}</span></div>
         <div class="wk-sky">${esc(f.sky || "--")}</div>
         <div class="wk-temp"><b>${show(f.tmax, "°")}</b> / ${show(f.tmin, "°")}</div>
         <ul class="wk-info">
           <li>${icon("wind", 14)} ${show(f.wind, "m/s")}</li>
-          <li>${icon("wave", 14)} ${show(f.wave, "m")}</li>
+          <li>${icon("wave", 14)} ${f.waveRange ? esc(f.waveRange + "m") : show(f.wave, "m")}</li>
         </ul>
         ${dayBadge(dayStatus(f.wind, f.wave, f.alert), true)}
       </div>`;
@@ -2126,7 +2157,7 @@ function monthView() {
   const blanks = Array.from({ length: lead }, () => `<div class="cal-cell blank"></div>`).join("");
   const cells = Array.from({ length: n }, (_, i) => {
     const d = addDays(today, i), f = findDay(D.live.month, d);
-    const st = dayStatus(f.wind, f.wave, f.alert);
+    const st = i === 0 ? currentStatus() : dayStatus(f.wind, f.wave, f.alert);
     const label = (i === 0 || d.getDate() === 1) ? `${d.getMonth() + 1}/${d.getDate()}` : d.getDate();
     return `
       <div class="cal-cell ${i === 0 ? "today" : ""} ${st ? "st-" + st.key : ""}">
@@ -2662,7 +2693,7 @@ function skyClass(now = new Date()) {
   if (m < 8 * 60) return "sky-dawn";
   return "sky-day";
 }
-const HERO_TITLE = { good: "요트 타기\n좋은 날이에요", mild: "배가 조금\n흔들리는 날이에요", rough: "배가 많이\n흔들리는 날이에요", stop: "오늘은 요트가\n항구에서 쉬어 가요" };
+const HERO_TITLE = { good: "잔잔해서\n요트 타기 좋은 날이에요", mild: "살랑살랑\n요트 타기 좋은 날이에요", rough: "출렁출렁\n파도 타는 날이에요", stop: "오늘은 요트가\n항구에서 쉬어 가요" };
 // 첫 화면 바다 그림: 날씨(파도·특보·비·눈)와 시각(해·달 모양과 위치)에 맞춰 바뀌어요.
 // 미리보기: 주소 끝에 ?preview=rough,rain,night 처럼 붙이면 그 상태로 그려요 (calm·mild·rough·stop / rain·snow·cloud / dawn·day·sunset·night)
 function sunTimes(date, lat = 37.773225, lon = 128.94735) {
@@ -2758,6 +2789,7 @@ function heroSea() {
   const note = mode === "stop" ? "운항 여부는 업체에 꼭 확인해 주세요"
     : precip === "rain" ? "비가 와도 요트는 떠요 · 우비를 챙기세요"
     : precip === "snow" ? "눈이 와도 요트는 떠요 · 따뜻하게 입으세요"
+    : mode === "rough" ? "운항 여부는 업체 확인 · 멀미약 챙기면 편해요"
     : night ? `오늘 밤은 ${moonName(moonPhase(now))}` : "";
   return `
     <section class="hero scene sky-${sky} mode-${mode} ${precip ? "p-" + precip : ""}" style="--amp:${P[0]};--rock:${P[1]}deg;--lift:${P[2]}px;--dur:${P[3]}s">
@@ -2867,8 +2899,28 @@ function pageHome() {
 }
 
 // 안목 코스 페이지 (문장 입력 → 결과)
+// 코스 짜기 자료(약 470KB)는 첫 화면을 그린 뒤에 받아요. 코스 화면에서 아직이면 받은 뒤 다시 그려요.
+const COURSE_FILES = ["course-dict.js?v=18.4", "course-engine.js?v=18.4", "course-cases.js?v=18.4"];
+function loadCourse() {
+  if (window.YF && window.COURSE_DICT && window.COURSE_CASES) return Promise.resolve();
+  return window.__courseLoading || (window.__courseLoading = COURSE_FILES.reduce((p, src) => p.then(() => new Promise((ok, fail) => {
+    const s = document.createElement("script"); s.src = src; s.onload = ok;
+    s.onerror = () => { window.__courseLoading = null; fail(new Error(src)); };
+    document.head.appendChild(s);
+  })), Promise.resolve()));
+}
 function pagePlan(params) {
   const key = location.hash;
+  if (!window.YF) {
+    loadCourse().then(() => { if (location.hash === key) { window.__keepScroll = true; router(); } })
+      .catch(() => { const b = document.getElementById("plan-loading"); if (b) b.textContent = "코스 자료를 불러오지 못했어요. 잠시 뒤 새로고침해 주세요."; });
+    return `
+    ${pageHead("", "안목 코스 짜기", "문장으로 적으면 맞춤 요트부터 내린 뒤 식당·카페까지 이어 드려요.")}
+    <section class="section"><div class="container narrow">
+      ${askBox(params.get("q") || "")}
+      ${params.get("q") || params.get("book") ? `<p class="pl-note" id="plan-loading" role="status">코스를 짜고 있어요…</p>` : ""}
+    </div></section>`;
+  }
   if (window.__planKey !== key) {
     window.__planKey = key;
     window.__plan = planFromParams(params);
@@ -2980,7 +3032,8 @@ function renderFooter() {
     <div class="container footer-inner">
       <strong>${esc(D.site.name)}</strong>
       <p>${esc(D.site.notice)}</p>
-      <p>문의 ${esc(D.site.contact)}</p>
+      <p>사이트 문의 <a href="mailto:${esc(D.site.contact)}">${esc(D.site.contact)}</a></p>
+      <p>${esc(D.site.yachtContact || "")} <a href="#/yacht">요트 업체 보기</a></p>
       <p class="credit" ${D.live.source ? "" : "hidden"}>날씨 정보: ${esc(D.live.source || "")} 제공</p>
     </div>`;
 }
@@ -3146,6 +3199,8 @@ document.addEventListener("click", e => {
 renderFooter();
 router();
 loadWeather();
+// 첫 화면을 그린 뒤 한가할 때 코스 자료를 미리 받아 두기
+(window.requestIdleCallback || (f => setTimeout(f, 1200)))(() => loadCourse().catch(() => {}));
 setInterval(loadWeather, 30 * 60 * 1000);   // 30분마다 다시 확인
 
   </script>

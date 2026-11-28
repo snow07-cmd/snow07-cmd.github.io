@@ -1,0 +1,16 @@
+{
+  "name": "요트핏 · 강릉항 요트마리나 안내",
+  "short_name": "요트핏",
+  "description": "오늘 바다 날씨와 요트 코스, 내린 뒤 안목 카페·식당까지 한 번에",
+  "lang": "ko",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F6F7",
+  "theme_color": "#2C4653",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
