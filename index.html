@@ -843,6 +843,19 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
 .pl-move::before { content: ""; position: absolute; left: 57px; top: -12px; bottom: 0; width: 2px; background: repeating-linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px); }
 .pl-move span { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); border: 1px dashed var(--line); border-radius: 999px; padding: 3px 10px; }
 .pl-alts { margin-top: 6px; display: grid; gap: 6px; }
+.rec-h { margin: 16px 0 8px; font-size: 16px; font-weight: 800; }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rec-card { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--paper); }
+.rec-top { display: flex; align-items: baseline; gap: 8px; }
+.rec-top .rec-n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--sea, #0a6fb3); color: #fff; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
+.rec-top h3 { font-size: 16px; margin: 0; flex: 1; }
+.rec-top .walk { font-size: 13px; color: var(--sub); white-space: nowrap; }
+.rec-tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+.rec-tags span { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: rgba(10,111,179,.09); color: var(--sea, #0a6fb3); }
+.rec-note { font-size: 14px; margin: 4px 0; }
+.rec-meta { font-size: 13px; color: var(--sub); margin: 4px 0; }
+.rec-meta .open { color: #138a4b; font-weight: 700; } .rec-meta .closed { color: #c0392b; font-weight: 700; }
+.rec-card.off { opacity: .72; }
 .pl-alts p { font-size: 13px; font-weight: 700; color: var(--sub); }
 .pl-alt { font: inherit; text-align: left; display: grid; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; color: var(--ink); }
 .pl-alt b { font-size: 14px; } .pl-alt span { font-size: 12px; color: var(--sub); }
@@ -2560,10 +2573,92 @@ function faqBox(o) {
   return `<div class="pl-faq"><b>물어보신 것</b><dl>${ks.map(k => `<dt>${FAQ_LABEL[k]}</dt><dd>${faqAnswer(k, o)}</dd>`).join("")}</dl></div>`;
 }
 
+// 추천만 보여 주기 (카페만 · 식당만 · 요트만 · 카페와 식당)
+const REC_TIMES = [ { key: 720, label: "점심" }, { key: 900, label: "오후" }, { key: 1110, label: "저녁" } ];
+function recWhen(o) {
+  const now = new Date(), date = addDays(now, o.day || 0);
+  const min = o.time != null ? o.time : YF.recTime(Object.assign({}, o, { slot: o.rawSlot }), now);
+  return { date, wd: date.getDay(), min };
+}
+function recPlaces(kind, o, n) {
+  const { date, wd, min } = recWhen(o);
+  const w0 = planWeather(o.day || 0);
+  const w = { cold: (w0.temp < 12) || (w0.wind >= 8) || (w0.water < 15), rain: !!w0.rain };
+  return Object.assign(YF.recommend({ kind, o, wd, min, w, P: D.places || {}, n }), { date, min });
+}
+function recPlaceCard(x, i, kind, o, min) {
+  const p = x.p, pr = (COURSE_DICT.places || {})[p.name] || {};
+  const tags = x.why.map(t => t === "menu" ? `${o.food} 메뉴가 있어요` : YF.TAG_TEXT[t]).filter(Boolean);
+  const menus = YF.profile(p).menus;
+  return `<li class="rec-card${x.open ? "" : " off"}">
+    <div class="rec-top"><span class="rec-n">${i + 1}</span><h3>${esc(p.name)}</h3><span class="walk">${esc(p.walkText || (p.walk != null ? `걸어서 ${p.walk}분` : ""))}</span></div>
+    ${tags.length ? `<div class="rec-tags">${tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
+    ${pr.note ? `<p class="rec-note">${esc(pr.note)}</p>` : p.text ? `<p class="rec-note">${esc(p.text)}</p>` : ""}
+    ${kind === "food" && menus.length ? `<p class="rec-meta">메뉴: ${esc(menus.join(" · "))}</p>` : ""}
+    <p class="rec-meta"><b class="${x.open ? "open" : "closed"}">${fmt(min)}에 ${x.open ? "열어요" : "닫혀 있어요"}</b> ${esc(p.hoursText || "")}</p>
+    ${p.link || p.map ? mapLinks(p) : ""}
+  </li>`;
+}
+function recPlaceBlock(kind, o, n) {
+  const r = recPlaces(kind, o, n), label = kind === "cafe" ? "카페" : "식당";
+  let warn = "";
+  if (!r.openCount) warn = `<p class="pl-moved" role="status">${fmt(r.min)}에 문 연 ${label}이 없어요. 시각을 바꾸거나 '내일'을 눌러 보세요.</p>`;
+  else if (kind === "food" && o.food && !r.items.some(x => x.open && YF.profile(x.p).menus.includes(o.food)))
+    warn = `<p class="pl-moved" role="status">${esc(o.food)} 가게가 이 시각엔 쉬어요. 문 연 다른 식당을 보여 드려요.</p>`;
+  return { html: `<h3 class="rec-h">추천 ${label} ${r.items.length}곳</h3>${warn}<ol class="rec-list">${r.items.map((x, i) => recPlaceCard(x, i, kind, o, r.min)).join("")}</ol>`, r };
+}
+function recYachtBlock(o, n) {
+  const r = YF.recommendYachts({ o: Object.assign({}, o, { slot: o.rawSlot || null }), D, n });
+  return `<h3 class="rec-h">추천 요트 ${r.items.length}개</h3>${o.pet ? `<p class="pl-moved" role="status">반려동물과 함께 탈 수 있는 코스만 골랐어요.</p>` : ""}<ol class="rec-list">${r.items.map((e, i) => {
+    const c = (D.companies || []).find(x => x.id === e.company);
+    const tot = totalPrice(e, o.people);
+    return `<li class="rec-card">
+      <div class="rec-top"><span class="rec-n">${i + 1}</span><h3>${esc(e.name)}</h3><span class="walk">${esc(c ? c.name : "")}</span></div>
+      ${(e.tags || []).length ? `<div class="rec-tags">${e.tags.slice(0, 4).map(t => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
+      <p class="rec-meta">${esc([e.duration, e.price, tot && `(${tot})`].filter(Boolean).join(" · "))}</p>
+      ${e.note ? `<p class="rec-note">${esc(e.note)}</p>` : ""}
+      <div class="pl-row"><a class="pl-more" href="#/yacht" data-company="${esc(e.company || "")}">코스·예약 보기</a><span></span></div>
+    </li>`; }).join("")}</ol>`;
+}
+function recItemsForShare(o) {
+  if (o.mode === "yacht") return YF.recommendYachts({ o: Object.assign({}, o, { slot: o.rawSlot || null }), D, n: 5 }).items.map(e => { const c = (D.companies || []).find(x => x.id === e.company); return `${e.name}${c ? ` (${c.name})` : ""}`; });
+  const ks = o.mode === "places" ? ["cafe", "food"] : [o.mode];
+  return ks.flatMap(k => recPlaces(k, o, o.mode === "places" ? 4 : 5).items.map(x => x.p.name));
+}
+function recHTML(o) {
+  const seg = (name, list, cur) => list.map(x => `<button type="button" class="pl-opt ${cur === x.key ? "on" : ""}" data-pl="${name}" data-val="${x.key}" aria-pressed="${cur === x.key}">${x.label}</button>`).join("");
+  const tog = (name, label) => `<button type="button" class="pl-opt ${o[name] ? "on" : ""}" data-pl="${name}" data-val="toggle" aria-pressed="${!!o[name]}">${label}</button>`;
+  const { date, min } = recWhen(o);
+  const yacht = o.mode === "yacht";
+  const w0 = planWeather(o.day || 0);
+  const storm = yacht && (/풍랑/.test(w0.alert) || (w0.st && w0.st.key === "stop"));
+  let body = "";
+  if (yacht) body = recYachtBlock(o, 5);
+  else if (o.mode === "places") body = recPlaceBlock("cafe", o, 4).html + recPlaceBlock("food", o, 4).html;
+  else body = recPlaceBlock(o.mode, o, 5).html;
+  const title = { cafe: "카페", food: "식당", yacht: "요트", places: "카페·식당" }[o.mode];
+  return `
+    <div class="planner" id="planner">
+      <div class="pl-read"><b>읽은 조건</b>${o.found.map(f => `<span>${esc(f)}</span>`).join("")}</div>
+      ${faqBox(o)}
+      <div class="pl-controls">
+        <div class="pl-seg">${seg("day", [{ key: 0, label: "오늘" }, { key: 1, label: "내일" }], o.day || 0)}<span class="pl-gap"></span>${yacht ? seg("slot", PLAN_SLOTS, o.rawSlot) : seg("rtime", REC_TIMES, o.time)}</div>
+        <div class="pl-chips">${seg("party", PLAN_PARTY, o.party)}${tog("pet", "반려동물")}${yacht ? tog("sick", "멀미 걱정") : ""}</div>
+      </div>
+      ${storm ? `<div class="pl-alert">${icon("alert", 18)}<span>요트 운항이 어려울 수 있는 날이에요. 예약 전에 업체에 꼭 확인해 주세요.</span></div>` : ""}
+      <p class="pl-date">${date.getMonth() + 1}월 ${date.getDate()}일 (${WEEKDAY[date.getDay()]})${yacht ? "" : ` ${fmt(min)} 기준 · 그 시각에 연 곳 먼저`}</p>
+      ${body}
+      <div class="pl-actions"><button type="button" class="pl-share" data-share>일행에게 공유</button>${yacht ? "" : `<button type="button" class="pl-full" data-reroll>다른 ${title} 더 보기</button>`}</div>
+      <p class="pl-more-link"><button type="button" class="pl-full" data-course>이 조건으로 하루 코스 짜기</button></p>
+      <p class="pl-note">영업시간과 요금은 자료 기준이에요. 방문·예약 전에 가게와 업체에 확인해 주세요.</p>
+    </div>`;
+}
+
 // 결과 (읽은 조건 칩 + 추천 요트 + 시간표)
 function planResultHTML() {
   const o = window.__plan;
   if (!o) return "";
+  if (o.mode) return recHTML(o);
   const plan = makePlan(o);
   o.rankedLen = plan.ranked.length;
   const seg = (name, list, cur) => list.map(x => `<button type="button" class="pl-opt ${cur === x.key ? "on" : ""}" data-pl="${name}" data-val="${x.key}" aria-pressed="${cur === x.key}">${x.label}</button>`).join("");
@@ -2602,6 +2697,7 @@ function rerenderPlanner() {
 const newSeed = () => Math.floor(Math.random() * 1e9);
 // 같은 주소(s=)면 누가 열어도 같은 코스가 나오게: 최근에 본 카페는 새 번호를 고를 때만 피해요
 function pickSeed(o) {
+  if (o.mode) return newSeed();
   const recent = recentCafes();
   let best = newSeed(), bestHit = 1e9;
   if (!recent.length) return best;
@@ -2627,7 +2723,8 @@ function seedFromParams(params, o) {
 function recentCafes() { try { return JSON.parse(localStorage.getItem("yf_recent_cafes") || "[]"); } catch (e) { return []; } }
 function rememberCafes(o) {
   try {
-    const names = makePlan(o).steps.filter(x => x.kind === "cafe").map(x => x.title);
+    if (o.mode === "yacht" || o.mode === "food") return;
+    const names = o.mode ? recPlaces("cafe", o, 3).items.map(x => x.p.name) : makePlan(o).steps.filter(x => x.kind === "cafe").map(x => x.title);
     const list = [...names, ...recentCafes().filter(n => !names.includes(n))].slice(0, 6);
     localStorage.setItem("yf_recent_cafes", JSON.stringify(list));
   } catch (e) { /* 저장 못 해도 괜찮아요 */ }
@@ -2641,7 +2738,9 @@ function planFromParams(params) {
   } else {
     const q = (params.get("q") || "").trim();
     if (!q) return null;
-    o = Object.assign(fillDefaults(parseQuery(q)), { yacht: 0, swaps: {} });
+    const raw = parseQuery(q), rawSlot = raw.slot || null, rawDay = raw.day;
+    o = Object.assign(fillDefaults(raw), { yacht: 0, swaps: {}, rawSlot });
+    if (o.mode && rawDay == null) o.day = 0;   // 추천은 따로 말 없으면 오늘 기준
   }
   o.recent = [];
   o.seed = seedFromParams(params, o);
@@ -2670,12 +2769,20 @@ document.addEventListener("change", e => {
 document.addEventListener("click", e => {
   const ex = e.target.closest && e.target.closest("[data-plan-ex]");
   if (ex) { const box = document.getElementById("plan-q"); box.value = ex.dataset.planEx; box.focus(); return; }
-  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], [data-reroll], .pl-more, .pl-alt");
+  const b = e.target.closest && e.target.closest("[data-pl], .pl-swap, [data-share], [data-reroll], [data-course], .pl-more, .pl-alt");
   if (!b) return;
   const o = window.__plan;
   if (b.matches(".pl-more")) { if (b.dataset.company) window.__expCompany = b.dataset.company; return; }
   if (b.matches("[data-share]")) { sharePlan(); return; }
   if (!o) return;
+  if (b.matches("[data-course]")) {   // 추천만 보다가 → 같은 조건으로 하루 코스
+    o.mode = null; o.found = o.found.filter(f => !/만 추천|·식당 추천/.test(f));
+    if (o.rawSlot) o.slot = o.rawSlot; o.time = o.rawSlot ? o.time : null;
+    o.seed = pickSeed(o); o.swaps = {}; o.yacht = 0;
+    rerenderPlanner(); rememberCafes(o);
+    document.getElementById("planner")?.scrollIntoView({ block: "start" });
+    return;
+  }
   if (b.matches("[data-reroll]")) {   // 같은 조건으로 카페·식당만 새로 뽑기
     o.swaps = {}; o.seed = pickSeed(o);
     const h = location.hash.replace(/([?&])s=\d+/, "$1s=" + o.seed);
@@ -2689,7 +2796,10 @@ document.addEventListener("click", e => {
     else o.swaps[b.dataset.swap] = (o.swaps[b.dataset.swap] || 0) + 1;
   } else {
     const k = b.dataset.pl, v = b.dataset.val;
-    if (v === "toggle") o[k] = !o[k]; else o[k] = k === "day" ? Number(v) : v;
+    if (k === "rtime") o.time = Number(v);
+    else if (v === "toggle") o[k] = !o[k]; else o[k] = k === "day" ? Number(v) : v;
+    if (k === "slot") o.rawSlot = v;
+    if (k === "pet" && o.pet && o.party === "pet") o.party = "couple";
     if (k === "day" || k === "slot") o.movedFrom = "";
     if (k === "slot") o.time = null;
     o.yacht = 0; o.swaps = {};
@@ -2697,6 +2807,13 @@ document.addEventListener("click", e => {
   rerenderPlanner();
 });
 async function sharePlan() {
+  const o = window.__plan;
+  if (o && o.mode) {
+    const { date } = recWhen(o), names = recItemsForShare(o);
+    const data = { title: "요트핏 안목 추천", text: `${date.getMonth() + 1}월 ${date.getDate()}일 안목 추천\n` + names.map((n, i) => `${i + 1}. ${n}`).join("\n"), url: location.href };
+    try { if (navigator.share) { await navigator.share(data); return; } await navigator.clipboard.writeText(data.text + "\n" + data.url); toast("추천 목록을 복사했어요. 메신저에 붙여 넣으세요."); } catch (err) { /* 공유 취소 */ }
+    return;
+  }
   const plan = makePlan(window.__plan);
   const text = plan.steps.filter(s => s.kind !== "move").map(s => `${fmt(s.time)} ${s.title}`).join("\n");
   const url = location.href;
@@ -2931,7 +3048,14 @@ function pageHome() {
 
 // 안목 코스 페이지 (문장 입력 → 결과)
 // 코스 짜기 자료(약 470KB)는 첫 화면을 그린 뒤에 받아요. 코스 화면에서 아직이면 받은 뒤 다시 그려요.
-const COURSE_FILES = ["course-dict.js?v=18.4", "course-engine.js?v=21", "course-cases.js?v=18.4"];
+const COURSE_FILES = ["course-dict.js?v=22", "course-engine.js?v=22", "course-cases.js?v=22"];
+// 추천만 보여 주기 표(약 175KB)는 추천을 물어볼 때만 받아요. 없어도 같은 결과를 바로 계산해요.
+function loadRecs() {
+  if (window.COURSE_RECS || window.__recsLoading) return;
+  window.__recsLoading = true;
+  const s = document.createElement("script"); s.src = "course-recs.js?v=22"; s.onerror = () => { window.__recsLoading = false; };
+  document.head.appendChild(s);
+}
 function loadCourse() {
   if (window.YF && window.COURSE_DICT && window.COURSE_CASES) return Promise.resolve();
   return window.__courseLoading || (window.__courseLoading = COURSE_FILES.reduce((p, src) => p.then(() => new Promise((ok, fail) => {
@@ -2955,7 +3079,7 @@ function pagePlan(params) {
   if (window.__planKey !== key) {
     window.__planKey = key;
     window.__plan = planFromParams(params);
-    if (window.__plan) rememberCafes(window.__plan);
+    if (window.__plan) { rememberCafes(window.__plan); if (window.__plan.mode) loadRecs(); }
   }
   const q = params.get("q") || "";
   return `

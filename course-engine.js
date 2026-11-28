@@ -256,12 +256,39 @@
       if (n >= 1 && n <= 10) { o.afterBudget = n * 60 + (bm[2] ? 30 : 0); o.found.push(`내린 뒤 ${n}${bm[2] ? "시간 반" : "시간"}`); delete o.wants.longRide; o.found = o.found.filter(f => f !== "오래 타기"); }
     }
     // 시간대를 말하지 않고 "저녁은 ○○"처럼 저녁 식사를 말하면 노을 코스 뒤 저녁으로
-    if (!o.slot && o.time == null && /저녁/.test(raw) && (o.food || o.meal) && !o.cafeOnly) hit("slot", "sunset", "노을");
+    if (!o.slot && o.time == null && /저녁/.test(raw) && (o.food || o.meal) && !o.cafeOnly) { hit("slot", "sunset", "노을"); o._eveSlot = true; }
     // 손님이 말한 가게
     o.must = [...new Set(findAll("place", s).map(h => h.v))];
     if (o.must.length) o.found.push(...o.must.map(n => n.replace(/ (강릉|안목).*$/, "")));
     // 궁금한 것 (질문)
     o.ask = [...new Set(findAll("ask", s).map(h => h.v))];
+
+    // 추천만 원하는지: "카페 추천해줘", "맛집 알려줘", "요트만 추천", "카페랑 식당 추천"
+    const tg = new Set(findAll("target", s).map(h => h.v));
+    // 메뉴·빵만 말했을 땐 "어디서 팔아요?"처럼 가게를 묻는 말이 있어야 추천만 보여 줘요 ("대게 먹고 싶어요 추천해줘"는 하루 코스)
+    const askShop = /어디|어딨|파는\s*(곳|데|집)|맛있는\s*(곳|데|집)|잘하는\s*(곳|데|집)|유명한\s*(곳|데|집)|맛집/.test(raw);
+    if (!tg.size && askShop) { if (o.food) tg.add("food"); else if (o.bakery || o.wants.dessert) tg.add("cafe"); }
+    const endNoun = /(카페|커피숍|빵집|베이커리|디저트|식당|맛집|밥집|음식점|횟집|술집|레스토랑|요트투어|곳|데|집)\s*(는요|은요|요|좀|들)?\s*[?？.!~]*\s*$/.test(raw.trim()) || /요트\s*(추천|종류|비교|뭐|어떤)/.test(raw);
+    const verb = findAll("recVerb", s).length > 0 || /[?？]\s*$/.test(raw.trim()) || endNoun || (s.length <= 8 && !tg.has("yacht"));
+    // "카페만 알려줘"처럼 '만' 바로 뒤에 추천 말이 올 때만 (그냥 "카페만"은 코스에서 식사를 빼는 뜻)
+    const om = raw.match(/(카페|커피숍|빵집|디저트|식당|맛집|밥집|요트)\s*(만|위주로만|만요)\s*(좀\s*)?(추천|알려|보여|골라|찾아|소개|리스트|목록)/);
+    const only = !!om;
+    const onlyT = om ? (/카페|커피|빵집|디저트/.test(om[1]) ? "cafe" : /요트|배/.test(om[1]) ? "yacht" : "food") : null;
+    const sigs = findAll("courseSig", s).map(h => h.w);
+    const plain = !o.food && !o.meal && !o.cafeOnly && !o.cafeHop;
+    const strongSig = sigs.filter(w => !(tg.size === 1 && tg.has("yacht") && plain && /^타고/.test(w))).length > 0;
+    const orderSaid = (o.cafeOnly || o.cafeHop || o.foodFirst || o.cafeFirst || o.noAfter) && /요트|배\s*(타|에서)|타고|타면|탄\s*(뒤|후|다음)|내려|코스|일정/.test(raw);
+    if ((verb || only) && tg.size && (only || !orderSaid)) {
+      if (onlyT && tg.has(onlyT)) o.mode = onlyT;                 // "카페만 알려줘"는 다른 말이 있어도 카페만
+      else if (tg.size === 1 && (only || !strongSig)) o.mode = [...tg][0];
+      else if (tg.size === 2 && tg.has("cafe") && tg.has("food") && !strongSig) o.mode = "places";
+    }
+    if (o.mode) {
+      o.found.push({ cafe: "카페만 추천", food: "식당만 추천", yacht: "요트만 추천", places: "카페·식당 추천" }[o.mode]);
+      o.ask = (o.ask || []).filter(a => !["cafes", "foods", "courses"].includes(a));
+      if (o.noAfter) { o.noAfter = false; o.found = o.found.filter(f => f !== "탄 뒤 바로 출발"); }
+      if (o._eveSlot && o.mode !== "yacht") { o.slot = null; o.found = o.found.filter(f => f !== "노을"); o.found.push("저녁"); }
+    }
 
     // 예약·업체
     const co = best(findAll("company", s));
@@ -437,6 +464,138 @@
       move: { kind: "move", text: `마리나까지 걸어서 약 ${x.mv}분` } };
   }
 
+  /* ---------- 요트 순위 (사이트 index.html 의 rankYachts 가 이걸 불러요) ---------- */
+  const durMin = s => { const t = String(s || ""); const h = t.match(/(\d+)\s*시간/), m = t.match(/(\d+)\s*분/); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0) || 60; };
+  function rankYachts(o, D) {
+    const tag = (e, t) => (e.tags || []).includes(t);
+    const price = e => { const m = String(e.price || "").match(/([\d,]+)\s*원/); return m ? Number(m[1].replace(/,/g, "")) : 1e9; };
+    const ord = id => (D.companies || []).findIndex(c => c.id === id);
+    const list = (D.experiences || []).filter(e => e.type !== "special").map(e => {
+      let s = 0;
+      const pet = o.pet || o.party === "pet";
+      const wantPrivate = o.private || pet || (o.people || 0) >= 9;
+      if (pet) s += tag(e, "반려동물 동반") ? 100 : -100;
+      if (o.company) s += e.company === o.company ? 60 : 0;
+      const w = o.wants || {}, b = o.body || {};
+      if (o.senior || o.kid || b.pregnant || b.water || b.walkHard || w.shortRide) s += durMin(e.duration) <= 60 ? 12 : -6;
+      if (w.longRide) s += durMin(e.duration) >= 120 ? 15 : 0;
+      s += (e.type === "private") === !!wantPrivate ? 20 : -20;
+      if (o.slot === "am") s += tag(e, "오전") ? 30 : tag(e, "노을 시간대") ? -30 : 0;
+      if (o.slot === "sunset") s += tag(e, "노을 시간대") ? 30 : -30;
+      if (o.slot === "pm") s += (!tag(e, "오전") && !tag(e, "노을 시간대")) ? 30 : -10;
+      if (o.wine) s += /와인/.test(e.name) ? 40 : 0;
+      if (o.swim) s += /수영/.test(e.name) ? 40 : -5;
+      if (o.sick) s += durMin(e.duration) <= 60 ? 10 : -10;
+      if (o.cheap) s -= price(e) / 20000;
+      return { e, s, p: price(e), c: ord(e.company) };
+    });
+    return list.sort((a, b) => b.s - a.s || a.p - b.p || a.c - b.c).map(x => x.e);
+  }
+
+  /* ---------- 추천만 보여 주기 ---------- */
+  // 언제 기준으로 볼지: 말한 시각 > 시간대 > 문장 속 '점심·저녁' > 지금
+  function recTime(o, now) {
+    if (o.time != null) return o.time;
+    if (o.mode !== "yacht" && /아침|모닝|새벽/.test(String(o.q || ""))) return 9 * 60 + 30;
+    if (o.slot === "am") return o.mode === "yacht" ? 600 : 11 * 60 + 20;
+    if (o.slot === "pm") return o.mode === "yacht" ? 840 : 15 * 60 + 20;
+    if (o.slot === "sunset") return o.mode === "yacht" ? 990 : 18 * 60 + 20;
+    const q = String(o.q || "");
+    if (/저녁|디너|밤/.test(q)) return 18 * 60 + 30;
+    if (/점심|브런치|낮/.test(q)) return 12 * 60;
+    if ((o.day || 0) === 0 && now) return r10(now.getHours() * 60 + now.getMinutes());
+    return 14 * 60;
+  }
+  const CAFE_PREFS = ["none", "view", "bakery", "dessert", "quiet", "photo", "coffee", "work", "rooftop"];
+  const FOOD_PREFS = ["none", "대게", "회", "버거", "돈까스", "닭강정", "미역국", "피자", "꼬치", "beer"];
+  const YACHT_PREFS = ["none", "cheap", "private", "wine", "swim", "short", "long"];
+  function recPref(kind, o) {
+    const w = o.wants || {};
+    if (kind === "cafe") {
+      const on = CAFE_PREFS.slice(1).filter(k => k === "bakery" ? (o.bakery || w.bakery) : w[k]);
+      return on.length === 0 ? "none" : on.length === 1 ? on[0] : null;
+    }
+    if (kind === "food") {
+      if (o.food && w.beer) return null;
+      return o.food ? o.food : w.beer ? "beer" : "none";
+    }
+    if (o.sick) return null;
+    const on = [o.cheap && "cheap", o.private && "private", o.wine && "wine", o.swim && "swim", w.shortRide && "short", w.longRide && "long"].filter(Boolean);
+    return on.length === 0 ? "none" : on.length === 1 ? on[0] : null;
+  }
+  // 표로 바로 낼 수 있는지 (취향 하나 + 특별한 몸 상태·가게 이름 없음)
+  function simpleRec(kind, o) {
+    const allowed = kind === "cafe" ? CAFE_PREFS : kind === "food" ? ["beer"] : ["wine", "swim", "private", "cheap", "longRide", "shortRide"];
+    const extra = Object.keys(o.wants || {}).filter(k => o.wants[k] && !allowed.includes(k) && !(kind === "cafe" && k === "bakery"));
+    if (o.company || (o.car && (o.wants || {}).beer) || (kind !== "cafe" && o.bakery)) return false;
+    return recPref(kind, o) != null && !extra.length && !Object.keys(o.body || {}).some(k => o.body[k] && !(kind !== "yacht" && k === "sick"))
+      && !(o.must && o.must.length) && !(o.kid && o.party !== "family") && !(o.senior && o.party !== "senior");
+  }
+  const HOURS = { from: 9, n: 13 };     // 9시 ~ 21시, 한 시간 단위
+  function keyRec(kind, o, wd, min, w) {
+    const pi = DIM.party.indexOf(partyDim(o)), wi = DIM.weather.indexOf(weatherClass(w));
+    const pref = recPref(kind, o);
+    if (kind === "yacht") {
+      const si = ["none", "am", "pm", "sunset"].indexOf(o.slot || "none"), fi = YACHT_PREFS.indexOf(pref);
+      const ppl = !o.people ? 0 : o.people <= 2 ? 0 : o.people <= 8 ? 1 : 2;
+      if (si < 0 || fi < 0 || pi < 0) return -1;
+      return (((si * DIM.party.length + pi) * YACHT_PREFS.length + fi) * 3 + ppl);
+    }
+    const prefs = kind === "cafe" ? CAFE_PREFS : FOOD_PREFS, fi = prefs.indexOf(pref);
+    const h = Math.floor(min / 60) - HOURS.from;
+    if (h < 0 || h >= HOURS.n || fi < 0 || pi < 0 || wi < 0) return -1;
+    return ((((wd * HOURS.n + h) * DIM.party.length + pi) * prefs.length + fi) * DIM.weather.length + wi);
+  }
+  function lookupRec(kind, key) {
+    const C = root.COURSE_RECS; if (!C || key < 0) return null;
+    const code = (C[kind] || "").substr(key * C.w, C.w);
+    if (!code || code.length < C.w) return null;
+    const v = C.values[parseInt(code, 36)];
+    return v == null ? null : v === "" ? [] : v.split(",").map(n => parseInt(n, 36));
+  }
+  // 카페·식당 추천: [{p, open, sc, why:[...]}] (그 시각에 연 곳 먼저, 비슷하면 무작위)
+  function recommend(ctx) {
+    const { kind, o, wd, min, w = {}, P, n = 5 } = ctx;
+    const list = (kind === "cafe" ? P.cafe : P.food) || [];
+    let pool = null, fromTable = false;
+    if (simpleRec(kind, o)) {
+      const ids = lookupRec(kind, keyRec(kind, o, wd, Math.max(min, HOURS.from * 60), w));
+      if (ids) { pool = ids.map(i => list[i]).filter(Boolean); fromTable = true; }
+    }
+    const stay = STAY[kind];
+    const all = list.map(p => ({ p, open: openAt(p, wd, min, stay), sc: fitScore(p, kind, o, w, 0) }));
+    let open = all.filter(x => x.open);
+    const same = pool && pool.length === open.length && pool.every(p => open.some(x => x.p === p));
+    if (same) open = pool.map(p => open.find(x => x.p === p));
+    else fromTable = false;
+    // 손님이 말한 가게는 맨 앞
+    const must = new Set(o.must || []);
+    const ordered = order(open, kind, o, `rec${kind}${wd}${min}`);
+    const ranked = [...ordered.filter(x => must.has(x.p.name)), ...ordered.filter(x => !must.has(x.p.name))];
+    const closed = all.filter(x => !x.open).sort((a, b) => b.sc - a.sc);
+    const pick = ranked.slice(0, n);
+    if (pick.length < n) pick.push(...closed.slice(0, n - pick.length));
+    return { items: pick.map(x => ({ p: x.p, open: x.open, sc: x.sc, why: score(x.p, kind, o, w).why.filter(t => TAG_TEXT[t] || t === "menu").slice(0, 3) })), openCount: open.length, fromTable };
+  }
+  function recommendYachts(ctx) {
+    const { o, D, n = 5 } = ctx;
+    let ranked = null, fromTable = false;
+    if (simpleRec("yacht", o)) {
+      const ids = lookupRec("yacht", keyRec("yacht", o, 0, 0, {}));
+      if (ids && ids.length) { ranked = ids.map(i => D.experiences[i]).filter(Boolean); fromTable = true; }
+    }
+    if (!ranked) ranked = rankYachts(o, D);
+    // 반려동물이면 동반 가능한 코스만
+    if (o.pet || o.party === "pet") { const ok = ranked.filter(e => (e.tags || []).includes("반려동물 동반")); if (ok.length) ranked = ok; }
+    // 업체를 골고루: 업체마다 가장 잘 맞는 코스 하나씩 먼저, 그다음 나머지 (업체를 말했으면 그대로)
+    if (!o.company) {
+      const seen = new Set(), first = [], rest = [];
+      for (const e of ranked) (seen.has(e.company) ? rest : (seen.add(e.company), first)).push(e);
+      ranked = first.concat(rest);
+    }
+    return { items: ranked.slice(0, n), fromTable };
+  }
+
   /* ---------- 미리 계산 표 ---------- */
   const DIM = {
     party: ["couple", "family", "senior", "friends", "group", "solo", "pet"],
@@ -545,6 +704,6 @@
       move: { kind: "move", text: `마리나까지 걸어서 약 ${x.mv}분` } };
   }
 
-  root.YF = { endBuffer, planBeforeFast, order, fitScore, rng, PICK, parse, score, profile, planAfter, planAfterFast, planBefore, openAt, simple, keyAfter, keyBefore, lookup, weatherClass,
+  root.YF = { rankYachts, recommend, recommendYachts, recTime, recPref, simpleRec, keyRec, CAFE_PREFS, FOOD_PREFS, YACHT_PREFS, REC_HOURS: HOURS, durMin, endBuffer, planBeforeFast, order, fitScore, rng, PICK, parse, score, profile, planAfter, planAfterFast, planBefore, openAt, simple, keyAfter, keyBefore, lookup, weatherClass,
     DIM, STAY, hm, fmt, r10, isMeal, TAG_TEXT, PARTY_LABEL };
 })(typeof window !== "undefined" ? window : globalThis);
