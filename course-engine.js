@@ -244,8 +244,10 @@
     if (od.includes("noAfter")) hit("noAfter", true, "탄 뒤 바로 출발");
     if (od.includes("cafeOnly") && !o.cafeHop) { hit("cafeOnly", true, "식사 없이 카페로"); o.meal = false; o.food = null; o.found = o.found.filter(f => f !== "식사" && f !== fh?.v); }
     if (o.cafeHop && od.includes("cafeOnly")) { o.meal = false; o.food = null; o.found = o.found.filter(f => f !== "식사"); }
-    if (!o.cafeOnly && !o.cafeHop && !(o.foodFirst && /카페|커피/.test(raw)) && /(점심|아침|밥|식사|브런치|대게|회|버거|돈까스|돈가스|닭강정|미역국|피자|꼬치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(raw)
-        && !/(타고|탄\s*(뒤|후|다음)|내려서|내리고|끝나고)[^.]{0,10}(점심|저녁|밥|식사|먹)/.test(raw)) hit("preMeal", true, "타기 전 식사");
+    // "타기 전에 점심" 처럼 분명히 말하면 다른 말이 섞여도 타기 전 식사로 읽어요
+    const preSaid = /(타기|탑승하기|승선하기|출항)\s*전에?[^.]{0,12}(점심|아침|저녁|밥|식사|브런치|먹)/.test(raw);
+    if (!o.cafeOnly && !o.cafeHop && (preSaid || (!(o.foodFirst && /카페|커피/.test(raw)) && /(점심|아침|밥|식사|브런치|대게|회|버거|돈까스|돈가스|닭강정|미역국|피자|꼬치)[^.]{0,8}(먹고|먹은\s*(뒤|후|다음)|하고|한\s*(뒤|후|다음))/.test(raw)
+        && !/(타고|탄\s*(뒤|후|다음)|내려서|내리고|끝나고)[^.]{0,10}(점심|저녁|밥|식사|먹)/.test(raw)))) hit("preMeal", true, "타기 전 식사");
 
     // 내린 뒤 쓸 수 있는 시간 ("2시간만 있어요", "세 시간 정도 여유")
     const bm = raw.match(/(\d{1,2}|한|두|세|네|다섯)\s*시간\s*(반)?\s*(만|정도|쯤|밖에|가량)?\s*(있|머물|놀|여유|시간|남|돌아|뿐|가능|비어|빈다|비는)/);
