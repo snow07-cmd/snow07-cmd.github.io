@@ -2376,8 +2376,9 @@ function makePlan(o) {
   if (!o.booked && !o.day) {
     const now = new Date(), nm = now.getHours() * 60 + now.getMinutes();
     const dep0 = o.time != null ? o.time : slotTime(o.slot, now);
-    if (dep0 < nm + 30) { o.day = 1; moved = fmt(dep0); }
+    if (dep0 < nm + 30) { o.day = 1; o.movedFrom = fmt(dep0); }
   }
+  if (o.day === 1 && o.movedFrom) moved = o.movedFrom;
   const date = addDays(new Date(), o.day);
   const w = planWeather(o.day);
   const sunset = hm(D.live.sunset);
@@ -2689,6 +2690,7 @@ document.addEventListener("click", e => {
   } else {
     const k = b.dataset.pl, v = b.dataset.val;
     if (v === "toggle") o[k] = !o[k]; else o[k] = k === "day" ? Number(v) : v;
+    if (k === "day" || k === "slot") o.movedFrom = "";
     if (k === "slot") o.time = null;
     o.yacht = 0; o.swaps = {};
   }
