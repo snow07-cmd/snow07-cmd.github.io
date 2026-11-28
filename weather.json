@@ -1,16 +1,16 @@
 {
-  "updated": "08:35",
-  "updatedAt": "2026-11-28T08:35:03.558+09:00",
+  "updated": "09:04",
+  "updatedAt": "2026-11-28T09:04:20.252+09:00",
   "source": "기상청",
   "grid": {
     "nx": 94,
     "ny": 132
   },
   "current": {
-    "temp": 10.1,
-    "wind": 2.8,
+    "temp": 10.6,
+    "wind": 4.1,
     "wave": 0.6,
-    "water": 14.9,
+    "water": 14.6,
     "alert": "없음",
     "pty": ""
   },
