@@ -1,14 +1,14 @@
 {
-  "updated": "18:18",
-  "updatedAt": "2026-11-28T18:18:20.248+09:00",
+  "updated": "18:47",
+  "updatedAt": "2026-11-28T18:47:38.589+09:00",
   "source": "기상청",
   "grid": {
     "nx": 94,
     "ny": 132
   },
   "current": {
-    "temp": 10,
-    "wind": 4.3,
+    "temp": 8.8,
+    "wind": 3.1,
     "wave": 1.1,
     "water": 15.2,
     "alert": "없음",
@@ -52,6 +52,51 @@
       "tmin": 6,
       "wind": 1,
       "wave": 0.5
+    },
+    {
+      "date": "2026-12-03",
+      "sky": "흐림",
+      "tmax": 15,
+      "tmin": 9,
+      "wind": null,
+      "wave": 0.8,
+      "waveRange": "0.5~1"
+    },
+    {
+      "date": "2026-12-04",
+      "sky": "구름많음",
+      "tmax": 15,
+      "tmin": 8,
+      "wind": null,
+      "wave": 0.8,
+      "waveRange": "0.5~1"
+    },
+    {
+      "date": "2026-12-05",
+      "sky": "흐리고 한때 비",
+      "tmax": 13,
+      "tmin": 8,
+      "wind": null,
+      "wave": 1.5,
+      "waveRange": "0.5~2.5"
+    },
+    {
+      "date": "2026-12-06",
+      "sky": "흐리고 비",
+      "tmax": 12,
+      "tmin": 6,
+      "wind": null,
+      "wave": 1.8,
+      "waveRange": "1.5~2"
+    },
+    {
+      "date": "2026-12-07",
+      "sky": "흐리고 비",
+      "tmax": 10,
+      "tmin": 6,
+      "wind": null,
+      "wave": 3,
+      "waveRange": "1.5~4.5"
     }
   ]
 }
