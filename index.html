@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://raw.githubusercontent.com; frame-src https:; media-src https:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v18.6">
+  <meta name="site-version" content="v18.7">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -2354,7 +2354,7 @@ function askBox(q = "") {
         <textarea id="plan-q" name="q" rows="2" placeholder="${esc(PLAN_EXAMPLES[0])}">${esc(q)}</textarea>
         <button type="submit" class="ask-go">코스 짜기</button>
       </div>
-      <div class="ask-ex">${PLAN_EXAMPLES.map(x => `<button type="button" data-plan-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+      <div class="ask-ex">${PLAN_EXAMPLES.slice(0, 3).map(x => `<button type="button" data-plan-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
     </form>
     <details class="booked">
       <summary>요트를 이미 예약했어요</summary>
