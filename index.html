@@ -2929,7 +2929,7 @@ function pageHome() {
 
 // 안목 코스 페이지 (문장 입력 → 결과)
 // 코스 짜기 자료(약 470KB)는 첫 화면을 그린 뒤에 받아요. 코스 화면에서 아직이면 받은 뒤 다시 그려요.
-const COURSE_FILES = ["course-dict.js?v=18.4", "course-engine.js?v=18.4", "course-cases.js?v=18.4"];
+const COURSE_FILES = ["course-dict.js?v=18.4", "course-engine.js?v=21", "course-cases.js?v=18.4"];
 function loadCourse() {
   if (window.YF && window.COURSE_DICT && window.COURSE_CASES) return Promise.resolve();
   return window.__courseLoading || (window.__courseLoading = COURSE_FILES.reduce((p, src) => p.then(() => new Promise((ok, fail) => {
