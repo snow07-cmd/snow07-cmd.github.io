@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://raw.githubusercontent.com; frame-src https:; media-src https:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>요트핏 | 강릉 마리나 가이드</title>
-  <meta name="site-version" content="v18.7">
+  <meta name="site-version" content="v19">
   <!-- 사이트 버전 v11 (2026-11-26) -->
 
   <meta name="description" content="강릉 마리나의 체험, 가는 방법, 주변 관광, 안전 수칙을 한곳에서 확인하고 AI로 방문 코스를 추천받으세요.">
@@ -836,6 +836,31 @@ body { font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui
   .pl-move { padding-left: 64px; } .pl-move::before { left: 53px; }
 }
 
+/* ---------- 마리나 사진 칸 ---------- */
+.mphotos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+.mphoto { margin: 0; }
+.mphoto-frame { display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; border: 0; padding: 0; background: var(--soft); position: relative; cursor: default; }
+.mphoto-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+button.mphoto-frame { cursor: zoom-in; }
+button.mphoto-frame:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.mphoto-empty { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--primary); border: 1.5px dashed #B9CBD3; border-radius: 14px; font-size: 13px; font-weight: 700; }
+.mphoto-empty .icon { width: 28px; height: 28px; opacity: .7; }
+.mphoto figcaption { margin-top: 8px; }
+.mphoto figcaption b { display: block; font-size: 15px; font-weight: 800; }
+.mphoto figcaption span { display: block; font-size: 13px; color: var(--sub); margin-top: 1px; }
+.mphoto-view { position: fixed; inset: 0; z-index: 90; background: rgba(10, 22, 30, .88); display: grid; place-items: center; padding: 20px; }
+.mphoto-view img { max-width: 100%; max-height: 80vh; border-radius: 12px; }
+.mphoto-view p { color: #fff; margin-top: 10px; text-align: center; font-weight: 700; }
+.mphoto-view button { position: absolute; top: 14px; right: 14px; font: inherit; font-size: 15px; font-weight: 700; color: #fff; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.4); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+.place-photo { aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+.place-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.place-addr, .place-fee { font-size: 13px; color: var(--sub); }
+@media (max-width: 900px) { .mphotos { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) {
+  .mphotos { grid-template-columns: repeat(8, 68%); overflow-x: auto; scroll-snap-type: x mandatory; margin: 14px -16px 0; padding: 0 16px 6px; scroll-padding: 0 16px; scrollbar-width: none; }
+  .mphotos::-webkit-scrollbar { display: none; }
+  .mphoto { scroll-snap-align: start; }
+}
   </style>
 </head>
 <body>
@@ -1079,6 +1104,20 @@ window.SITE_DATA = {
      place(위치), hours(이용 시간), fee(요금)는 모르면 빼도 됩니다.
      label(칸 이름), short(칸 아래 한마디), pic(그림: toilet·park·wait·cafe·food·vest), sign("no" = 빨간 사선 = 없어요), head(펼쳤을 때 제목)
      예시) { name: "[시설 이름]", text: "[설명]", place: "[주소]", hours: "[09:00~18:00]", fee: "무료" } */
+  /* ---------- 마리나 사진 ----------
+     사진 파일을 저장소 photos 폴더에 올리고, src에 주소를 적으면 그 칸에 사진이 나와요. (비어 있으면 '사진 준비 중')
+     예시) { title: "대기실", caption: "출항 전 기다리는 곳", src: "photos/lounge.jpg" } */
+  photos: [
+    { title: "마리나 전경", caption: "강릉항 요트마리나 전체 모습", src: "" },
+    { title: "선착장·계류장", caption: "요트를 타고 내리는 곳", src: "" },
+    { title: "대기실", caption: "출항 전 기다리는 곳", src: "" },
+    { title: "요트", caption: "타게 될 요트 모습", src: "" },
+    { title: "요트 안·갑판", caption: "앉는 자리와 선실", src: "" },
+    { title: "화장실", caption: "안목 여행자센터 화장실 (마리나 안에는 없어요)", src: "" },
+    { title: "주차장", caption: "강릉항 공영주차장", src: "" },
+    { title: "산책로", caption: "안목해변 산책로와 솔바람다리", src: "" }
+  ],
+
   facilities: [
     { label: "화장실", short: "마리나 안 없음", pic: "toilet", sign: "no", head: "화장실은 안목 여행자센터에서", name: "화장실",
       text: "마리나 안에는 화장실이 없어요. 가까운 강릉 안목 여행자센터 화장실을 이용해 주세요.",
@@ -1233,6 +1272,22 @@ window.SITE_DATA = {
         hoursText: "언제나", text: "카페거리를 따라 이어지는 해변 산책로예요. 노을 보기 좋아요." },
       { name: "솔바람다리", walk: 0, walkText: "마리나 바로 옆", night: true,
         hoursText: "언제나, 밤에는 조명", text: "남항진과 안목을 잇는 걷는 다리예요. 밤에 조명이 켜져요." }
+    ],
+    // 주변 관광지: 운영시간·요금은 인터넷 공개 자료 기준 (2026-11 확인). 걸어서 몇 분은 팀 확인 후 walk에 숫자로
+    sights: [
+      { name: "강릉 커피거리", walkText: "마리나 바로 앞", map: true,
+        hoursText: "언제나 (가게마다 영업시간이 달라요)", text: "안목해변을 따라 바다가 보이는 카페가 줄지어 있는 거리예요." },
+      { name: "남항진 해변", walkText: "솔바람다리 건너편", map: true,
+        hoursText: "언제나", text: "솔바람다리를 건너면 닿는 조용한 해변이에요. 다리 야경과 함께 걷기 좋아요." },
+      { name: "아라나비", addr: "강릉시 공항길127번길 35-7", walkText: "남항진 쪽", map: true,
+        hoursText: "화~일 10:00~17:00, 월 12:00~16:30", fee: "짚라인 1인 20,000원",
+        text: "높은 타워에서 바다 위를 가로질러 내려오는 짚라인(약 600m)과 바다하늘자전거를 탈 수 있어요. 날씨에 따라 편도만 운영하기도 해요." },
+      { name: "환희컵박물관", addr: "강릉시 해안로 10 (견소동)", walkText: "안목 근처", map: true,
+        hoursText: "09:30~18:00 (겨울 17:00까지), 휴관일은 방문 전 확인", fee: "어른 10,000원",
+        text: "세계 여러 나라의 컵을 모아 둔 박물관이에요. 컵 만들기 같은 체험도 있어 아이와 가기 좋아요." },
+      { name: "장길환미술관", addr: "강릉시 해안로 10", walkText: "안목 근처", map: true,
+        hoursText: "09:00~18:00, 월요일 휴관 (방문 전 확인)", fee: "어른 10,000원",
+        text: "가족이 함께 보기 좋은 전시와 체험을 하는 사립 미술관이에요. 환희컵박물관과 주소가 같아요." }
     ]
   },
 
@@ -1325,6 +1380,7 @@ const isEmpty = list => !list || list.length === 0;
 
 // 간단한 아이콘 (선 그림)
 const ICON = {
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   home: '<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/>',
   sun: '<circle cx="9" cy="9" r="3.5"/><path d="M9 2v1.5M2 9h1.5M4 4l1 1M14 4l-1 1"/><path d="M10 20h9a3 3 0 0 0 0-6 4.5 4.5 0 0 0-8.6 1.2A2.4 2.4 0 0 0 10 20z"/>',
   boat:   '<path d="M3 17l2 3h14l2-3H3z"/><path d="M12 3v11"/><path d="M12 4l6 9h-6"/><path d="M12 6l-5 7h5"/>',
@@ -1723,11 +1779,50 @@ function pageMarina() {
     ${pageHead("", "마리나 소개", "강릉항 요트마리나가 어떤 곳인지, 어떤 시설이 있는지 알려 드려요.")}
     <section class="section"><div class="container">
       ${body}
+      <h2 class="section-title mt-48" id="photos">사진으로 보는 마리나</h2>
+      <p class="muted fac-sub">처음 오는 분도 미리 둘러볼 수 있게 마리나 곳곳의 모습을 모았어요</p>
+      ${marinaPhotos()}
       <h2 class="section-title mt-48" id="facilities">마리나 시설</h2>
       <p class="muted fac-sub">누르면 주소와 시간이 나와요</p>
       ${facilities}
     </div></section>`;
 }
+function marinaPhotos() {
+  const list = D.photos || [];
+  if (!list.length) return preparing("사진 준비 중입니다");
+  const cols = list.length;
+  return `<div class="mphotos" style="--n:${cols}">${list.map((ph, i) => {
+    const src = safeImg(ph.src);
+    return `<figure class="mphoto">
+      ${src ? `<button type="button" class="mphoto-frame" data-photo="${i}" aria-label="${esc(ph.title)} 크게 보기"><img src="${esc(src)}" alt="${esc(ph.title)}" loading="lazy"></button>`
+            : `<div class="mphoto-frame"><div class="mphoto-empty">${icon("camera", 28)}사진 준비 중</div></div>`}
+      <figcaption><b>${esc(ph.title)}</b>${ph.caption ? `<span>${esc(ph.caption)}</span>` : ""}</figcaption>
+    </figure>`;
+  }).join("")}</div>`;
+}
+// 사진 주소: 같은 사이트의 파일(photos/...)이나 https 주소만
+function safeImg(u) {
+  const s = String(u || "").trim();
+  if (!s) return "";
+  if (/^https:\/\//i.test(s)) return s;
+  if (/^[\w\-./]+\.(jpe?g|png|webp|avif|gif)$/i.test(s) && !s.includes("..")) return s;
+  return "";
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-photo]");
+  if (b) {
+    const ph = (D.photos || [])[Number(b.dataset.photo)]; if (!ph) return;
+    const v = document.createElement("div");
+    v.className = "mphoto-view"; v.setAttribute("role", "dialog"); v.setAttribute("aria-label", ph.title);
+    v.innerHTML = `<div><img src="${esc(safeImg(ph.src))}" alt="${esc(ph.title)}"><p>${esc(ph.title)}${ph.caption ? " · " + esc(ph.caption) : ""}</p></div><button type="button" data-photo-close>닫기</button>`;
+    document.body.appendChild(v); v.querySelector("button").focus();
+    return;
+  }
+  const c = e.target.closest && (e.target.closest("[data-photo-close]") || (e.target.classList && e.target.classList.contains("mphoto-view") ? e.target : null));
+  if (c) document.querySelector(".mphoto-view")?.remove();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelector(".mphoto-view")?.remove(); });
+
 function facDetail(f) {
   const rows = [
     f.place ? `<li>${icon("pin", 16)} ${esc(f.place)}</li>` : "",
@@ -2798,16 +2893,19 @@ function placeCard(p) {
         <h3>${esc(p.name)}</h3>
         <span class="walk">${esc(p.walkText || (p.walk != null ? `걸어서 ${p.walk}분` : ""))}</span>
       </div>
+      ${safeImg(p.photo) ? `<div class="place-photo"><img src="${esc(safeImg(p.photo))}" alt="${esc(p.name)}" loading="lazy"></div>` : ""}
       ${p.menu ? `<p class="place-menu">${esc(p.menu)}</p>` : ""}
       ${p.text ? `<p class="place-text">${esc(p.text)}</p>` : ""}
+      ${p.addr && !p.link ? `<p class="place-addr">${icon("pin", 14)} ${esc(p.addr)}</p>` : ""}
+      ${p.fee ? `<p class="place-fee">${esc(p.fee)}</p>` : ""}
       <p class="place-hours">${st ? `<b class="${/영업 중/.test(st) ? "open" : "closed"}">${st}</b>` : ""}${esc(p.hoursText || "")}</p>
       ${p.parking ? `<p class="place-park">${icon("parking", 14)} ${esc(p.parking)}</p>` : ""}
-      ${p.link ? mapLinks(p) : ""}
+      ${p.link || p.map ? mapLinks(p) : ""}
     </div>`;
 }
 function pageTour(kind) {
   const P = D.places || {};
-  const tabs = [ { key: "cafe", label: "카페" }, { key: "food", label: "식당" }, { key: "walk", label: "산책·야경" } ];
+  const tabs = [ { key: "cafe", label: "카페" }, { key: "food", label: "식당" }, { key: "walk", label: "산책·야경" }, { key: "sights", label: "관광지" } ];
   const cur = tabs.find(t => t.key === kind) ? kind : "cafe";
   const list = (P[cur] || []).slice().sort((a, b) => (a.walk ?? 99) - (b.walk ?? 99));
   return `
